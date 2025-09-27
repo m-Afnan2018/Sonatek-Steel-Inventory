@@ -165,6 +165,26 @@ const addVarient = async (req, res) => {
     }
 }
 
+const getAllVarients = async(req, res) =>{
+    try{
+        // Performing Task
+        const cutters = await Cutter.find({});
+        const grades = await Grade.find({})
+        const thickness = await Thickness.find({});
+        const widths = await Width.find({});
+
+        res.status(200).json({
+            success: true,
+            cutters, 
+            grades, 
+            thickness,
+            widths
+        })
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
 const getVarients = async (req, res) => {
     try {
         const { type } = req.query;
@@ -285,6 +305,7 @@ module.exports = {
     deleteItem,
     addVarient,
     getVarients,
+    getAllVarients,
     updateVarient,
     deleteVarient
 }
