@@ -94,9 +94,27 @@ const getOrder = async (req, res) => {
     }
 };
 
-model.exports = {
+const getAllOrders = async(req, res) =>{
+    try{
+
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
+const getMyOrders = async(req, res)=>{
+    try{
+
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
+module.exports = {
     createOrder,
     updateOrder,
     deleteOrder,
-    getOrder
+    getOrder,
+    getAllOrders,
+    getMyOrders
 }
