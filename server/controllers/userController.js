@@ -1,0 +1,183 @@
+const bcrypt = require('bcrypt');
+const { customError, errorResponse } = require("../utils/errorHandler");
+const User = require("../models/userModel");
+
+const updateUser = async(req, res) => {
+    try {
+        // Fetching
+        const { firstName, lastName, password, userId } = req.body;
+
+
+        // Validation
+        if (!userId) {
+            throw customError('User ID is required', 400);
+        }
+
+        // Update logic here (e.g., find user and update fields)
+        const user = await User.findById(userId);
+        if (!user) {
+            throw customError('User not found', 404);
+        }
+
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+
+        const updatedUser = await user.save();
+
+        // Response
+        res.status(200).json({
+            success: true,
+            message: 'User updated successfully',
+            user: updatedUser
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const deleteUser = async(req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.params;
+
+        // Validation
+        if (!userId) {
+            throw customError(400, 'User ID is required');
+        }
+
+        // Deletion logic here (e.g., find user and delete)
+        const user = await User.findById(userId);
+        if (!user) {
+            throw customError(404, 'User not found');
+        }
+
+        await user.remove();
+
+        // Response
+        res.status(200).json({
+            success: true,
+            message: 'User deleted successfully'
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const getUserDetails = async(req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.params;
+
+        // Validation
+        if (!userId) {
+            throw customError(400, 'User ID is required');
+        }
+        const user = await user.findById(userId);
+        if (!user) {
+            throw customError(404, 'User not found');
+        }
+
+        // Response
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const listUsers = async(req, res) => {
+    try {
+        // Fetching
+        const users = await User.find();
+
+        // Response
+        res.status(200).json({
+            success: true,
+            users
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const updateUserRole = async(req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.params;
+        const { role } = req.body;
+
+        // Validation
+        if (!userId) {
+            throw customError(400, 'User ID is required');
+        }
+
+        if (!role || !['admin', 'director', 'inventory_associate', 'agent', 'accountant'].includes(role)) {
+            throw customError(400, 'Invalid role specified');
+        }
+
+        // Update logic here (e.g., find user and update role)
+        const user = await User.findById(userId);
+        if (!user) {
+            throw customError(404, 'User not found');
+        }
+
+        user.role = role;
+        const updatedUser = await user.save();
+
+        // Response
+        res.status(200).json({
+            success: true,
+            message: 'User role updated successfully',
+            user: updatedUser
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const verifyUser = async(req, res)=>{
+    try{
+        // Fetching
+        const { userId } = req.body;
+        if(!userId){
+            throw customError(400, 'User ID is required');
+        }
+
+        // Validation
+        const user = await User.findById(userId);
+        if(!user){
+            throw customError(404, 'User not found');
+        }
+        if(user.isVerified){
+            throw customError(400, 'User is already verified');
+        }
+
+        // Verification logic here
+        user.isVerified = true;
+        await user.save();
+
+        // Response
+        res.status(200).json({
+            success: true,
+            message: 'User verified successfully',
+        });
+
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
+module.exports = {
+    updateUser,
+    deleteUser,
+    updateUserRole,
+    getUserDetails,
+    listUsers,
+    verifyUser
+};
