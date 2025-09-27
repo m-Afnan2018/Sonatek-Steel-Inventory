@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
+const OTP  = require('../models/otpModel')
 const jwt = require('jsonwebtoken')
 const { customError, errorResponse } = require('../utils/errorHandler');
 const generateNumericOTP = require('../utils/otpGenerator');
+const sendMail = require('../utils/mailSender');
+const { forgetPasswordMail } = require('../mails/forgetPassword');
 
 const createDirector = async (req, res) => {
     try {
@@ -60,6 +63,10 @@ const registerUser = async (req, res) => {
         }
         if (role && !['admin', 'director', 'inventory_associate', 'agent', 'accountant'].includes(role)) {
             throw customError(400, 'Invalid role specified');
+        }
+        const alreadyRegisteredEmail = await    User.findOne({email});
+        if(alreadyRegisteredEmail){
+            throw customError('This email is already registered', 304);
         }
 
         // Registration logic here (e.g., save user to database)
@@ -148,12 +155,31 @@ const forgetPassword = async (req, res) => {
         if (!user) {
             throw customError(404, 'User not found');
         }
+        const oldOtp = await OTP.findOne({ email })
 
-        // Password reset logic here (e.g., generate token, send email)
-        const otp = generateNumericOTP(6);
+        if (oldOtp) {
+            if (oldOtp.retries > 5) {
+                throw customError('OTP generation limit reached', 501);
+            }
+            await OTP.findByIdAndUpdate(oldOtp._id, {
+                retries: oldOtp.retries + 1,
+            })
+            await sendMail(
+                email,
+                "Forget Password - Sonatek Steel Inventory",
+                forgetPasswordMail(oldOtp.otp)
+            );
+        } else {
+            // Password reset logic here (e.g., generate token, send email)
+            const otp = generateNumericOTP(6);
 
-        // Send email with reset link (pseudo-code)
-        await sendMail(user.email, 'Password Reset', `Your OTP is: ${otp}`);
+            const newOtp = new OTP({
+                email, otp
+            })
+
+            await newOtp.save();
+        }
+
 
         // Response
         res.status(200).json({
@@ -165,9 +191,52 @@ const forgetPassword = async (req, res) => {
     }
 };
 
+const resetPassword = async(req, res) => {
+    try{
+        // Fetching
+        const { email, password, otp } = req.body;
+
+        // Validation 
+        if(!email || !password || !otp){
+            throw customError("All fields are required", 404);
+        }
+        if(password.length < 8){
+            throw customError("Password length should be atleast 8", 400);
+        }
+        const otpCheck = await  OTP.findOne({email});
+        if(!otpCheck){
+            throw customError("No reset password request found", 401);
+        }
+        console.log(otpCheck)
+        if(otpCheck.otp !== Number(otp)){
+            otpCheck.checkRetries += 1;
+            otpCheck.save();
+            throw customError("OTP mismatched", 401);
+        }
+        if(otpCheck.checkRetries > 5){
+            throw customError("Maximum number of limit reached for this account", 502);
+        }
+
+        // Performing Task
+        const hashPassword = await bcrypt.hash(password, 10);
+        await User.findOneAndUpdate({email}, {
+            password: hashPassword
+        })
+
+        // Send Response
+        res.status(200).json({
+            succes: true, 
+            message: "Successfully changed the password of the user"
+        })
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
 module.exports = {
     createDirector,
     registerUser,
     loginUser,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 }

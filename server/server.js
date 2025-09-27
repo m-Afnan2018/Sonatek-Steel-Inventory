@@ -25,8 +25,14 @@ app.route('/').get((req, res) => {
 
 // Importing routes
 const authRoutes = require('./routes/authRoutes')
+const userRoutes = require('./routes/userRoutes')
+const itemRoutes = require('./routes/itemRoutes')
+const orderRoutes = require('./routes/orderRoutes')
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/item', itemRoutes);
+app.use('api/v1/order', orderRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}:  http://localhost:${port}`);

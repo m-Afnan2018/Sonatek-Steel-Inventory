@@ -1,24 +1,30 @@
 const { default: mongoose } = require("mongoose");
+const sendMail = require("../utils/mailSender");
+const { forgetPasswordMail } = require("../mails/forgetPassword");
 
 const otpSchema = new mongoose.Schema({
     email: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
     },
     otp: {
         type: Number,
         required: true
     },
-	retries: {
+	sendRetries: {
 		type: Number,
-		default: 0,
+		default: 1,
+		max: 5
+	},
+	checkRetries: {
+		type: Number,
+		default: 1,
 		max: 5
 	},
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: '1h'
+        expires: '15m'
     }
 });
 
@@ -26,10 +32,10 @@ const otpSchema = new mongoose.Schema({
 async function sendVerificationEmail(email, otp) {
 	// Send the email
 	try {
-		const mailResponse = await mailSender(
+		const mailResponse = await sendMail(
 			email,
 			"Forget Password - Sonatek Steel Inventory",
-			emailTemplate(otp)
+			forgetPasswordMail(otp)
 		);
 		console.log("Email sent successfully: ", mailResponse.response);
 	} catch (error) {

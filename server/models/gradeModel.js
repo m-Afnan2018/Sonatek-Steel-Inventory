@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
 const gradeSchema = new mongoose.Schema({
-    name: {
+    grade: {
         type: String, 
     }
 })

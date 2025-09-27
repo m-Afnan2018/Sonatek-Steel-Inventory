@@ -7,7 +7,6 @@ const updateUser = async(req, res) => {
         // Fetching
         const { firstName, lastName, password, userId } = req.body;
 
-
         // Validation
         if (!userId) {
             throw customError('User ID is required', 400);
@@ -42,7 +41,7 @@ const updateUser = async(req, res) => {
 const deleteUser = async(req, res) => {
     try {
         // Fetching
-        const { userId } = req.params;
+        const { userId } = req.user;
 
         // Validation
         if (!userId) {
@@ -50,12 +49,10 @@ const deleteUser = async(req, res) => {
         }
 
         // Deletion logic here (e.g., find user and delete)
-        const user = await User.findById(userId);
+        const user = await User.findByIdAndDelete(userId);
         if (!user) {
             throw customError(404, 'User not found');
         }
-
-        await user.remove();
 
         // Response
         res.status(200).json({
@@ -67,18 +64,43 @@ const deleteUser = async(req, res) => {
     }
 };
 
+const removeUser = async(req, res)=>{
+    try{
+        // Fetching
+        const { userId } = req. body;
+
+        // Validation
+        if(!userId){
+            throw customError("User ID is required", 404);
+        }
+        const user = await User.findByIdAndDelete(userId);
+
+        if(!user){
+            throw customError("Unable to find the user", 401);
+        }
+
+        // Send Response
+        res.status(200).json({
+            success: true, 
+            message: "Sucessfully deleted the user"
+        })
+    }catch(err){
+        errorResponse(res, err);
+    }
+}
+
 const getUserDetails = async(req, res) => {
     try {
         // Fetching
-        const { userId } = req.params;
+        const { userId } = req.user;
 
         // Validation
         if (!userId) {
-            throw customError(400, 'User ID is required');
+            throw customError('User ID is required', 400);
         }
-        const user = await user.findById(userId);
+        const user = await User.findById(userId);
         if (!user) {
-            throw customError(404, 'User not found');
+            throw customError('User not found', 404);
         }
 
         // Response
@@ -109,22 +131,21 @@ const listUsers = async(req, res) => {
 const updateUserRole = async(req, res) => {
     try {
         // Fetching
-        const { userId } = req.params;
-        const { role } = req.body;
+        const { userId, role } = req.body;
 
         // Validation
         if (!userId) {
-            throw customError(400, 'User ID is required');
+            throw customError('User ID is required', 400);
         }
 
         if (!role || !['admin', 'director', 'inventory_associate', 'agent', 'accountant'].includes(role)) {
-            throw customError(400, 'Invalid role specified');
+            throw customError('Invalid role specified', 400);
         }
 
         // Update logic here (e.g., find user and update role)
         const user = await User.findById(userId);
         if (!user) {
-            throw customError(404, 'User not found');
+            throw customError('User not found', 404);
         }
 
         user.role = role;
@@ -152,10 +173,10 @@ const verifyUser = async(req, res)=>{
         // Validation
         const user = await User.findById(userId);
         if(!user){
-            throw customError(404, 'User not found');
+            throw customError('User not found', 404);
         }
         if(user.isVerified){
-            throw customError(400, 'User is already verified');
+            throw customError('User is already verified', 400);
         }
 
         // Verification logic here
@@ -179,5 +200,6 @@ module.exports = {
     updateUserRole,
     getUserDetails,
     listUsers,
-    verifyUser
+    verifyUser,
+    removeUser,
 };
