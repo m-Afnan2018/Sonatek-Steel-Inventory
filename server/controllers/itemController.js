@@ -1,15 +1,37 @@
 
 const { customError, errorResponse } = require("../utils/errorHandler");
 const Item = require("../models/itemModel");
+const Thickness = require('../models/thicknessModel')
+const Cutter = require('../models/cutterModel')
+const Grade = require('../models/gradeModel')
+const Width = require('../models/widthModel')
 
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, formType, width, weight, thickness, wagonNumber, challanNumber, challanDate, quantity, pricePerUnit } = req.body;
+        const { type, grade, formType, width, weight, thickness, wagonNumber, challan, quantity, pricePerUnit, shipTo } = req.body;
+        const { challanNumber, challanDate } = challan;
 
         // Validation
         if (!type || !grade || !formType || !width || !weight || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity || !pricePerUnit) {
             throw customError('All fields are required', 400);
+        }
+        const cutterChecker = await Cutter.findById(shipTo);
+        const widthChecker = await Width.findById(width);
+        const thicknessChecker = await Thickness.findById(thickness);
+        const gradeChecker = await Grade.findById(grade)
+
+        if (!thicknessChecker) {
+            throw customError("Invalid Thickness is Selected",);
+        }
+        if (!gradeChecker) {
+            throw customError("Invaldi Grade is selected");
+        }
+        if (!widthChecker) {
+            throw customError('Invalid Width is selected');
+        }
+        if (!cutterChecker) {
+            throw customError('Invalid Cutter is selected');
         }
 
         // Create new item
@@ -25,6 +47,7 @@ const addItem = async (req, res) => {
                 challanNumber,
                 challanDate
             },
+            shipTo,
             quantity,
             pricePerUnit
         });
@@ -42,10 +65,10 @@ const addItem = async (req, res) => {
 
 const updateItem = async (req, res) => {
     try {
-        const { id } = req.params;
         const updateData = req.body;
 
         // Prevent updating _id
+        const id = updateData._id;
         if (updateData._id) delete updateData._id;
 
         // If challan fields are present, nest them
@@ -75,10 +98,12 @@ const updateItem = async (req, res) => {
 
 const getItem = async (req, res) => {
     try {
-        const { id } = req.params;
-        const item = await Item.findById(id)
+        const { itemId } = req.body;
+        const item = await Item.findById(itemId)
             .populate('width')
             .populate('thickness')
+            .populate('shipTo')
+            .populate('grade')
             .populate('weight');
         if (!item) throw customError('Item not found', 404);
         res.status(200).json({
@@ -95,6 +120,8 @@ const getAllItem = async (req, res) => {
         const items = await Item.find()
             .populate('width')
             .populate('thickness')
+            .populate('shipTo')
+            .populate('grade')
             .populate('challan');
         res.status(200).json({
             success: true,
@@ -107,8 +134,8 @@ const getAllItem = async (req, res) => {
 
 const deleteItem = async (req, res) => {
     try {
-        const { id } = req.params;
-        const deleted = await Item.findByIdAndDelete(id);
+        const { itemId } = req.body;
+        const deleted = await Item.findByIdAndDelete(itemId);
         if (!deleted) throw customError('Item not found', 404);
         res.status(200).json({
             success: true,
@@ -165,8 +192,8 @@ const addVarient = async (req, res) => {
     }
 }
 
-const getAllVarients = async(req, res) =>{
-    try{
+const getAllVarients = async (req, res) => {
+    try {
         // Performing Task
         const cutters = await Cutter.find({});
         const grades = await Grade.find({})
@@ -175,12 +202,12 @@ const getAllVarients = async(req, res) =>{
 
         res.status(200).json({
             success: true,
-            cutters, 
-            grades, 
+            cutters,
+            grades,
             thickness,
             widths
         })
-    }catch(err){
+    } catch (err) {
         errorResponse(res, err);
     }
 }
@@ -272,13 +299,13 @@ const deleteVarient = async (req, res) => {
         // Step 2: Check if variant is used in Products
         let isUsed = false;
         if (type === 'thickness') {
-            isUsed = await Item.exists({ thickness: variantDoc.thickness });
+            isUsed = await Item.exists({ thickness: variantDoc._id });
         } else if (type === 'grade') {
-            isUsed = await Item.exists({ grade: variantDoc.grade });
+            isUsed = await Item.exists({ grade: variantDoc._id });
         } else if (type === 'width') {
-            isUsed = await Item.exists({ width: variantDoc.width });
+            isUsed = await Item.exists({ width: variantDoc._id });
         } else if (type === 'cutter') {
-            isUsed = await Item.exists({ cutter: variantDoc.name });
+            isUsed = await Item.exists({ shipTo: variantDoc._id });
         }
 
         if (isUsed) {

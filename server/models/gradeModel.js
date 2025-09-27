@@ -3,7 +3,8 @@ const { default: mongoose } = require("mongoose");
 const gradeSchema = new mongoose.Schema({
     grade: {
         type: String, 
+        required: true,
     }
 })
 
-model.exports = mongoose.model('Grade', gradeSchema);
+module.exports = mongoose.model('Grade', gradeSchema);
