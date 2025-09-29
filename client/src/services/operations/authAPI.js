@@ -6,7 +6,6 @@ import { authEndpoints } from "../apis";
 export async function login(email, password, dispatch) {
     try {
         dispatch(setLoader(true));
-        dispatch(setIsLogin(true));
         console.log(`Email: ${email}, Password: ${password}`)
 
         const response = await apiConnector('POST', authEndpoints.LOGIN, {
@@ -16,10 +15,12 @@ export async function login(email, password, dispatch) {
         console.log(response);
 
         dispatch(setLoader(false));
+
+        return true;
     } catch (err) {
         dispatch(setLoader(false));
-        dispatch(setIsLogin(false));
         console.log(err);
+        return false;
     }
 
 }
@@ -27,32 +28,38 @@ export async function login(email, password, dispatch) {
 export async function signup(firstName, lastName, email, password, dispatch) {
     try {
         dispatch(setLoader(true));
-        dispatch(setIsLogin(true));
         const response = await apiConnector('POST', authEndpoints.SIGNUP, {
             firstName, lastName, email, password
         })
 
 
         console.log(response);
+
+        dispatch(setLoader(false));
+        return true;
     } catch (err) {
         dispatch(setLoader(false));
-        dispatch(setIsLogin(false));
         console.log(err)
+        return false;
     }
 }
 
 export async function sendLink(email, dispatch) {
     try {
         dispatch(setLoader(true));
+        dispatch(setIsLogin(false))
         const response = await apiConnector('POST', authEndpoints.FORGET_PASSWORD, {
             email
         })
 
         dispatch(setLoader(false));
-        
+
         console.log(response);
+
+        return true;
     } catch (err) {
         dispatch(setLoader(false));
         console.log(err);
+        return false;
     }
 }

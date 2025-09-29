@@ -18,10 +18,11 @@
 
 .heading {
     background: rgba(0, 31, 43, 1);
-    height: 48px;
+    height: 64px;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0.5rem;
 }
 
 .heading>img {

@@ -5,27 +5,34 @@ import Signup from '../../components/core/Auth/Signup';
 import ForgetPassword from '../../components/core/Auth/ForgetPassword';
 import logo from '../../assets/images/logo.svg'
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import ResetPassword from '../../components/core/Auth/ResetPassword';
 
 const Auth = () => {
     const [path, setPath] = useState('login')
     const { loader } = useSelector((state) => state.auth)
 
-    useEffect(()=>{
-        console.log("Value : ", loader);
-    }, [loader])
+    const location = useLocation();
 
+    // eslint-disable-next-line eqeqeq
+    useEffect(() => {
+        if (location.pathname.toLocaleLowerCase() == '/resetpassword') {
+            setPath('resetPassword')
+        }
+    }, [location.pathname])
     return (
         <div className={style.Auth}>
             <div className={style.container}>
                 <div className={style.heading}>
                     <img src={logo} alt='SONATEK STEELS LOGO' />
                 </div>
-                { loader && <div className={style.loaderContainer}>
-                    <div className='loader'/>
+                {loader && <div className={style.loaderContainer}>
+                    <div className='loader' />
                 </div>}
-                { !loader && path === 'login' && <Login setPath={setPath} />}
-                { !loader && path === 'signup' && <Signup setPath={setPath} />}
-                { !loader && path === 'forgetPassword' && <ForgetPassword setPath={setPath} />}
+                {!loader && path === 'login' && <Login setPath={setPath} />}
+                {!loader && path === 'signup' && <Signup setPath={setPath} />}
+                {!loader && path === 'forgetPassword' && <ForgetPassword setPath={setPath} />}
+                {!loader && path === 'resetPassword' && <ResetPassword setPath={setPath} />}
             </div>
         </div>
     )

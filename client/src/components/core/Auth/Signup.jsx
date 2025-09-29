@@ -17,15 +17,18 @@ const Signup = ({ setPath }) => {
 
     const dispatch = useDispatch();
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
 
-        if(!email || !firstName || !lastName || !password || !confirmPassword || password!==confirmPassword){
+        if (!email || !firstName || !lastName || !password || !confirmPassword || password !== confirmPassword) {
             setShowError(true);
             return;
         }
 
-        signup(firstName, lastName, email, password, dispatch);
+        const response = await signup(firstName, lastName, email, password, dispatch);
+        if(response){
+            setPath('login');
+        }
     }
 
     return (

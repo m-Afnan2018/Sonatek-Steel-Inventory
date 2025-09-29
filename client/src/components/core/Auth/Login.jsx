@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import style from './Auth.module.css'
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { login } from '../../../services/operations/authAPI';
+import { setIsLogin } from '../../../slices/authSlice';
 
 const Login = ({ setPath }) => {
     const [email, setEmail] = useState('');
@@ -14,7 +15,11 @@ const Login = ({ setPath }) => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-       login(email, password, dispatch)
+        const response = await login(email, password, dispatch)
+
+        if (response) {
+            dispatch(setIsLogin(true));
+        }
 
         console.log(`Email: ${email}, Password: ${password}`)
     }
