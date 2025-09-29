@@ -1,0 +1,37 @@
+.Auth {
+    height: 100dvh;
+    width: 100dvw;
+    background: radial-gradient(50.00% 50.00% at 50% 50%, rgba(8, 81, 109, 1), rgba(0, 31, 43, 1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 60dvw;
+    max-width: 500px;
+    background-color: rgb(145, 182, 214);
+    border-radius: 6px;
+    box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 1);
+    background: rgba(255, 255, 255, 1);
+}
+
+.heading {
+    background: rgba(0, 31, 43, 1);
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.heading>img {
+    width: auto;
+    height: 90%;
+}
+
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem;
+}

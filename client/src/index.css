@@ -1,0 +1,93 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "system-ui";
+    transition: all 200ms;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input {
+    padding: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    border-style: solid;
+}
+
+input::placeholder {
+    color: #b7b7b7;
+}
+
+textarea:focus,
+input:focus {
+    outline: none;
+}
+
+body {
+    font-family: "Inter", "system-ui";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+    overflow: hidden;
+}
+
+/* clears the 'X' from Internet Explorer */
+input[type=search]::-ms-clear,
+input[type=search]::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* clears the 'X' from Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    display: none;
+}
+
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+    scrollbar-width: 1px;
+    /* scrollbar-color: var(--cerulean) var(--light-orange); */
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 1px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--light-orange);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--cerulean);
+    border-radius: 10px;
+    border: 0px solid var(--light-orange);
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side, #001f2b 94%, #0000) top / 8px 8px no-repeat, conic-gradient(#0000 30%, #001f2b);
+    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+    animation: l13 1s infinite linear;
+}
+
+@keyframes l13 {
+    100% {
+        transform: rotate(1turn)
+    }
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}

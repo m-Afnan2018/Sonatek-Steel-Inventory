@@ -3,8 +3,13 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 app.use(bodyParser.json())
 app.use(cookieParser());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true, 
+}))
 
 require('dotenv').config();
 
@@ -19,7 +24,7 @@ cloudinaryConnection(process.env.CLOUDINARY_CLOUD_NAME, process.env.CLOUDINARY_A
 const port = process.env.PORT || 3000;
 
 app.route('/').get((req, res) => {
-  res.send('Welcome to the Sonatek Steel Inventory API');
+    res.send('Welcome to the Sonatek Steel Inventory API');
 });
 
 
@@ -32,8 +37,8 @@ const orderRoutes = require('./routes/orderRoutes')
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/item', itemRoutes);
-app.use('api/v1/order', orderRoutes);
+app.use('/api/v1/order', orderRoutes);
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}:  http://localhost:${port}`);
+    console.log(`Server is running on port ${port}:  http://localhost:${port}`);
 });
