@@ -1,0 +1,62 @@
+.Sidebar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 256px;
+    background: rgba(0, 31, 43, 1);
+    overflow: hidden;
+}
+
+.Sidebar>div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 256px;
+    background: rgba(0, 31, 43, 1);
+}
+
+.navlinks {
+    all: unset;
+    padding: 1rem;
+    color: white;
+    font-weight: 900;
+    width: calc(100% - 2rem);
+    cursor: pointer;
+    background-color: rgba(0, 31, 43, 1);
+}
+
+.navlinks:hover {
+    background-color: rgb(2, 17, 24);
+}
+
+.activeLink {
+    font-style: italic;
+    background-color: rgb(2, 17, 24);
+
+}
+
+.Sidebar>div:nth-child(1) {
+    height: 90%;
+}
+
+.Sidebar>div:nth-child(2) {
+    height: 10%;
+}
+
+.Sidebar button {
+    all: unset;
+    padding: 1rem;
+    color: white;
+    font-weight: 900;
+    width: calc(100% - 2rem);
+    cursor: pointer;
+    background-color: rgba(0, 31, 43, 1);
+    text-align: center;
+    height: 10%;
+}
+
+.Sidebar button:hover {
+    background-color: rgb(2, 17, 24);
+}

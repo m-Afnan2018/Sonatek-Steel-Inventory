@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
-const OTP  = require('../models/otpModel')
+const OTP = require('../models/otpModel')
 const jwt = require('jsonwebtoken')
 const { customError, errorResponse } = require('../utils/errorHandler');
 const generateNumericOTP = require('../utils/otpGenerator');
@@ -64,8 +64,8 @@ const registerUser = async (req, res) => {
         if (role && !['admin', 'director', 'inventory_associate', 'agent', 'accountant'].includes(role)) {
             throw customError(400, 'Invalid role specified');
         }
-        const alreadyRegisteredEmail = await    User.findOne({email});
-        if(alreadyRegisteredEmail){
+        const alreadyRegisteredEmail = await User.findOne({ email });
+        if (alreadyRegisteredEmail) {
             throw customError('This email is already registered', 304);
         }
 
@@ -191,43 +191,72 @@ const forgetPassword = async (req, res) => {
     }
 };
 
-const resetPassword = async(req, res) => {
-    try{
+const resetPassword = async (req, res) => {
+    try {
         // Fetching
         const { email, password, otp } = req.body;
 
         // Validation 
-        if(!email || !password || !otp){
+        if (!email || !password || !otp) {
             throw customError("All fields are required", 404);
         }
-        if(password.length < 8){
+        if (password.length < 8) {
             throw customError("Password length should be atleast 8", 400);
         }
-        const otpCheck = await  OTP.findOne({email});
-        if(!otpCheck){
+        const otpCheck = await OTP.findOne({ email });
+        if (!otpCheck) {
             throw customError("No reset password request found", 401);
         }
         console.log(otpCheck)
-        if(otpCheck.otp !== Number(otp)){
+        if (otpCheck.otp !== Number(otp)) {
             otpCheck.checkRetries += 1;
             otpCheck.save();
             throw customError("OTP mismatched", 401);
         }
-        if(otpCheck.checkRetries > 5){
+        if (otpCheck.checkRetries > 5) {
             throw customError("Maximum number of limit reached for this account", 502);
         }
 
         // Performing Task
         const hashPassword = await bcrypt.hash(password, 10);
-        await User.findOneAndUpdate({email}, {
+        await User.findOneAndUpdate({ email }, {
             password: hashPassword
         })
 
         // Send Response
         res.status(200).json({
-            succes: true, 
+            succes: true,
             message: "Successfully changed the password of the user"
         })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const getUser = async (req, res) => {
+    try {
+        const user = req.user;
+        const token = req.token
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched the user",
+            user,
+            token,
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const logoutUser = async (req, res) => {
+    try{
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        res.send({ message: "Logged out successfully" });
     }catch(err){
         errorResponse(res, err);
     }
@@ -238,5 +267,7 @@ module.exports = {
     registerUser,
     loginUser,
     forgetPassword,
-    resetPassword
+    resetPassword,
+    getUser, 
+    logoutUser
 }

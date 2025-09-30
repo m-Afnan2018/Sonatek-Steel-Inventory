@@ -1,0 +1,21 @@
+.Navbar {
+    background: rgba(0, 31, 43, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 64px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+.Navbar>img {
+    height: 90%;
+}
+
+.Navbar>svg {
+    position: absolute;
+    left: 1rem;
+    color: #ffffff;
+    font-size: 2rem;
+    cursor: pointer;
+}

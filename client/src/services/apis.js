@@ -5,4 +5,16 @@ export const authEndpoints = {
     SIGNUP: `${BASE_URL}/auth/registerUser`,
     FORGET_PASSWORD: `${BASE_URL}/auth/forgetPassword`,
     RESET_PASSWORD: `${BASE_URL}/auth/resetPassword`,
+    GET_USER: `${BASE_URL}/auth/getUser`,
+    LOGOUT_USER: `${BASE_URL}/auth/logoutUser`,
+}
+
+export const userEndpoints = {
+    GET_ALL_USER: `${BASE_URL}/user/getAllUsers`,
+    UPDATE_USER: `${BASE_URL}/user/updateUser`,
+    VERIFY_USER: `${BASE_URL}/user/verifyUser`,
+    DELETE_USER: `${BASE_URL}/user/deleteUser`,
+    REMOVE_USER: `${BASE_URL}/user/deleteUser`,
+    CHANGE_DESIGNATION: `${BASE_URL}/user/changeUserDesignation`,
+    GET_USER: `${BASE_URL}/user/getUser`
 }

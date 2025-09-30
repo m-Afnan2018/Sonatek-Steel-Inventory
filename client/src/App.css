@@ -1,0 +1,9 @@
+.main-container {
+    display: flex;
+    justify-content: center;
+    height: calc(100vh - 64px);
+}
+
+.main-container>:nth-child(2){
+    width: -webkit-fill-available;
+}

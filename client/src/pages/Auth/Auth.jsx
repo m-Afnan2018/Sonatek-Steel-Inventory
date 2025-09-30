@@ -14,12 +14,13 @@ const Auth = () => {
 
     const location = useLocation();
 
-    // eslint-disable-next-line eqeqeq
     useEffect(() => {
+        // eslint-disable-next-line eqeqeq
         if (location.pathname.toLocaleLowerCase() == '/resetpassword') {
             setPath('resetPassword')
         }
     }, [location.pathname])
+    
     return (
         <div className={style.Auth}>
             <div className={style.container}>

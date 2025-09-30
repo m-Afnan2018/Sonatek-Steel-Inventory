@@ -20,6 +20,11 @@ const userSchema =  new mongoose.Schema({
         minLength: 8,
         select: false
     },
+    phoneNumber: {
+        type: String,
+        required: true,
+        minLength: 10,
+    },
     isVerified: {
         type: Boolean, 
         required: true, 
@@ -28,7 +33,7 @@ const userSchema =  new mongoose.Schema({
     role: {
         type: String, 
         enum: ['admin', 'director', 'inventory_associate', 'agent', 'accountant'],
-        default: 'agent'
+        default: null
     }, 
     createdAt: {
         type: Date,

@@ -1,4 +1,5 @@
 const error = (message, code)=>{
+    console.log(message);
     let err = new   Error(message);
     err.code = code;
     return err;

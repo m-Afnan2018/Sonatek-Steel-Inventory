@@ -1,4 +1,4 @@
-import { setIsLogin, setLoader } from "../../slices/authSlice";
+import { setIsLogin, setLoader, setToken, setUserData } from "../../slices/authSlice";
 import { apiConnector } from "../apiConnector";
 import { authEndpoints } from "../apis";
 
@@ -13,6 +13,10 @@ export async function login(email, password, dispatch) {
         });
 
         console.log(response);
+
+        localStorage.setItem('isLogin', true);
+        dispatch(setUserData(response.data.user));
+        dispatch(setToken(response.data.token));
 
         dispatch(setLoader(false));
 
@@ -61,5 +65,39 @@ export async function sendLink(email, dispatch) {
         dispatch(setLoader(false));
         console.log(err);
         return false;
+    }
+}
+
+export async function getUser(dispatch) {
+    try {
+        const response = await apiConnector('GET', authEndpoints.GET_USER);
+
+
+        if (response.data.success) {
+            console.log(response)
+            dispatch(setUserData(response.data.user));
+            dispatch(setToken(response.data.token));
+        }
+
+        dispatch(setLoader(false))
+
+    } catch (err) {
+        console.log("Error:", err)
+        localStorage.removeItem('isLogin');
+    }
+}
+
+export async function logoutUser(dispatch) {
+    try {
+        const response = await apiConnector('GET', authEndpoints.LOGOUT_USER);
+
+        console.log(response);
+
+        dispatch(setToken(null));
+        dispatch(setUserData(null));
+        dispatch(setIsLogin(false));
+        localStorage.removeItem('isLogin');
+    } catch (err) {
+        console.log("Error while logging out", err);
     }
 }
