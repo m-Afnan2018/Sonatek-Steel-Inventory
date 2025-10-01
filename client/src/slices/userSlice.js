@@ -1,18 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    users: null,
+    allUsers: [],
 }
 
 const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setUsers(state, action){
-            state.users = action.payload;
+        setAllUsers(state, action) {
+            state.allUsers = action.payload;
+        },
+        updateUserVerification: (state, action) => {
+            // console.log(`${state.allUsers} - ${typeof (state.allUsers)}`)
+            const userId = action.payload;
+            state.allUsers = state.allUsers.map(user =>
+                user._id === userId ? { ...user, isVerified: true } : user
+            );
+        },
+        deleteUser: (state, action) => {
+            const userId = action.payload;
+            state.allUsers = state.allUsers.filter(user =>
+                user._id !== userId
+            )
+        },
+        updateUserDesignation: (state, action) => {
+            const { userId, role } = action.payload;
+            state.allUsers = state.allUsers.map(user =>
+                user._id === userId ? { ...user, role: role } : user
+            );
         }
     }
 })
 
-export const { setUsers } = userSlice.actions;
+export const { setAllUsers, updateUserVerification, deleteUser, updateUserDesignation } = userSlice.actions;
 export default userSlice.reducer;
