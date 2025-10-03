@@ -12,6 +12,8 @@ import Order from './pages/Order/Order';
 import User from './pages/User/User';
 import Account from './pages/Account/Account';
 import { getUser } from 'services/operations/authAPI';
+import Varient from 'pages/Varient/Varient';
+import { getAllVarients } from 'services/operations/varientAPI';
 
 function App() {
     //  If User Logged in
@@ -23,8 +25,10 @@ function App() {
     useEffect(() => {
         if (!isLogin) {
             dispatch(setLoader(false));
-        }else{
+        } else {
             getUser(dispatch);
+            getAllVarients(dispatch);
+
         }
 
     }, [dispatch, isLogin])
@@ -41,9 +45,10 @@ function App() {
         <div className="App">
             <Navbar triggerSidebar={triggerSidebar} />
             <div className='main-container'>
-                <Sidebar sidebar={sidebar}/>
+                <Sidebar sidebar={sidebar} />
                 <Routes>
                     <Route path='/' element={<Dashboard />} />
+                    <Route path='/manage-varient' element={<Varient />} />
                     <Route path='/manage-inventory' element={<Inventory />} />
                     <Route path='/manage-orders' element={<Order />} />
                     <Route path='/manage-users' element={<User />} />

@@ -18,3 +18,10 @@ export const userEndpoints = {
     CHANGE_DESIGNATION: `${BASE_URL}/user/changeUserDesignation`,
     GET_USER: `${BASE_URL}/user/getUser`
 }
+
+export const varientEndpoints = {
+    GET_ALL_VARIENT: `${BASE_URL}/item/getAllVarients`,
+    ADD_VARIENT: `${BASE_URL}/item/addVarient`,
+    UPDATE_VARIENT: `${BASE_URL}/item/updateVarient`,
+    DELETE_VARIENT: `${BASE_URL}/item/deleteVarient`,
+}

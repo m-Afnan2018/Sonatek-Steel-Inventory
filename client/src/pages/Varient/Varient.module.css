@@ -5,11 +5,11 @@
     background: rgba(240, 251, 255, 1);
 }
 
-.Inventory {
+.Varient {
     background: rgba(240, 251, 255, 1);
 }
 
-.Inventory>h2 {
+.Varient>h2 {
     color: rgba(0, 31, 43, 1);
     font-family: Inter;
     font-size: 36px;
@@ -19,4 +19,21 @@
     text-align: left;
     margin-left: 2rem;
     margin-top: 2rem;
+}
+
+.Varient button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    color: rgb(0 31 43);
+    border: none;
+    background-color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.Varient button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background: #05516f;
+    color: #f0fbff;
 }

@@ -20,6 +20,7 @@ const Sidebar = ({ sidebar }) => {
         <div className={style.Sidebar} style={{ width: sidebar ? '256px' : '0px' }}>
             <div>
                 <NavLink className={`${location.pathname === '/' ? style.activeLink : ''} ${style.navlinks}`} to={'/'}>Dashboard</NavLink>
+                <NavLink className={`${location.pathname === '/manage-varients' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-varient'}>Manage Varients</NavLink>
                 <NavLink className={`${location.pathname === '/manage-inventory' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-inventory'}>Manage Inventory</NavLink>
                 <NavLink className={`${location.pathname === '/manage-orders' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-orders'}>Manage Orders</NavLink>
                 {(userData.role === 'admin' || userData.role === 'director') && <NavLink className={`${location.pathname === '/manage-users' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-users'}>Manange Users</NavLink>}

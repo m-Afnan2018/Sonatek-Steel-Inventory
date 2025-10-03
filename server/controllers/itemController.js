@@ -160,32 +160,34 @@ const addVarient = async (req, res) => {
         }
 
         // Performing Task
+        let returnValue;
         if (type === 'thickness') {
             const newThickness = new Thickness({
-                thickness: Number(value)
+                name: Number(value)
             })
-            await newThickness.save();
+            returnValue = await newThickness.save();
         } else if (type === 'grade') {
             const newGrade = new Grade({
-                grade: value
+                name: value
             })
-            await newGrade.save();
+            returnValue = await newGrade.save();
         } else if (type === 'width') {
             const newWidth = new Width({
-                width: value
+                name: value
             })
-            await newWidth.save();
+            returnValue = await newWidth.save();
         } else if (type === 'cutter') {
             const newCutter = new Cutter({
                 name: value
             })
-            await newCutter.save();
+            returnValue = await newCutter.save();
         }
 
         // Sending response
         res.status(200).json({
             success: true,
-            message: "Successfully added the varients"
+            message: "Successfully added the varients", 
+            value: returnValue
         })
     } catch (err) {
         errorResponse(res, err);
