@@ -8,7 +8,7 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-input {
+input, select {
     padding: 0.5rem;
     font-weight: 700;
     border-radius: 0.25rem;

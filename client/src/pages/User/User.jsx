@@ -12,7 +12,6 @@ const User = () => {
         role: null,
         sorted: null,
     })
-    const [selectRole, setSelectRole] = useState(null);
 
     const { userData } = useSelector(state => state.auth);
     const { allUsers } = useSelector(state => state.user)

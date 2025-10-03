@@ -9,11 +9,11 @@ const Width = require('../models/widthModel')
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, formType, width, weight, thickness, wagonNumber, challan, quantity, pricePerUnit, shipTo } = req.body;
+        const { type, grade, formType, width, weight, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
         const { challanNumber, challanDate } = challan;
 
         // Validation
-        if (!type || !grade || !formType || !width || !weight || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity || !pricePerUnit) {
+        if (!type || !grade || !formType || !width || !weight || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
             throw customError('All fields are required', 400);
         }
         const cutterChecker = await Cutter.findById(shipTo);
@@ -49,7 +49,6 @@ const addItem = async (req, res) => {
             },
             shipTo,
             quantity,
-            pricePerUnit
         });
 
         await newItem.save();
@@ -115,20 +114,69 @@ const getItem = async (req, res) => {
     }
 };
 
+// Get all items with search, filter, sort, and pagination
 const getAllItem = async (req, res) => {
     try {
-        const items = await Item.find()
-            .populate('width')
-            .populate('thickness')
-            .populate('shipTo')
-            .populate('grade')
-            .populate('challan');
-        res.status(200).json({
-            success: true,
-            items
+        const {
+            search,
+            sortBy = "createdAt",
+            order = "desc",
+            page = 1,
+            limit = 50,
+            ...filters
+        } = req.query;
+
+        let query = {};
+
+        // 🔍 Search (regex on multiple fields)
+        if (search) {
+            query.$or = [
+                { type: { $regex: search, $options: "i" } },
+                { wagonNumber: { $regex: search, $options: "i" } },
+                { formType: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        // 🎯 Filtering (dynamic from query params)
+        Object.keys(filters).forEach((key) => {
+            if (filters[key]) {
+                query[key] = filters[key];
+            }
         });
-    } catch (err) {
-        errorResponse(res, err);
+
+        // 📊 Pagination setup
+        const skip = (page - 1) * limit;
+
+        // 📦 Fetch items
+        const items = await Item.find(query)
+            .populate("grade width thickness shipTo")
+            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        // 📈 Total count for frontend
+        const total = await Item.countDocuments(query);
+
+        // 🏷 Map with custom "name"
+        const formattedItems = items.map((item) => ({
+            _id: item._id,
+            name: `${item.type} - ${item.formType} - ${item.wagonNumber}`,
+            type: item.type,
+            grade: item.grade,
+            formType: item.formType,
+            width: item.width,
+            thickness: item.thickness,
+            createdAt: item.createdAt,
+        }));
+
+        res.status(200).json({
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / limit),
+            items: formattedItems
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -186,7 +234,7 @@ const addVarient = async (req, res) => {
         // Sending response
         res.status(200).json({
             success: true,
-            message: "Successfully added the varients", 
+            message: "Successfully added the varients",
             value: returnValue
         })
     } catch (err) {

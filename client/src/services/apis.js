@@ -25,3 +25,11 @@ export const varientEndpoints = {
     UPDATE_VARIENT: `${BASE_URL}/item/updateVarient`,
     DELETE_VARIENT: `${BASE_URL}/item/deleteVarient`,
 }
+
+export const itemEndpoints = {
+    GET_ALL_ITEMS: `${BASE_URL}/item/getAllItems`,
+    ADD_ITEM: `${BASE_URL}/item/addItem`,
+    UPDATE_ITEM: `${BASE_URL}/item/updateItem`,
+    GET_ITEM: `${BASE_URL}/item/getItem`,
+    DELETE_ITEM: `${BASE_URL}/item/deleteItem`
+}

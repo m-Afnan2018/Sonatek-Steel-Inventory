@@ -64,10 +64,6 @@ const itemSchema = new mongoose.Schema({
         required: true,
         default: function() { return this.quantity; }
     },
-    pricePerUnit: {
-        type: Number,
-        required: true,
-    },
     shipTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cutter',

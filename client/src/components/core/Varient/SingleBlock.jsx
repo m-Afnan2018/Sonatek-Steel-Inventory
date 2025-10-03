@@ -10,7 +10,7 @@ const SingleBlock = ({ list, name }) => {
 
     const dispatch = useDispatch();
 
-    const onSubmit = (e, type, value) => {
+    const onSubmit = (e, type) => {
         e.preventDefault();
         if (type === 'Grade') {
             addVarient('grade', varient, dispatch, list);
@@ -25,6 +25,7 @@ const SingleBlock = ({ list, name }) => {
         if (type === 'Width') {
             addVarient('width', varient, dispatch, list);
         }
+        setShowForm(false);
     }
 
     const onUpdate = (id, value) => {
@@ -63,7 +64,7 @@ const SingleBlock = ({ list, name }) => {
         <div className={style.Varient}>
             <h3>{name}</h3>
             <button style={{ height: showForm ? '0' : '5rem', padding: '0 3rem', opacity: showForm ? '0' : '1' }} onClick={() => setShowForm(true)}>Add new {name}</button>
-            <form style={{ height: showForm ? '5rem' : '0' }} onSubmit={(e) => onSubmit(e, name, varient)}>
+            <form style={{ height: showForm ? '5rem' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
                 <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} />
                 <div>
                     <button type='submit'>Add new {name}</button>
