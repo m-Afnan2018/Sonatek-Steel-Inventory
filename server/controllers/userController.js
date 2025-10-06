@@ -2,10 +2,11 @@ const bcrypt = require('bcrypt');
 const { customError, errorResponse } = require("../utils/errorHandler");
 const User = require("../models/userModel");
 
-const updateUser = async(req, res) => {
+const updateUser = async (req, res) => {
     try {
         // Fetching
-        const { firstName, lastName, password, userId } = req.body;
+        const { userId } = req.user;
+        const { firstName, lastName, phoneNumber } = req.body;
 
         // Validation
         if (!userId) {
@@ -14,16 +15,18 @@ const updateUser = async(req, res) => {
 
         // Update logic here (e.g., find user and update fields)
         const user = await User.findById(userId);
+        console.log(user, userId);
         if (!user) {
             throw customError('User not found', 404);
         }
 
         user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
+        user.phoneNumber = phoneNumber || user.phoneNumber;
 
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
-        }
+        // if (password) {
+        //     user.password = await bcrypt.hash(password, 10);
+        // }
 
         const updatedUser = await user.save();
 
@@ -38,7 +41,7 @@ const updateUser = async(req, res) => {
     }
 };
 
-const deleteUser = async(req, res) => {
+const deleteUser = async (req, res) => {
     try {
         // Fetching
         const { userId } = req.user;
@@ -64,32 +67,32 @@ const deleteUser = async(req, res) => {
     }
 };
 
-const removeUser = async(req, res)=>{
-    try{
+const removeUser = async (req, res) => {
+    try {
         // Fetching
-        const { userId } = req. body;
+        const { userId } = req.body;
 
         // Validation
-        if(!userId){
+        if (!userId) {
             throw customError("User ID is required", 404);
         }
         const user = await User.findByIdAndDelete(userId);
 
-        if(!user){
+        if (!user) {
             throw customError("Unable to find the user", 401);
         }
 
         // Send Response
         res.status(200).json({
-            success: true, 
+            success: true,
             message: "Sucessfully deleted the user"
         })
-    }catch(err){
+    } catch (err) {
         errorResponse(res, err);
     }
 }
 
-const getUserDetails = async(req, res) => {
+const getUserDetails = async (req, res) => {
     try {
         // Fetching
         const { userId } = req.user;
@@ -113,7 +116,7 @@ const getUserDetails = async(req, res) => {
     }
 };
 
-const listUsers = async(req, res) => {
+const listUsers = async (req, res) => {
     try {
         // Fetching
         const users = await User.find();
@@ -128,7 +131,7 @@ const listUsers = async(req, res) => {
     }
 };
 
-const updateUserRole = async(req, res) => {
+const updateUserRole = async (req, res) => {
     try {
         // Fetching
         const { userId, role } = req.body;
@@ -162,20 +165,20 @@ const updateUserRole = async(req, res) => {
     }
 };
 
-const verifyUser = async(req, res)=>{
-    try{
+const verifyUser = async (req, res) => {
+    try {
         // Fetching
         const { userId } = req.body;
-        if(!userId){
+        if (!userId) {
             throw customError(400, 'User ID is required');
         }
 
         // Validation
         const user = await User.findById(userId);
-        if(!user){
+        if (!user) {
             throw customError('User not found', 404);
         }
-        if(user.isVerified){
+        if (user.isVerified) {
             throw customError('User is already verified', 400);
         }
 
@@ -189,7 +192,7 @@ const verifyUser = async(req, res)=>{
             message: 'User verified successfully',
         });
 
-    }catch(err){
+    } catch (err) {
         errorResponse(res, err);
     }
 }

@@ -148,6 +148,7 @@ option {
     justify-content: space-between;
     align-items: center;
     color: #f0fbff;
+    gap: 1rem;
 }
 
 .usersList select {
@@ -159,7 +160,7 @@ option {
     cursor: pointer;
 }
 
-.disignation button{
+.disignation button {
     width: 25%;
     border-radius: 1rem;
     padding: 0.5rem 0.5rem;
@@ -167,7 +168,7 @@ option {
     border: none;
 }
 
-.disignation select{
+.disignation select {
     width: 50%;
     border-radius: 1rem;
     padding: 0.5rem 0.5rem;

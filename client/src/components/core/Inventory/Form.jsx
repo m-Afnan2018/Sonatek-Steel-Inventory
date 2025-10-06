@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import style from './Inventory.module.css'
-import { useSelector } from 'react-redux'
-import { addItem } from 'services/operations/itemAPI'
+import { useDispatch, useSelector } from 'react-redux'
+import { addItem, updateItem } from 'services/operations/itemAPI'
+import { setSelectUpdate } from 'slices/itemSlice'
 
 const Form = ({ setShowForm, showForm }) => {
     const { grades, widths, thicknesses, cutters } = useSelector(state => state.varient)
+    const { selectUpdate } = useSelector(state => state.item);
+    const dispatch = useDispatch();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
@@ -22,6 +25,25 @@ const Form = ({ setShowForm, showForm }) => {
             shipTo: '',
         }
     })
+
+    useEffect(() => {
+        if (selectUpdate) {
+            reset({
+                type: selectUpdate.type,
+                grade: selectUpdate.grade._id,
+                formType: selectUpdate.formType,
+                width: selectUpdate.width._id,
+                thickness: selectUpdate.thickness._id,
+                weight: selectUpdate.weight,
+                wagonNumber: selectUpdate.wagonNumber,
+                challanNumber: selectUpdate.challan.challanNumber,
+                challanDate: selectUpdate.challan.challanDate,
+                quantity: selectUpdate.quantity,
+                shipTo: selectUpdate.shipTo._id,
+            })
+            setShowForm(true);
+        }
+    }, [reset, selectUpdate, setShowForm])
 
     const onSubmit = (data) => {
         // Transform data to match your API structure
@@ -41,12 +63,17 @@ const Form = ({ setShowForm, showForm }) => {
             shipTo: data.shipTo,
         }
 
-        addItem(formattedData)
+        if (selectUpdate) {
+            updateItem({ ...formattedData, _id: selectUpdate._id }, dispatch);
+        } else {
+            addItem(formattedData, dispatch);
+        }
         reset()
         setShowForm(false)
     }
 
     const handleCancel = () => {
+        dispatch(setSelectUpdate(null));
         reset()
         setShowForm(false)
     }
@@ -226,7 +253,7 @@ const Form = ({ setShowForm, showForm }) => {
             </div>
 
             <div className={style.buttonGroup}>
-                <button type='submit'>Add New Item</button>
+                <button type='submit'>{selectUpdate ? 'Update Item' : 'Add New Item'}</button>
                 <button type='button' onClick={handleCancel}>Cancel</button>
             </div>
         </form>

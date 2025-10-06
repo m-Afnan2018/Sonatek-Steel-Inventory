@@ -7,27 +7,30 @@ const orderSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    item: {
+    item: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item',
         required: true,
-    },
+    }],
     quantity: {
         type: Number,
         required: true,
-        min: 1,
     },
-    totalPrice: {
+    requirement: {
         type: Number,
         required: true,
     },
     vehicleNumber: {
         type: String,
+    },
+    orderBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     status: {
         type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+        enum: ['Pending', 'Processing', 'Delivered', 'Cancelled'],
         default: 'Pending'
     },
     orderDate: {

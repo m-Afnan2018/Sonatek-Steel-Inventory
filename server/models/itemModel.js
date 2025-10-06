@@ -38,10 +38,6 @@ const itemSchema = new mongoose.Schema({
         ref: 'Thickness',
         required: true
     },
-    weight: {
-        type: Number, 
-        required: true
-    },
     wagonNumber: {
         type: String,
         required: true,

@@ -74,16 +74,16 @@ export async function getUser(dispatch) {
 
 
         if (response.data.success) {
-            console.log(response)
             dispatch(setUserData(response.data.user));
             dispatch(setToken(response.data.token));
         }
 
         dispatch(setLoader(false))
-
+        
     } catch (err) {
         console.log("Error:", err)
         localStorage.removeItem('isLogin');
+        dispatch(setLoader(false))
     }
 }
 

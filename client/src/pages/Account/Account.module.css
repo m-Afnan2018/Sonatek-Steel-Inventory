@@ -39,9 +39,15 @@
 }
 
 .Account form input {
-width: 80%;
+    width: 80%;
     border-radius: 0px 24px 24px 0px;
     background: rgba(196, 196, 196, 1);
+}
+
+.Account form span {
+    color: red;
+    font-weight: 900;
+    font-size: 0.75rem;
 }
 
 .Account button {
@@ -59,7 +65,7 @@ width: 80%;
     background: #05516f;
 }
 
-.Account form>div:nth-last-child(1){
+.Account form>div:nth-last-child(1) {
     display: flex;
     justify-content: flex-start;
     flex-direction: row;

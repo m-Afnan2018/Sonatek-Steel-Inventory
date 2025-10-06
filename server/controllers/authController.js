@@ -117,6 +117,7 @@ const loginUser = async (req, res) => {
             userId: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
             role: user.role,
             email: user.email,
             isVerified: user.isVerified
@@ -236,12 +237,34 @@ const resetPassword = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const user = req.user;
-        const token = req.token
+        const findUser = await User.findById(user.userId);
 
-        res.status(200).json({
+        if (!findUser) {
+            throw customError("Unable to find the user", 404);
+        }
+
+        const payload = {
+            userId: findUser._id,
+            firstName: findUser.firstName,
+            lastName: findUser.lastName,
+            phoneNumber: findUser.phoneNumber,
+            role: findUser.role,
+            email: findUser.email,
+            isVerified: findUser.isVerified
+        }
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            sameSite: 'none',
+            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            secure: true,
+            partitioned: false
+        }).status(200).json({
             success: true,
             message: "Successfully fetched the user",
-            user,
+            user: payload,
             token,
         })
     } catch (err) {
@@ -250,14 +273,14 @@ const getUser = async (req, res) => {
 }
 
 const logoutUser = async (req, res) => {
-    try{
+    try {
         res.clearCookie("token", {
             httpOnly: true,
             secure: true,
             sameSite: "none",
         });
         res.send({ message: "Logged out successfully" });
-    }catch(err){
+    } catch (err) {
         errorResponse(res, err);
     }
 }
@@ -268,6 +291,6 @@ module.exports = {
     loginUser,
     forgetPassword,
     resetPassword,
-    getUser, 
+    getUser,
     logoutUser
 }

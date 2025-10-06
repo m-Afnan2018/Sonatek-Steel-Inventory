@@ -96,3 +96,9 @@
     background: rgba(9, 133, 180, 1);
 }
 
+
+@media (max-width: 500px) {
+    .Auth .container {
+        width: 80dvw;
+    }
+}

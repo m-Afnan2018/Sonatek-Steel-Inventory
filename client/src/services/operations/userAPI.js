@@ -1,5 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { userEndpoints } from "services/apis";
+import { setUserData } from "slices/authSlice";
 import { deleteUser, setAllUsers, updateUserDesignation, updateUserVerification } from "slices/userSlice";
 
 
@@ -45,5 +46,18 @@ export async function changeUserDesignation(id, role, dispatch) {
         }
     } catch (err) {
 
+    }
+}
+
+
+export async function updateUser(params, dispatch) {
+    try {
+        const response = (await apiConnector('PUT', userEndpoints.UPDATE_USER, params)).data;
+
+        if (response.success) {
+            dispatch(setUserData(response.user));
+        }
+    } catch (err) {
+        console.log(err);
     }
 }

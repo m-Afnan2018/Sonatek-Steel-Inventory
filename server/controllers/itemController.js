@@ -82,13 +82,26 @@ const updateItem = async (req, res) => {
 
         updateData.updatedAt = Date.now();
 
-        const updatedItem = await Item.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedItem = await Item.findByIdAndUpdate(id, updateData, { new: true })
+            .populate("grade width thickness shipTo");
         if (!updatedItem) throw customError('Item not found', 404);
+
+        const formattedItems = {
+            _id: updatedItem._id,
+            name: `${updatedItem.wagonNumber} - ${updatedItem.type} - ${updatedItem.formType}`,
+            type: updatedItem.type,
+            grade: updatedItem.grade.name,
+            formType: updatedItem.formType,
+            width: updatedItem.width.name,
+            remaining: updatedItem.remaining,
+            thickness: updatedItem.thickness.name,
+            createdAt: updatedItem.createdAt,
+        };
 
         res.status(200).json({
             success: true,
             message: "Item updated successfully",
-            item: updatedItem
+            item: formattedItems
         });
     } catch (err) {
         errorResponse(res, err);
@@ -103,7 +116,7 @@ const getItem = async (req, res) => {
             .populate('thickness')
             .populate('shipTo')
             .populate('grade')
-            .populate('weight');
+            .populate('challan');
         if (!item) throw customError('Item not found', 404);
         res.status(200).json({
             success: true,
@@ -124,7 +137,7 @@ const getAllItem = async (req, res) => {
             page = 1,
             limit = 50,
             ...filters
-        } = req.query;
+        } = req.body;
 
         let query = {};
 
@@ -148,8 +161,9 @@ const getAllItem = async (req, res) => {
         const skip = (page - 1) * limit;
 
         // 📦 Fetch items
+        // .select('type formType wagonNumber')
         const items = await Item.find(query)
-            .populate("grade width thickness shipTo")
+            .populate("grade width thickness shipTo challan")
             .sort({ [sortBy]: order === "asc" ? 1 : -1 })
             .skip(skip)
             .limit(parseInt(limit));
@@ -160,12 +174,16 @@ const getAllItem = async (req, res) => {
         // 🏷 Map with custom "name"
         const formattedItems = items.map((item) => ({
             _id: item._id,
-            name: `${item.type} - ${item.formType} - ${item.wagonNumber}`,
+            name: `${item.wagonNumber} - ${item.type} - ${item.formType}`,
             type: item.type,
-            grade: item.grade,
+            grade: item.grade.name,
             formType: item.formType,
-            width: item.width,
-            thickness: item.thickness,
+            width: item.width.name,
+            remaining: item.remaining,
+            wagonNumber: item.wagonNumber,
+            challanNumber: item.challan.challanNumber,
+            challanDate: item.challan.challanDate,
+            thickness: item.thickness.name,
             createdAt: item.createdAt,
         }));
 

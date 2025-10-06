@@ -36,3 +36,9 @@
     align-items: center;
     padding: 6rem;
 }
+
+@media (max-width: 500px) {
+    .container{
+        width: 90dvw;
+    }
+}

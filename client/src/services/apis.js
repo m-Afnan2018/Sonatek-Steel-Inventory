@@ -33,3 +33,12 @@ export const itemEndpoints = {
     GET_ITEM: `${BASE_URL}/item/getItem`,
     DELETE_ITEM: `${BASE_URL}/item/deleteItem`
 }
+
+export const orderEndpoints = {
+    SEARCH_OPTIONS: `${BASE_URL}/order/searchOptions`,
+    PLACE_ORDER: `${BASE_URL}/order/createOrder`,
+    GET_MY_ORDER: `${BASE_URL}/order/getMyOrder`,
+    GET_ORDER: `${BASE_URL}/order/getOrder`,
+    GET_ALL_ORDER: `${BASE_URL}/order/getAllOrders`,
+    UPDATE_ORDER: `${BASE_URL}/order/updateOrder`,
+}

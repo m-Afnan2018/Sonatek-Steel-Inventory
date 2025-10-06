@@ -7,8 +7,8 @@ const router = express.Router();
 //  Item Routes
 router.post('/addItem', authentication, inventoryAccess, addItem);
 router.patch('/updateItem', authentication, inventoryAccess, updateItem);
-router.get('/getItem', authentication, getItem);
-router.get('/getAllItem', authentication, getAllItem);
+router.post('/getItem', authentication, getItem);
+router.post('/getAllItems', authentication, getAllItem);
 router.delete('/deleteItem', authentication, directorAccess, deleteItem);
 
 //  Varient Routes

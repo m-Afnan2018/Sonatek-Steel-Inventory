@@ -49,6 +49,10 @@
     gap: 1rem;
 }
 
+.Varient input {
+    width: 100%;
+}
+
 .SingleVarient {
     display: flex;
     justify-content: space-between;

@@ -40,7 +40,7 @@
     font-weight: 600;
 }
 
-.allItems>div {
+.search {
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -83,7 +83,7 @@ select {
     color: #f0fbff;
 }
 
-.addNew button {
+.addNew>button {
     padding: 0rem 3rem;
     border-radius: 8px;
     background-color: rgb(0 31 43);
@@ -97,26 +97,8 @@ select {
     overflow: hidden;
 }
 
-.addNew button:hover {
+.addNew>button:hover {
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
     color: #05516f;
     background-color: #f0fbff;
-}
-
-.addNew form>div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-}
-
-.addNew form {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    width: 100%;
-    gap: 1rem;
-    padding: 0 1rem;
 }
