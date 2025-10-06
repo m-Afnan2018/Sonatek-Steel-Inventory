@@ -26,6 +26,9 @@ const orderSlice = createSlice({
         },
         setRequirement(state, action) {
             state.requirement = action.payload;
+        },
+        setOrders(state, action) {
+            state.orders = action.payload;
         }
     }
 })
@@ -34,7 +37,8 @@ export const {
     setBestSuggestion,
     setAllChoices,
     setAllSuggestion,
-    setRequirement
+    setRequirement,
+    setOrders
 } = orderSlice.actions;
 
 export default orderSlice.reducer

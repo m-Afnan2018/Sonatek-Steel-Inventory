@@ -50,7 +50,7 @@ const View = ({ view, show }) => {
     }
 
     return (
-        <div className={style.view} style={{ height: show ? '20rem' : 0 }}>
+        <div className={style.view} style={{ height: show ? '25rem' : 0 }}>
             <div>
                 <h4>Type:</h4>
                 <h5>{view.type}</h5>
@@ -87,7 +87,7 @@ const View = ({ view, show }) => {
                 <h4>Challan Date:</h4>
                 <h5>{formatDate(view.challanDate)}</h5>
             </div>
-            <div>
+            <div style={{borderBottom: 0}}>
                 <button onClick={onUpdate}>Update</button>
                 <button onClick={onDelete}>Delete</button>
             </div>

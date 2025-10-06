@@ -37,7 +37,7 @@ export const itemEndpoints = {
 export const orderEndpoints = {
     SEARCH_OPTIONS: `${BASE_URL}/order/searchOptions`,
     PLACE_ORDER: `${BASE_URL}/order/createOrder`,
-    GET_MY_ORDER: `${BASE_URL}/order/getMyOrder`,
+    GET_MY_ORDER: `${BASE_URL}/order/getMyOrders`,
     GET_ORDER: `${BASE_URL}/order/getOrder`,
     GET_ALL_ORDER: `${BASE_URL}/order/getAllOrders`,
     UPDATE_ORDER: `${BASE_URL}/order/updateOrder`,

@@ -1,6 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { orderEndpoints } from "services/apis";
-import { setAllChoices, setAllSuggestion, setBestSuggestion } from "slices/orderSlice";
+import { setAllChoices, setAllSuggestion, setBestSuggestion, setOrders } from "slices/orderSlice";
 
 
 export async function searchOptions(params, dispatch) {
@@ -35,12 +35,13 @@ export async function orderItems(params, dispatch) {
     }
 }
 
-export async function getMyOrders() {
+export async function getMyOrders(dispatch) {
     try {
         const response = (await apiConnector('GET', orderEndpoints.GET_MY_ORDER)).data;
 
         if (response.success) {
-            console.log(response.orders);
+            console.log(response);
+            dispatch(setOrders(response.orders));
         }
     } catch (err) {
         console.log("Error: ", err);

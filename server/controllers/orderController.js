@@ -1,7 +1,8 @@
 
 const { customError, errorResponse } = require("../utils/errorHandler");
 const Order = require("../models/orderModel");
-const Item = require("../models/itemModel")
+const Item = require("../models/itemModel");
+const User = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -13,13 +14,14 @@ const createOrder = async (req, res) => {
         if (!items || items.length === 0) {
             throw customError("Please select items", 404);
         }
-
+        console.log(items);
         const allItems = await Promise.all(items.map(id => Item.findById(id)));
+        console.log(allItems);
         const sum = allItems.reduce((acc, item) => acc + (item?.quantity || 0), 0);
 
         const newOrder = new Order({
             order_id: uuidv4(),
-            item: items,
+            items: items,
             quantity: sum,
             requirement,
             orderBy: userId
@@ -98,11 +100,35 @@ const getOrder = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
     try {
+        const { search } = req.body;
 
+        let query = {};
+
+        // 🔍 If there's a search term, filter by order_id or vehicleNumber
+        if (search && search.trim() !== "") {
+            query = {
+                $or: [
+                    { order_id: { $regex: search, $options: "i" } },
+                    { vehicleNumber: { $regex: search, $options: "i" } },
+                ],
+            };
+        }
+
+        const orders = await Order.find(query)
+            .populate("item", "name quantity") // populate item name & quantity
+            .populate("orderBy", "firstName lastName email") // populate user info
+            .sort({ orderDate: -1 }); // latest first
+
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            orders,
+        });
     } catch (err) {
         errorResponse(res, err);
     }
-}
+};
+
 
 const getMyOrders = async (req, res) => {
     try {
@@ -113,12 +139,38 @@ const getMyOrders = async (req, res) => {
         if (!userId) {
             throw customError("Please relogin", 400);
         }
-        const orders = await User.find({ orderBy: userId });
+        const orders = await Order.find({ orderBy: userId })
+            .populate({
+                path: 'items',
+                populate: [
+                    { path: 'grade', select: 'name' },
+                    { path: 'thickness', select: 'name' }
+                ]
+            });
 
-        response.status(200).json({
+        const allOrders = orders.map((order) => {
+            const payload = {
+                _id: order._id,
+                quantity: order.quantity,
+                requirement: order.requirement,
+                status: order.status,
+                orderDate: order.orderDate,
+                type: order.items[0].type,
+                grade: order.items[0].grade.name,
+                formType: order.items[0].formType,
+                thickness: order.items[0].thickness.name,
+                wagonNumber: order.items[0].wagonNumber,
+                challanDate: order.items[0].challan.challanDate,
+                challanNumber: order.items[0].challan.challanNumber,
+            }
+
+            return payload;
+        })
+
+        res.status(200).json({
             success: true,
             message: "Successfully fetched your orders",
-            orders
+            orders: allOrders
         })
     } catch (err) {
         errorResponse(res, err);
