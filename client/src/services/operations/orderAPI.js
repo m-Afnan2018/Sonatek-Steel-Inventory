@@ -1,10 +1,11 @@
 import { apiConnector } from "services/apiConnector";
 import { orderEndpoints } from "services/apis";
-import { setAllChoices, setAllSuggestion, setBestSuggestion, setOrders } from "slices/orderSlice";
+import { setAllChoices, setAllSuggestion, setBestSuggestion, setOrders, updateOrderStatus } from "slices/orderSlice";
 
 
 export async function searchOptions(params, dispatch) {
     try {
+        dispatch(setAllChoices(null));
         const response = (await apiConnector('POST', orderEndpoints.SEARCH_OPTIONS, params)).data;
 
         console.log(response);
@@ -42,6 +43,42 @@ export async function getMyOrders(dispatch) {
         if (response.success) {
             console.log(response);
             dispatch(setOrders(response.orders));
+        }
+    } catch (err) {
+        console.log("Error: ", err);
+    }
+}
+
+export async function cancelOrder(params, dispatch) {
+    try {
+        const response = (await apiConnector('PATCH', orderEndpoints.CANCEL_ORDER, params)).data;
+
+        if (response.success) {
+            dispatch(updateOrderStatus({ orderId: params.orderId, status: 'Cancelled' }))
+        }
+    } catch (err) {
+        console.log("Error: ", err);
+    }
+}
+
+export async function confirmOrder(params, dispatch) {
+    try {
+        const response = (await apiConnector('PATCH', orderEndpoints.CANCEL_ORDER, params)).data;
+
+        if (response.success) {
+            dispatch(updateOrderStatus({ orderId: params.orderId, status: 'Processing' }))
+        }
+    } catch (err) {
+        console.log("Error: ", err);
+    }
+}
+
+export async function deliverOrder(params, dispatch) {
+    try {
+        const response = (await apiConnector('PATCH', orderEndpoints.CANCEL_ORDER, params)).data;
+
+        if (response.success) {
+            dispatch(updateOrderStatus({ orderId: params.orderId, status: 'Delivered' }))
         }
     } catch (err) {
         console.log("Error: ", err);

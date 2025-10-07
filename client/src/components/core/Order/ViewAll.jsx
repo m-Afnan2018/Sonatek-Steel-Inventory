@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import style from './Order.module.css'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { formatDate } from 'utils/dateHandler';
+import { cancelOrder, confirmOrder, deliverOrder } from 'services/operations/orderAPI';
 
 const ViewAll = () => {
     const [view, setView] = useState('all');
     const { orders } = useSelector(state => state.order);
     const [select, setSelect] = useState(null);
+
+    const dispatch = useDispatch();
 
     const [listing, setListing] = useState(null);
 
@@ -17,6 +20,8 @@ const ViewAll = () => {
                 setListing(orders);
             } else if (view === 'pending') {
                 setListing(orders.filter((item) => item.status === 'Pending'));
+            } else if (view === 'cancelled') {
+                setListing(orders.filter((item) => item.status === 'Cancelled'));
             } else if (view === 'processing') {
                 setListing(orders.filter((item) => item.status === 'Processing'));
             } else if (view === 'completed') {
@@ -24,6 +29,18 @@ const ViewAll = () => {
             }
         }
     }, [orders, view])
+
+    const cancel = (id) => {
+        cancelOrder({ orderId: id }, dispatch);
+    }
+
+    const confirm = (id) => {
+        confirmOrder({ orderId: id }, dispatch);
+    }
+
+    const deliver = (id) => {
+        deliverOrder({ orderId: id }, dispatch);
+    }
 
     useEffect(() => console.log(view), [view]);
 
@@ -35,6 +52,7 @@ const ViewAll = () => {
                 <div className={style.viewOptions}>
                     <button className={view === 'all' && style.selected} onClick={() => setView('all')}>All</button>
                     <button className={view === 'pending' && style.selected} onClick={() => setView('pending')}>Pending</button>
+                    <button className={view === 'cancelled' && style.selected} onClick={() => setView('cancelled')}>Cancelled</button>
                     <button className={view === 'processing' && style.selected} onClick={() => setView('processing')}>Processing</button>
                     <button className={view === 'completed' && style.selected} onClick={() => setView('completed')}>Completed</button>
                 </div>
@@ -88,10 +106,11 @@ const ViewAll = () => {
                                         <h4>Challan Date</h4>
                                         <h5>{formatDate(order.challanDate)}</h5>
                                     </div>
-                                    <div style={{ borderBottom: '0' }}>
-                                        <button>Cancel Order</button>
-                                        <button>Confirm Order</button>
-                                    </div>
+                                    {order.status !== 'Cancelled' && <div style={{ borderBottom: '0' }}>
+                                        {order.status !== 'Delivered' && <button onClick={() => cancel(order._id)}>Cancel Order</button>}
+                                        {order.status !== 'Pending' && order.status !== 'Processing' && <button onClick={() => confirm(order._id)}>Confirm Order</button>}
+                                        {order.status === 'Processing' && <button onClick={deliver}>Delivered</button>}
+                                    </div>}
                                 </div>
                             </div>
 

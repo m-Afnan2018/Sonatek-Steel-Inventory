@@ -13,7 +13,7 @@ const challanSchema = new mongoose.Schema({
 });
 
 const itemSchema = new mongoose.Schema({
-    type:{
+    type: {
         type: String,
         enum: ['Hot Rolled', 'Cold Rolled', 'Galvanized', 'Color Coated', 'Stainless Steel', 'Aluminum'],
         required: true,
@@ -54,11 +54,6 @@ const itemSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true,
-    },
-    remaining:{
-        type: Number,
-        required: true,
-        default: function() { return this.quantity; }
     },
     shipTo: {
         type: mongoose.Schema.Types.ObjectId,

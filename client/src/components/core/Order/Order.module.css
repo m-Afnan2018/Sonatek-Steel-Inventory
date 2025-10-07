@@ -168,6 +168,7 @@
     background-color: #065675;
     color: #f0fbff;
     cursor: pointer;
+    box-shadow: 0px 0px 4px 4px black;
 }
 
 .singleItem .selected {

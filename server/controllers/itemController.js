@@ -179,7 +179,7 @@ const getAllItem = async (req, res) => {
             grade: item.grade.name,
             formType: item.formType,
             width: item.width.name,
-            remaining: item.remaining,
+            remaining: item.quantity,
             wagonNumber: item.wagonNumber,
             challanNumber: item.challan.challanNumber,
             challanDate: item.challan.challanDate,

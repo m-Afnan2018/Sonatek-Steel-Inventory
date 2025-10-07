@@ -39,9 +39,9 @@ const Choices = () => {
     }
 
     return (
-        <div className={style.choices} style={{ height: showChoices ? '60rem' : '0', overflow: showChoices ? 'scroll' : 'hidden' }}>
+        <div className={style.choices} style={{ height: showChoices ? '20rem' : '0', overflow: showChoices ? 'scroll' : 'hidden' }}>
             {/* Best Suggestion */}
-            <div>
+            {/* <div>
                 <h2>Best Suggestion</h2>
                 <div className={style.groupItem}>
                     <div className={style.singleItem}>
@@ -60,10 +60,10 @@ const Choices = () => {
                         <button>Order this one</button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* All Suggestions */}
-            <div>
+            {/* <div>
                 <h2>All Suggestions</h2>
                 <div>
                     <div className={style.groupItem}>
@@ -101,7 +101,7 @@ const Choices = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* All Choices */}
             <div>
@@ -109,7 +109,7 @@ const Choices = () => {
                 <div className={style.groupItem}>
                     {
                         allChoices?.map((items) => {
-                            return <div onClick={() => selecting(items._id)} style={{ boxShadow: selectChoices.includes(items._id) ? 'inset 0px 0px 4px 2px black' : '0px 0px 4px 2px black' }} className={style.singleItem}>
+                            return <div onClick={() => selecting(items._id)} style={{ backgroundColor: selectChoices.includes(items._id) ? '#065675' : '#001f2b' }} className={style.singleItem}>
                                 <h4>{items.wagonNumber}</h4>
                                 <h4>{items.remaining}</h4>
                             </div>

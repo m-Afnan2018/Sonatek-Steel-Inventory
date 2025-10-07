@@ -41,4 +41,7 @@ export const orderEndpoints = {
     GET_ORDER: `${BASE_URL}/order/getOrder`,
     GET_ALL_ORDER: `${BASE_URL}/order/getAllOrders`,
     UPDATE_ORDER: `${BASE_URL}/order/updateOrder`,
+    CONFIRM_ORDER: `${BASE_URL}/order/confirmOrder`,
+    CANCEL_ORDER: `${BASE_URL}/order/cancelOrder`,
+    DELIVER_ORDER: `${BASE_URL}/order/deliverOrder`,
 }

@@ -29,6 +29,16 @@ const orderSlice = createSlice({
         },
         setOrders(state, action) {
             state.orders = action.payload;
+        },
+        updateOrderStatus(state, action) {
+            const { orderId, status } = action.payload;
+
+            state.orders = state.orders.map(order => {
+                if (order._id === orderId) {
+                    order.status = status;
+                }
+                return order;
+            })
         }
     }
 })
@@ -38,7 +48,8 @@ export const {
     setAllChoices,
     setAllSuggestion,
     setRequirement,
-    setOrders
+    setOrders,
+    updateOrderStatus
 } = orderSlice.actions;
 
 export default orderSlice.reducer
