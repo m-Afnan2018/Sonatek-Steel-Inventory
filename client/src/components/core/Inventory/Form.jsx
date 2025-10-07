@@ -17,7 +17,6 @@ const Form = ({ setShowForm, showForm }) => {
             formType: '',
             width: '',
             thickness: '',
-            weight: '',
             wagonNumber: '',
             challanNumber: '',
             challanDate: '',
@@ -34,7 +33,6 @@ const Form = ({ setShowForm, showForm }) => {
                 formType: selectUpdate.formType,
                 width: selectUpdate.width._id,
                 thickness: selectUpdate.thickness._id,
-                weight: selectUpdate.weight,
                 wagonNumber: selectUpdate.wagonNumber,
                 challanNumber: selectUpdate.challan.challanNumber,
                 challanDate: selectUpdate.challan.challanDate,
@@ -53,7 +51,6 @@ const Form = ({ setShowForm, showForm }) => {
             formType: data.formType,
             width: data.width,
             thickness: data.thickness,
-            weight: parseFloat(data.weight),
             wagonNumber: data.wagonNumber,
             challan: {
                 challanDate: data.challanDate,
@@ -172,21 +169,6 @@ const Form = ({ setShowForm, showForm }) => {
                     ))}
                 </select>
                 {errors.thickness && <span className={style.error}>{errors.thickness.message}</span>}
-            </div>
-
-            <div>
-                <label htmlFor='weight'>Weight:</label>
-                <input
-                    id='weight'
-                    type='number'
-                    step='0.01'
-                    placeholder='Enter weight'
-                    {...register('weight', {
-                        required: 'Weight is required',
-                        min: { value: 0, message: 'Weight must be positive' }
-                    })}
-                />
-                {errors.weight && <span className={style.error}>{errors.weight.message}</span>}
             </div>
 
             <div>

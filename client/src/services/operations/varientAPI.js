@@ -108,3 +108,16 @@ export async function deleteVarient(id, type, dispatch, list) {
         console.log(err);
     }
 }
+
+export async function getAllVarientsDetail(setData, setLoading) {
+    try {
+        const response = (await apiConnector('GET', varientEndpoints.GET_ALL_VARIENT_DETAIL)).data;
+
+        if (response) {
+            setData(response.data)
+            setLoading(false);
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}

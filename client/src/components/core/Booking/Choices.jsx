@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import style from './Order.module.css'
+import style from './Booking.module.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { orderItems } from 'services/operations/orderAPI';
+import { bookingItems } from 'services/operations/bookingAPI';
 
 const Choices = () => {
-    const { bestSuggestion, allSuggestion, allChoices, requirement } = useSelector(state => state.order);
+    const { bestSuggestion, allSuggestion, allChoices, requirement } = useSelector(state => state.booking);
     const [showChoices, setShowChoices] = useState(false);
 
     const dispatch = useDispatch();
@@ -12,7 +12,6 @@ const Choices = () => {
     const [selectChoices, setSelectChoices] = useState([]);
 
     useEffect(() => {
-        console.log("Here:", { bestSuggestion }, { allSuggestion }, { allChoices })
         if (bestSuggestion === null && allSuggestion === null && allChoices === null) {
             setShowChoices(false);
         } else {
@@ -21,8 +20,6 @@ const Choices = () => {
     }, [bestSuggestion, allSuggestion, allChoices])
 
     const selecting = (id) => {
-        console.log(id);
-        console.log(selectChoices)
         if (selectChoices.includes(id)) {
             setSelectChoices((prev) => prev.filter((i) => i !== id))
         } else {
@@ -30,12 +27,12 @@ const Choices = () => {
         }
     }
 
-    const onOrdering = (items) => {
+    const onBookinging = (items) => {
         if (items.length <= 0) {
             return;
         }
         console.log({ items }, { requirement })
-        orderItems({ items: [...items], requirement }, dispatch)
+        bookingItems({ items: [...items], requirement }, dispatch)
     }
 
     return (
@@ -57,7 +54,7 @@ const Choices = () => {
                         <h4>Quantity</h4>
                     </div>
                     <div className={style.confirmationButton}>
-                        <button>Order this one</button>
+                        <button>Booking this one</button>
                     </div>
                 </div>
             </div> */}
@@ -80,7 +77,7 @@ const Choices = () => {
                             <h4>Quantity</h4>
                         </div>
                         <div className={style.confirmationButton}>
-                            <button>Order this one</button>
+                            <button>Booking this one</button>
                         </div>
                     </div>
                     <div className={style.groupItem}>
@@ -97,7 +94,7 @@ const Choices = () => {
                             <h4>Quantity</h4>
                         </div>
                         <div className={style.confirmationButton}>
-                            <button>Order this one</button>
+                            <button>Booking this one</button>
                         </div>
                     </div>
                 </div>
@@ -111,12 +108,12 @@ const Choices = () => {
                         allChoices?.map((items) => {
                             return <div onClick={() => selecting(items._id)} style={{ backgroundColor: selectChoices.includes(items._id) ? '#065675' : '#001f2b' }} className={style.singleItem}>
                                 <h4>{items.wagonNumber}</h4>
-                                <h4>{items.remaining}</h4>
+                                <h4>{items.quantity}</h4>
                             </div>
                         })
                     }
                     <div className={style.confirmationButton}>
-                        <button onClick={() => onOrdering(selectChoices)}>Order selected</button>
+                        <button onClick={() => onBookinging(selectChoices)}>Booking selected</button>
                     </div>
                 </div>
             </div>

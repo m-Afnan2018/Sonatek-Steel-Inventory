@@ -24,6 +24,7 @@ export const varientEndpoints = {
     ADD_VARIENT: `${BASE_URL}/item/addVarient`,
     UPDATE_VARIENT: `${BASE_URL}/item/updateVarient`,
     DELETE_VARIENT: `${BASE_URL}/item/deleteVarient`,
+    GET_ALL_VARIENT_DETAIL: `${BASE_URL}/item/getAllDetailVarient`
 }
 
 export const itemEndpoints = {
@@ -34,14 +35,15 @@ export const itemEndpoints = {
     DELETE_ITEM: `${BASE_URL}/item/deleteItem`
 }
 
-export const orderEndpoints = {
-    SEARCH_OPTIONS: `${BASE_URL}/order/searchOptions`,
-    PLACE_ORDER: `${BASE_URL}/order/createOrder`,
-    GET_MY_ORDER: `${BASE_URL}/order/getMyOrders`,
-    GET_ORDER: `${BASE_URL}/order/getOrder`,
-    GET_ALL_ORDER: `${BASE_URL}/order/getAllOrders`,
-    UPDATE_ORDER: `${BASE_URL}/order/updateOrder`,
-    CONFIRM_ORDER: `${BASE_URL}/order/confirmOrder`,
-    CANCEL_ORDER: `${BASE_URL}/order/cancelOrder`,
-    DELIVER_ORDER: `${BASE_URL}/order/deliverOrder`,
+export const bookingEndpoints = {
+    SEARCH_OPTIONS: `${BASE_URL}/booking/searchOptions`,
+    PLACE_BOOKING: `${BASE_URL}/booking/createBooking`,
+    GET_MY_BOOKING: `${BASE_URL}/booking/getMyBookings`,
+    GET_BOOKING: `${BASE_URL}/booking/getBooking`,
+    GET_ALL_BOOKING: `${BASE_URL}/booking/getAllBookings`,
+    UPDATE_BOOKING: `${BASE_URL}/booking/updateBooking`,
+    CONFIRM_BOOKING: `${BASE_URL}/booking/confirmBooking`,
+    CANCEL_BOOKING: `${BASE_URL}/booking/cancelBooking`,
+    DELIVER_BOOKING: `${BASE_URL}/booking/deliverBooking`,
+    GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`
 }

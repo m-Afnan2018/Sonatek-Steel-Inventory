@@ -8,7 +8,7 @@ import Navbar from './components/common/Navbar/Navbar';
 import Sidebar from './components/common/Sidebar/Sidebar';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Inventory from './pages/Inventory/Inventory';
-import Order from './pages/Order/Order';
+import Booking from './pages/Booking/Booking';
 import User from './pages/User/User';
 import Account from './pages/Account/Account';
 import { getUser } from 'services/operations/authAPI';
@@ -50,7 +50,7 @@ function App() {
                     <Route path='/' element={<Dashboard />} />
                     <Route path='/manage-varient' element={<Varient />} />
                     <Route path='/manage-inventory' element={<Inventory />} />
-                    <Route path='/manage-orders' element={<Order />} />
+                    <Route path='/manage-bookings' element={<Booking />} />
                     <Route path='/manage-users' element={<User />} />
                     <Route path='/manage-account' element={<Account />} />
                 </Routes>

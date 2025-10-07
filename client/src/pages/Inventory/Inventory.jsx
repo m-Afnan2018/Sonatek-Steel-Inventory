@@ -18,7 +18,7 @@ const Inventory = () => {
     // const [limit, setLimit] = useState(50);
     // const [statusFilter, setStatusFilter] = useState("");
     // const [sortBy, setSortBy] = useState("createdAt");
-    // const [order, setOrder] = useState("desc");
+    // const [booking, setOrder] = useState("desc");
     // const [page, setPage] = useState(1);
     // const [pages, setPages] = useState(1);
 

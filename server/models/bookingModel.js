@@ -1,11 +1,14 @@
 const { default: mongoose } = require("mongoose");
 
 
-const orderSchema = new mongoose.Schema({
-    order_id: {
+const bookingSchema = new mongoose.Schema({
+    booking_id: {
         type: String,
         required: true,
         unique: true,
+    },
+    order_id: {
+        type: String,
     },
     items: [{
         item: {
@@ -29,7 +32,7 @@ const orderSchema = new mongoose.Schema({
     vehicleNumber: {
         type: String,
     },
-    orderBy: {
+    bookedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -39,7 +42,7 @@ const orderSchema = new mongoose.Schema({
         enum: ['Pending', 'Processing', 'Delivered', 'Cancelled'],
         default: 'Pending'
     },
-    orderDate: {
+    bookingDate: {
         type: Date,
         default: Date.now
     },
@@ -52,5 +55,5 @@ const orderSchema = new mongoose.Schema({
     }
 });
 
-const Order = mongoose.model('Order', orderSchema);
-module.exports = Order;
+const Booking = mongoose.model('Booking', bookingSchema);
+module.exports = Booking;

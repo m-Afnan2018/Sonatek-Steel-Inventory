@@ -179,7 +179,7 @@ const getAllItem = async (req, res) => {
             grade: item.grade.name,
             formType: item.formType,
             width: item.width.name,
-            remaining: item.quantity,
+            quantity: item.quantity,
             wagonNumber: item.wagonNumber,
             challanNumber: item.challan.challanNumber,
             challanDate: item.challan.challanDate,
@@ -279,6 +279,63 @@ const getAllVarients = async (req, res) => {
         errorResponse(res, err);
     }
 }
+const getAllDetailVarient = async (req, res) => {
+    try {
+        // Function to get total items per variant
+        const getVariantWithItemCount = async (Model, field) => {
+            return await Model.aggregate([
+                {
+                    $lookup: {
+                        from: "items", // collection name
+                        localField: "_id",
+                        foreignField: field, // e.g., shipTo, grade, thickness, width
+                        as: "items",
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        totalItems: { $size: "$items" },
+                    },
+                },
+            ]);
+        };
+
+        // Get all variant details
+        const [cutters, grades, thicknesses, widths] = await Promise.all([
+            getVariantWithItemCount(Cutter, "shipTo"),
+            getVariantWithItemCount(Grade, "grade"),
+            getVariantWithItemCount(Thickness, "thickness"),
+            getVariantWithItemCount(Width, "width"),
+        ]);
+
+        res.status(200).json({
+            success: true,
+            message: "Fetched all variant details successfully",
+            data: {
+                cutters: {
+                    total: cutters.length,
+                    list: cutters,
+                },
+                grades: {
+                    total: grades.length,
+                    list: grades,
+                },
+                thicknesses: {
+                    total: thicknesses.length,
+                    list: thicknesses,
+                },
+                widths: {
+                    total: widths.length,
+                    list: widths,
+                },
+            },
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
 
 const getVarients = async (req, res) => {
     try {
@@ -402,5 +459,6 @@ module.exports = {
     getVarients,
     getAllVarients,
     updateVarient,
-    deleteVarient
+    deleteVarient,
+    getAllDetailVarient
 }

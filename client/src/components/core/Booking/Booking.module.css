@@ -244,13 +244,13 @@
 }
 
 .allItems {
-    padding: 0.5rem;
     background-color: #f0fbff;
     border-radius: 0 0 0.5rem 0.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .allItems button {
@@ -276,6 +276,11 @@
     color: #f0fbff;
     border-radius: 0.5rem;
     cursor: pointer;
+}
+
+.items h2 {
+    font-size: 1em;
+    margin-bottom: 0.25rem;
 }
 
 .items>div {
@@ -309,4 +314,28 @@
     align-items: center;
     font-weight: 700;
     color: #001f2b;
+}
+
+.wagons {
+    overflow-x: scroll;
+}
+
+.singleWagon {
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    background-color: #001f2b;
+    box-shadow: inset 0px 0px 4px 4px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.singleWagon>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
 }

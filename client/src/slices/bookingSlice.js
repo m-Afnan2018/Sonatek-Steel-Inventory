@@ -7,12 +7,12 @@ const initialState = {
     allChoices: null,
     requirement: null,
     options: null,
-    orders: null,
+    bookings: null,
     loader: false,
 }
 
-const orderSlice = createSlice({
-    name: 'order',
+const bookingSlice = createSlice({
+    name: 'booking',
     initialState: initialState,
     reducers: {
         setBestSuggestion(state, action) {
@@ -27,18 +27,22 @@ const orderSlice = createSlice({
         setRequirement(state, action) {
             state.requirement = action.payload;
         },
-        setOrders(state, action) {
-            state.orders = action.payload;
+        setBookings(state, action) {
+            state.bookings = action.payload;
         },
-        updateOrderStatus(state, action) {
-            const { orderId, status } = action.payload;
+        updateBookingStatus(state, action) {
+            const { bookingId, status } = action.payload;
 
-            state.orders = state.orders.map(order => {
-                if (order._id === orderId) {
-                    order.status = status;
+            state.bookings = state.bookings.map(booking => {
+                if (booking._id === bookingId) {
+                    booking.status = status;
                 }
-                return order;
+                return booking;
             })
+        },
+        addNewBooking(state, action) {
+            const payload = action.payload;
+            state.bookings = [...state.bookings, payload];
         }
     }
 })
@@ -48,8 +52,9 @@ export const {
     setAllChoices,
     setAllSuggestion,
     setRequirement,
-    setOrders,
-    updateOrderStatus
-} = orderSlice.actions;
+    setBookings,
+    updateBookingStatus,
+    addNewBooking
+} = bookingSlice.actions;
 
-export default orderSlice.reducer
+export default bookingSlice.reducer

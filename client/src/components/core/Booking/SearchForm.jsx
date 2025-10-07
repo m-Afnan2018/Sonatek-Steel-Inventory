@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import style from './Order.module.css';
+import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { searchOptions } from 'services/operations/orderAPI';
-import { setRequirement } from 'slices/orderSlice';
+import { searchOptions } from 'services/operations/bookingAPI';
+import { setRequirement } from 'slices/bookingSlice';
 
 const SearchForm = () => {
     const [showForm, setShowForm] = useState(false);
@@ -44,7 +44,7 @@ const SearchForm = () => {
         <div className={style.SearchForm}>
             {/* Toggle button */}
             <div style={{ height: showForm ? '0rem' : '100%' }}>
-                <button onClick={() => setShowForm(true)}>Create new Order</button>
+                <button onClick={() => setShowForm(true)}>Create new Booking</button>
             </div>
 
             {/* Form */}
@@ -52,7 +52,7 @@ const SearchForm = () => {
                 style={{ height: showForm ? '40rem' : '0' }}
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <h3>Search for Order</h3>
+                <h3>Search for Booking</h3>
 
                 {/* Quantity */}
                 <div>

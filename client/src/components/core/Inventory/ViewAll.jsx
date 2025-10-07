@@ -69,7 +69,7 @@ const View = ({ view, show }) => {
             </div>
             <div>
                 <h4>Remaining:</h4>
-                <h5>{view.remaining}</h5>
+                <h5>{view.quantity}</h5>
             </div>
             <div>
                 <h4>Thickness:</h4>
@@ -87,7 +87,7 @@ const View = ({ view, show }) => {
                 <h4>Challan Date:</h4>
                 <h5>{formatDate(view.challanDate)}</h5>
             </div>
-            <div style={{borderBottom: 0}}>
+            <div style={{ borderBottom: 0 }}>
                 <button onClick={onUpdate}>Update</button>
                 <button onClick={onDelete}>Delete</button>
             </div>

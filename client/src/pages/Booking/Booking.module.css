@@ -5,11 +5,11 @@
     background: rgba(240, 251, 255, 1);
 }
 
-.Order {
+.Booking {
     background: rgba(240, 251, 255, 1);
 }
 
-.Order>h2 {
+.Booking>h2 {
     color: rgba(0, 31, 43, 1);
     font-family: Inter;
     font-size: 36px;
