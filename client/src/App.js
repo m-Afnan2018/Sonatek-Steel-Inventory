@@ -15,10 +15,11 @@ import { getUser } from 'services/operations/authAPI';
 import Varient from 'pages/Varient/Varient';
 import { getAllVarients } from 'services/operations/varientAPI';
 import Error from 'pages/Error/Error';
+import NotVerified from 'pages/NotVerified/NotVerified';
 
 function App() {
     //  If User Logged in
-    const { isLogin, token } = useSelector((state) => state.auth);
+    const { isLogin, token, userData } = useSelector((state) => state.auth);
     const [sidebar, setSidebar] = useState(false);
 
     const dispatch = useDispatch();
@@ -35,6 +36,10 @@ function App() {
 
     if (!isLogin || !token) {
         return <Auth />
+    }
+
+    if (!userData.isVerified) {
+        return <NotVerified />
     }
 
     const triggerSidebar = () => {
