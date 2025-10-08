@@ -37,9 +37,7 @@ async function sendVerificationEmail(email, otp) {
 			"Forget Password - Sonatek Steel Inventory",
 			forgetPasswordMail(otp)
 		);
-		console.log("Email sent successfully: ", mailResponse.response);
 	} catch (error) {
-		console.log("Error occurred while sending email: ", error);
 		throw error;
 	}
 }

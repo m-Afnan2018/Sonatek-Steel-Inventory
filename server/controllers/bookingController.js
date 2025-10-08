@@ -345,13 +345,13 @@ const searchOptions = async (req, res) => {
 
 const confirmBooking = async (req, res) => {
     try {
-        const { bookingId } = req.body;
+        const { bookingId, orderId } = req.body;
 
         if (!bookingId) {
             throw customError("Please select any one booking");
         }
 
-        const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Processing' });
+        const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Processing', order_id: orderId });
 
         if (!booking) {
             throw customError("Unable to find the booking");
@@ -405,14 +405,15 @@ const cancelBooking = async (req, res) => {
 
 const deliverBooking = async (req, res) => {
     try {
-        const { bookingId } = req.body;
+        const { bookingId, vehicle_number } = req.body;
 
         if (!bookingId) {
             throw customError("Please select any one booking");
         }
 
         const booking = await Booking.findByIdAndUpdate(bookingId, {
-            status: 'Delivered'
+            status: 'Delivered',
+            vehicleNumber: vehicle_number
         })
 
         if (!booking) {

@@ -15,7 +15,6 @@ const updateUser = async (req, res) => {
 
         // Update logic here (e.g., find user and update fields)
         const user = await User.findById(userId);
-        console.log(user, userId);
         if (!user) {
             throw customError('User not found', 404);
         }
@@ -109,6 +108,7 @@ const getUserDetails = async (req, res) => {
         // Response
         res.status(200).json({
             success: true,
+            message: "Successfully fetched the user details",
             user
         });
     } catch (err) {
@@ -124,6 +124,7 @@ const listUsers = async (req, res) => {
         // Response
         res.status(200).json({
             success: true,
+            message: "Successfully fetch the users list",
             users
         });
     } catch (err) {

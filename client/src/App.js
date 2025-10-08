@@ -14,6 +14,7 @@ import Account from './pages/Account/Account';
 import { getUser } from 'services/operations/authAPI';
 import Varient from 'pages/Varient/Varient';
 import { getAllVarients } from 'services/operations/varientAPI';
+import Error from 'pages/Error/Error';
 
 function App() {
     //  If User Logged in
@@ -28,7 +29,6 @@ function App() {
         } else {
             getUser(dispatch);
             getAllVarients(dispatch);
-
         }
 
     }, [dispatch, isLogin])
@@ -53,6 +53,7 @@ function App() {
                     <Route path='/manage-bookings' element={<Booking />} />
                     <Route path='/manage-users' element={<User />} />
                     <Route path='/manage-account' element={<Account />} />
+                    <Route path='*' element={<Error />} />
                 </Routes>
             </div>
         </div>

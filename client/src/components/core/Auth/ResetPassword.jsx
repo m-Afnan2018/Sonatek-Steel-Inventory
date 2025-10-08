@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import style from './Auth.module.css'
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import { resetPassword } from 'services/operations/authAPI';
+import toast from 'react-hot-toast';
 
 const ResetPassword = ({ setPath }) => {
     const [email, setEmail] = useState('');
@@ -23,15 +24,15 @@ const ResetPassword = ({ setPath }) => {
         setOTP(otp);
         setEmail(email);
 
-        console.log(`Email: ${email} OTP: ${otp}`);
-
     }, [search])
 
-    const dispatch = useDispatch();
-
     const onSubmit = (e) => {
+        if (confirmPassword !== password) {
+            toast.error("Password is not same");
+            return;
+        }
         e.preventDefault();
-        console.log(`Email: ${email}, Password: ${password}`)
+        resetPassword({ email, otp, password }, setPath)
     }
 
     return (

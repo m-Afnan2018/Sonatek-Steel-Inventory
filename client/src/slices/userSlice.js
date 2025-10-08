@@ -12,7 +12,6 @@ const userSlice = createSlice({
             state.allUsers = action.payload;
         },
         updateUserVerification: (state, action) => {
-            // console.log(`${state.allUsers} - ${typeof (state.allUsers)}`)
             const userId = action.payload;
             state.allUsers = state.allUsers.map(user =>
                 user._id === userId ? { ...user, isVerified: true } : user

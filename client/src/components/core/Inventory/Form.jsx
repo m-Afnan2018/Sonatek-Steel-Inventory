@@ -40,8 +40,9 @@ const Form = ({ setShowForm, showForm }) => {
                 shipTo: selectUpdate.shipTo._id,
             })
             setShowForm(true);
+            dispatch(setSelectUpdate(null))
         }
-    }, [reset, selectUpdate, setShowForm])
+    }, [dispatch, reset, selectUpdate, setShowForm])
 
     const onSubmit = (data) => {
         // Transform data to match your API structure

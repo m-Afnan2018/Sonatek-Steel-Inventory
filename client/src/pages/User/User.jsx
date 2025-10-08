@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import style from './User.module.css'
 import { changeUserDesignation, getAllUsers, removeUser, verifyUser } from 'services/operations/userAPI'
 import { useDispatch, useSelector } from 'react-redux';
+import { formatDate } from 'utils/dateHandler';
 
 const User = () => {
     const [requests, setRequests] = useState(null);
@@ -23,7 +24,6 @@ const User = () => {
 
     useEffect(() => {
         if (allUsers) {
-            console.log(allUsers)
             setRequests(allUsers.filter(user => !user.isVerified));
             setListUsers(allUsers);
         }
@@ -52,7 +52,6 @@ const User = () => {
     };
 
     const changeFilter = (e, type) => {
-        console.log(listUsers);
         if (type === 'query') {
             setFilter((prev) => {
                 prev.query = e.target.value;
@@ -186,11 +185,11 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
             </div>
             <div>
                 <p>Registered on: </p>
-                <p>{user.createdAt}</p>
+                <p>{formatDate(user.createdAt)}</p>
             </div>
             <div>
                 <p>Last Updated on: </p>
-                <p>{user.updatedAt}</p>
+                <p>{formatDate(user.updatedAt)}</p>
             </div>
 
             {userData.userId !== user._id && <div className={style.disignation}>

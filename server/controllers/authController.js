@@ -150,11 +150,11 @@ const forgetPassword = async (req, res) => {
 
         // Validation
         if (!email) {
-            throw customError(400, 'Email is required');
+            throw customError('Email is required', 404);
         }
         const user = await User.findOne({ email });
         if (!user) {
-            throw customError(404, 'User not found');
+            throw customError('User not found', 404);
         }
         const oldOtp = await OTP.findOne({ email })
 
@@ -168,7 +168,7 @@ const forgetPassword = async (req, res) => {
             await sendMail(
                 email,
                 "Forget Password - Sonatek Steel Inventory",
-                forgetPasswordMail(oldOtp.otp)
+                forgetPasswordMail(user.email, oldOtp.otp)
             );
         } else {
             // Password reset logic here (e.g., generate token, send email)
@@ -208,7 +208,6 @@ const resetPassword = async (req, res) => {
         if (!otpCheck) {
             throw customError("No reset password request found", 401);
         }
-        console.log(otpCheck)
         if (otpCheck.otp !== Number(otp)) {
             otpCheck.checkRetries += 1;
             otpCheck.save();

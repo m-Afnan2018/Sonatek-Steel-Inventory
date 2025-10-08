@@ -1,24 +1,51 @@
+import toast from "react-hot-toast";
 import { apiConnector } from "services/apiConnector";
 import { varientEndpoints } from "services/apis";
 import { setCutters, setGrades, setThicknesses, setWidths } from "slices/varientSlice";
 
 
 export async function getAllVarients(dispatch) {
+    const toastId = toast.loading("Loading...")
     try {
         const response = (await apiConnector('GET', varientEndpoints.GET_ALL_VARIENT)).data;
 
         if (response.success) {
-            dispatch(setGrades(response.grades));
-            dispatch(setCutters(response.cutters))
-            dispatch(setThicknesses(response.thickness))
-            dispatch(setWidths(response.widths));
+            // dispatch(setGrades(response.grades));
+            // dispatch(setCutters(response.cutters))
+            // dispatch(setThicknesses(response.thickness))
+            // dispatch(setWidths(response.widths));
+
+            // safe extractor that handles objects, strings, numbers, missing values
+            const toName = (item, key = 'name') => {
+                if (item == null) return '';                     // null/undefined -> empty
+                if (typeof item === 'string' || typeof item === 'number') return String(item);
+                const v = item[key];
+                return v == null ? '' : String(v);
+            };
+
+            const sortByName = (arr = [], key = 'name') =>
+                [...arr].sort((a, b) =>
+                    toName(a, key).localeCompare(toName(b, key), undefined, { numeric: true, sensitivity: 'base' })
+                );
+
+            // use before dispatch
+            dispatch(setGrades(sortByName(response.grades)));
+            dispatch(setCutters(sortByName(response.cutters)));
+            dispatch(setThicknesses(sortByName(response.thickness)));
+            dispatch(setWidths(sortByName(response.widths)));
         }
+
+        toast.dismiss(toastId);
+        toast.success(response.message)
     } catch (err) {
         console.log(err);
+        toast.dismiss(toastId);
+        toast.error(err.response.data.message)
     }
 }
 
 export async function addVarient(type, value, dispatch, list) {
+    const toastId = toast.loading("Loading...")
     try {
         const response = (await apiConnector('POST', varientEndpoints.ADD_VARIENT, { type, value })).data;
 
@@ -41,12 +68,17 @@ export async function addVarient(type, value, dispatch, list) {
                 dispatch(setWidths(newList));
             }
         }
+
+        toast.dismiss(toastId);
+        toast.success(response.message)
     } catch (err) {
-        console.log(err);
+        toast.dismiss(toastId);
+        toast.error(err.response.data.message)
     }
 }
 
 export async function updateVarient(id, type, value, dispatch, list) {
+    const toastId = toast.loading("Loading...")
     try {
         const response = (await apiConnector('PATCH', varientEndpoints.UPDATE_VARIENT, {
             id, type, value
@@ -76,12 +108,17 @@ export async function updateVarient(id, type, value, dispatch, list) {
                 dispatch(setWidths(newList));
             }
         }
+
+        toast.dismiss(toastId);
+        toast.success(response.message)
     } catch (err) {
-        console.log(err);
+        toast.dismiss(toastId);
+        toast.error(err.response.data.message)
     }
 }
 
 export async function deleteVarient(id, type, dispatch, list) {
+    const toastId = toast.loading("Loading...")
     try {
         const response = (await apiConnector('DELETE', varientEndpoints.DELETE_VARIENT, { id, type })).data;
 
@@ -104,12 +141,17 @@ export async function deleteVarient(id, type, dispatch, list) {
                 dispatch(setWidths(newList));
             }
         }
+
+        toast.dismiss(toastId);
+        toast.success(response.message)
     } catch (err) {
-        console.log(err);
+        toast.dismiss(toastId);
+        toast.error(err.response.data.message)
     }
 }
 
 export async function getAllVarientsDetail(setData, setLoading) {
+    const toastId = toast.loading("Loading...")
     try {
         const response = (await apiConnector('GET', varientEndpoints.GET_ALL_VARIENT_DETAIL)).data;
 
@@ -117,7 +159,11 @@ export async function getAllVarientsDetail(setData, setLoading) {
             setData(response.data)
             setLoading(false);
         }
+
+        toast.dismiss(toastId);
+        toast.success(response.message)
     } catch (err) {
-        console.log(err);
+        toast.dismiss(toastId);
+        toast.error(err.response.data.message)
     }
 }

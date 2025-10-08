@@ -9,11 +9,11 @@ const Width = require('../models/widthModel')
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, formType, width, weight, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
+        const { type, grade, formType, width, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
         const { challanNumber, challanDate } = challan;
 
         // Validation
-        if (!type || !grade || !formType || !width || !weight || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
+        if (!type || !grade || !formType || !width || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
             throw customError('All fields are required', 400);
         }
         const cutterChecker = await Cutter.findById(shipTo);
@@ -41,7 +41,6 @@ const addItem = async (req, res) => {
             formType,
             width,
             thickness,
-            weight,
             wagonNumber,
             challan: {
                 challanNumber,
@@ -120,6 +119,7 @@ const getItem = async (req, res) => {
         if (!item) throw customError('Item not found', 404);
         res.status(200).json({
             success: true,
+            message: "Successfully fetched the Item",
             item
         });
     } catch (err) {
@@ -188,10 +188,12 @@ const getAllItem = async (req, res) => {
         }));
 
         res.status(200).json({
+            success: true,
+            messsage: "Successfully get all the Items",
             total,
             page: Number(page),
             pages: Math.ceil(total / limit),
-            items: formattedItems
+            items: formattedItems,
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -270,6 +272,7 @@ const getAllVarients = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            message: "Successfully fetched the varients",
             cutters,
             grades,
             thickness,
@@ -356,7 +359,8 @@ const getVarients = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data
+            data,
+            message: "Successfully fetched the varients"
         });
     } catch (err) {
         errorResponse(res, err);

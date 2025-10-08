@@ -49,7 +49,7 @@ const SearchForm = () => {
 
             {/* Form */}
             <form
-                style={{ height: showForm ? '40rem' : '0' }}
+                style={{ height: showForm ? '38rem' : '0' }}
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <h3>Search for Booking</h3>

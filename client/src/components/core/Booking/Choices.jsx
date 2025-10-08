@@ -6,12 +6,14 @@ import { bookingItems } from 'services/operations/bookingAPI';
 const Choices = () => {
     const { bestSuggestion, allSuggestion, allChoices, requirement } = useSelector(state => state.booking);
     const [showChoices, setShowChoices] = useState(false);
+    const [height, setHeight] = useState(0);
 
     const dispatch = useDispatch();
 
     const [selectChoices, setSelectChoices] = useState([]);
 
     useEffect(() => {
+        setSelectChoices([]);
         if (bestSuggestion === null && allSuggestion === null && allChoices === null) {
             setShowChoices(false);
         } else {
@@ -27,16 +29,22 @@ const Choices = () => {
         }
     }
 
+    useEffect(() => {
+        if (allChoices) {
+            let calculate = (5 * allChoices.length) + 3;
+            setHeight(calculate);
+        }
+    }, [allChoices])
+
     const onBookinging = (items) => {
         if (items.length <= 0) {
             return;
         }
-        console.log({ items }, { requirement })
         bookingItems({ items: [...items], requirement }, dispatch)
     }
 
     return (
-        <div className={style.choices} style={{ height: showChoices ? '20rem' : '0', overflow: showChoices ? 'scroll' : 'hidden' }}>
+        <div className={style.choices} style={{ height: showChoices ? `${height}rem` : '0', overflow: showChoices ? 'scroll' : 'hidden' }}>
             {/* Best Suggestion */}
             {/* <div>
                 <h2>Best Suggestion</h2>

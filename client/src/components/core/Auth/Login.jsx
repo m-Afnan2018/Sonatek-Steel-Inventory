@@ -20,8 +20,6 @@ const Login = ({ setPath }) => {
         if (response) {
             dispatch(setIsLogin(true));
         }
-
-        console.log(`Email: ${email}, Password: ${password}`)
     }
 
     return (

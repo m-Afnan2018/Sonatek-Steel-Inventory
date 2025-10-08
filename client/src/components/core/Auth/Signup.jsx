@@ -3,6 +3,7 @@ import style from './Auth.module.css';
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { signup } from '../../../services/operations/authAPI';
 import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
 
 const Signup = ({ setPath }) => {
     const [email, setEmail] = useState('');
@@ -22,11 +23,12 @@ const Signup = ({ setPath }) => {
 
         if (!email || !firstName || !lastName || !password || !confirmPassword || password !== confirmPassword) {
             setShowError(true);
+            toast.error('Please fill the complete form');
             return;
         }
 
         const response = await signup(firstName, lastName, email, password, dispatch);
-        if(response){
+        if (response) {
             setPath('login');
         }
     }

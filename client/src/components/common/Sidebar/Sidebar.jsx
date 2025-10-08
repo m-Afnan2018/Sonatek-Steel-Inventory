@@ -14,8 +14,6 @@ const Sidebar = ({ sidebar }) => {
         logoutUser(dispatch);
     }
 
-    console.log(userData);
-
     return (
         <div className={style.Sidebar} style={{ width: sidebar ? '256px' : '0px' }}>
             <div>

@@ -11,7 +11,6 @@ const Items = () => {
     // Fetch all items
     useEffect(() => {
         if (currentList) {
-            console.log(currentList);
             setItems(currentList);
             setLoading(false);
         }
