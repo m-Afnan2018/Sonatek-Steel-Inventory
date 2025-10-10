@@ -1,6 +1,6 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
-const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcel, shippedBooking } = require('../controllers/bookingController')
+const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, getExcelItem, shippedBooking } = require('../controllers/bookingController')
 const { inventoryAccess, agentAccess, accountantAccess, directorAccess } = require('../middlewares/authorization');
 const router = express.Router();
 
@@ -16,6 +16,7 @@ router.patch('/shippedBooking', authentication, accountantAccess, shippedBooking
 router.patch('/cancelBooking', authentication, accountantAccess, cancelBooking);
 router.patch('/deliverBooking', authentication, accountantAccess, deliverBooking);
 router.get('/getAllBookingsDetails', authentication, getAllBookingsDetails);
-router.get('/getExcel', getExcel);
+router.get('/getExcelBooking', getExcelBooking);
+router.get('/getExcelItem', getExcelItem);
 
 module.exports = router

@@ -5,11 +5,13 @@ import Items from 'components/core/Dashboard/Items'
 import Varient from 'components/core/Dashboard/Varient'
 import Bookings from 'components/core/Dashboard/Bookings'
 import { getAllUsers } from 'services/operations/userAPI'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getAllItem } from 'services/operations/itemAPI'
 
 const Dashboard = () => {
     const dispatch = useDispatch();
+
+    const { token } = useSelector((state) => state.auth);
     useEffect(() => {
         getAllUsers(dispatch);
         getAllItem({ search: '' }, dispatch)
@@ -17,14 +19,20 @@ const Dashboard = () => {
 
     const onDownload = async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/v1/booking/getExcel');
+            const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem(token)}`
+                }
+            });
             const blob = await response.blob();
 
             // Create download link
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `stock-data-${Date.now()}.xlsx`;
+            link.download = `Item-Data-${Date.now()}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

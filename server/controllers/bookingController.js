@@ -512,8 +512,15 @@ const deliverBooking = async (req, res) => {
 
 const getAllBookingsDetails = async (req, res) => {
     try {
+        const { role } = req.user;
+
+        let query = {};
+        if(role === 'agent'){
+            query = { bookedBy: role.userId}
+        }
+
         // Fetch all bookings with related details populated
-        const bookings = await Booking.find({})
+        let bookings = await Booking.find(query)
             .populate("bookedBy", "firstName lastName email role")
             .populate({
                 path: "items.item",
@@ -569,7 +576,7 @@ const getAllBookingsDetails = async (req, res) => {
     }
 };
 
-const getExcel = async (req, res) => {
+const getExcelItem = async (req, res) => {
     try {
         const items = await Item.find().populate([
             "challan",
@@ -586,7 +593,79 @@ const getExcel = async (req, res) => {
                 : "N/A",
             ChallanNumber: item.challan?.challanNumber || "N/A",
             Weight: item.quantity,
-            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.formType || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
+            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
+            Cutters: item.shipTo?.name || "N/A",
+            WagonNumber: item.wagonNumber || "N/A",
+            Status: item.currentStatus,
+        }));
+
+        const workbook = XLSX.utils.book_new();
+
+        // Convert JSON data to worksheet
+        const worksheet = XLSX.utils.json_to_sheet(payload);
+
+        // Optional: Set column widths for better readability
+        worksheet['!cols'] = [
+            { wch: 12 }, // Date
+            { wch: 14 }, // ChallanDate
+            { wch: 16 }, // ChallanNumber
+            { wch: 10 }, // Weight
+            { wch: 30 }, // Description
+            { wch: 12 }, // Cutters
+            { wch: 14 }, // WagonNumber
+            { wch: 12 }  // Status
+        ];
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Stock Data');
+
+        // Generate buffer
+        const excelBuffer = XLSX.write(workbook, {
+            type: 'buffer',
+            bookType: 'xlsx'
+        });
+
+        // Set headers for file download
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename=stock-data-${Date.now()}.xlsx`
+        );
+        res.setHeader('Content-Length', excelBuffer.length);
+
+        // Send the buffer
+        res.send(excelBuffer);
+
+    } catch (error) {
+        console.error('Error generating Excel:', error);
+        res.status(500).json({
+            message: 'Error generating Excel file',
+            error: error.message
+        });
+    }
+};
+
+const getExcelBooking = async (req, res) => {
+    try {
+        const bookings = await Booking.find().populate([
+            "challan",
+            "grade",
+            "thickness",
+            "width",
+            "shipTo",
+        ]).lean();
+
+        const payload = bookings.map((item) => ({
+            Date: item.createdAt?.toISOString().split("T")[0],
+            ChallanDate: item.challan?.challanDate
+                ? item.challan.challanDate.toISOString().split("T")[0]
+                : "N/A",
+            ChallanNumber: item.challan?.challanNumber || "N/A",
+            Weight: item.quantity,
+            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
             Cutters: item.shipTo?.name || "N/A",
             WagonNumber: item.wagonNumber || "N/A",
             Status: item.currentStatus,
@@ -655,5 +734,6 @@ module.exports = {
     cancelBooking,
     deliverBooking,
     getAllBookingsDetails,
-    getExcel
+    getExcelBooking,
+    getExcelItem,
 }
