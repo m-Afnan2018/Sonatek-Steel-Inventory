@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/userModel')
 const { customError } = require('../utils/errorHandler');
 
 const authentication = async (req, res, next) => {
@@ -30,6 +31,19 @@ const authentication = async (req, res, next) => {
             req.token = token;
         } catch (err) {
             throw customError('Invalid Token', 403);
+        }
+
+        const user = await User.findById(req.user.userId);
+        if (!user || user.status === 'inactive') {
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+            }).json({
+                success: false,
+                message: "Sign in again",
+            }).status(266);
+            return;
         }
 
         //  Move Forward

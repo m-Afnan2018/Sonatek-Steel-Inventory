@@ -1,169 +1,137 @@
-import toast from "react-hot-toast";
 import { apiConnector } from "services/apiConnector";
 import { varientEndpoints } from "services/apis";
 import { setCutters, setGrades, setThicknesses, setWidths } from "slices/varientSlice";
+import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
-
+// 🧩 Get All Varients
 export async function getAllVarients(dispatch) {
-    const toastId = toast.loading("Loading...")
     try {
-        const response = (await apiConnector('GET', varientEndpoints.GET_ALL_VARIENT)).data;
+        dispatch(addLoader("getAllVarients"));
+
+        const response = (await apiConnector("GET", varientEndpoints.GET_ALL_VARIENT)).data;
 
         if (response.success) {
-            // dispatch(setGrades(response.grades));
-            // dispatch(setCutters(response.cutters))
-            // dispatch(setThicknesses(response.thickness))
-            // dispatch(setWidths(response.widths));
-
-            // safe extractor that handles objects, strings, numbers, missing values
-            const toName = (item, key = 'name') => {
-                if (item == null) return '';                     // null/undefined -> empty
-                if (typeof item === 'string' || typeof item === 'number') return String(item);
+            const toName = (item, key = "name") => {
+                if (item == null) return "";
+                if (typeof item === "string" || typeof item === "number") return String(item);
                 const v = item[key];
-                return v == null ? '' : String(v);
+                return v == null ? "" : String(v);
             };
 
-            const sortByName = (arr = [], key = 'name') =>
+            const sortByName = (arr = [], key = "name") =>
                 [...arr].sort((a, b) =>
-                    toName(a, key).localeCompare(toName(b, key), undefined, { numeric: true, sensitivity: 'base' })
+                    toName(a, key).localeCompare(toName(b, key), undefined, { numeric: true, sensitivity: "base" })
                 );
 
-            // use before dispatch
             dispatch(setGrades(sortByName(response.grades)));
             dispatch(setCutters(sortByName(response.cutters)));
             dispatch(setThicknesses(sortByName(response.thickness)));
             dispatch(setWidths(sortByName(response.widths)));
-        }
 
-        toast.dismiss(toastId);
-        toast.success(response.message)
+            dispatch(showSuccess({ id: "getAllVarients", message: response.message }));
+        }
     } catch (err) {
-        console.log(err);
-        toast.dismiss(toastId);
-        toast.error(err.response.data.message)
+        dispatch(showError({
+            id: "getAllVarients",
+            message: err?.response?.data?.message || "Failed to fetch variants"
+        }));
     }
 }
 
+// ➕ Add Varient
 export async function addVarient(type, value, dispatch, list) {
-    const toastId = toast.loading("Loading...")
     try {
-        const response = (await apiConnector('POST', varientEndpoints.ADD_VARIENT, { type, value })).data;
+        dispatch(addLoader("addVarient"));
+
+        const response = (await apiConnector("POST", varientEndpoints.ADD_VARIENT, { type, value })).data;
 
         if (response.success) {
             const newList = [...list, response.value];
 
-            if (type === 'grade') {
-                dispatch(setGrades(newList));
-            }
+            if (type === "grade") dispatch(setGrades(newList));
+            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "thickness") dispatch(setThicknesses(newList));
+            if (type === "width") dispatch(setWidths(newList));
 
-            if (type === 'cutter') {
-                dispatch(setCutters(newList));
-            }
-
-            if (type === 'thickness') {
-                dispatch(setThicknesses(newList));
-            }
-
-            if (type === 'width') {
-                dispatch(setWidths(newList));
-            }
+            dispatch(showSuccess({ id: "addVarient", message: response.message }));
         }
-
-        toast.dismiss(toastId);
-        toast.success(response.message)
     } catch (err) {
-        toast.dismiss(toastId);
-        toast.error(err.response.data.message)
+        dispatch(showError({
+            id: "addVarient",
+            message: err?.response?.data?.message || "Failed to add variant"
+        }));
     }
 }
 
+// ✏️ Update Varient
 export async function updateVarient(id, type, value, dispatch, list) {
-    const toastId = toast.loading("Loading...")
     try {
-        const response = (await apiConnector('PATCH', varientEndpoints.UPDATE_VARIENT, {
-            id, type, value
-        })).data;
+        dispatch(addLoader("updateVarient"));
+
+        const response = (await apiConnector("PATCH", varientEndpoints.UPDATE_VARIENT, { id, type, value })).data;
 
         if (response.success) {
-            const newList = list.map((vari) => {
-                if (vari._id === id) {
-                    return { ...vari, name: value }; // create new object with updated name
-                }
-                return vari;
-            });
+            const newList = list.map((vari) =>
+                vari._id === id ? { ...vari, name: value } : vari
+            );
 
-            if (type === 'grade') {
-                dispatch(setGrades(newList));
-            }
+            if (type === "grade") dispatch(setGrades(newList));
+            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "thickness") dispatch(setThicknesses(newList));
+            if (type === "width") dispatch(setWidths(newList));
 
-            if (type === 'cutter') {
-                dispatch(setCutters(newList));
-            }
-
-            if (type === 'thickness') {
-                dispatch(setThicknesses(newList));
-            }
-
-            if (type === 'width') {
-                dispatch(setWidths(newList));
-            }
+            dispatch(showSuccess({ id: "updateVarient", message: response.message }));
         }
-
-        toast.dismiss(toastId);
-        toast.success(response.message)
     } catch (err) {
-        toast.dismiss(toastId);
-        toast.error(err.response.data.message)
+        dispatch(showError({
+            id: "updateVarient",
+            message: err?.response?.data?.message || "Failed to update variant"
+        }));
     }
 }
 
+// ❌ Delete Varient
 export async function deleteVarient(id, type, dispatch, list) {
-    const toastId = toast.loading("Loading...")
     try {
-        const response = (await apiConnector('DELETE', varientEndpoints.DELETE_VARIENT, { id, type })).data;
+        dispatch(addLoader("deleteVarient"));
+
+        const response = (await apiConnector("DELETE", varientEndpoints.DELETE_VARIENT, { id, type })).data;
 
         if (response.success) {
             const newList = list.filter((vari) => vari._id !== id);
 
-            if (type === 'grade') {
-                dispatch(setGrades(newList));
-            }
+            if (type === "grade") dispatch(setGrades(newList));
+            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "thickness") dispatch(setThicknesses(newList));
+            if (type === "width") dispatch(setWidths(newList));
 
-            if (type === 'cutter') {
-                dispatch(setCutters(newList));
-            }
-
-            if (type === 'thickness') {
-                dispatch(setThicknesses(newList));
-            }
-
-            if (type === 'width') {
-                dispatch(setWidths(newList));
-            }
+            dispatch(showSuccess({ id: "deleteVarient", message: response.message }));
         }
-
-        toast.dismiss(toastId);
-        toast.success(response.message)
     } catch (err) {
-        toast.dismiss(toastId);
-        toast.error(err.response.data.message)
+        dispatch(showError({
+            id: "deleteVarient",
+            message: err?.response?.data?.message || "Failed to delete variant"
+        }));
     }
 }
 
-export async function getAllVarientsDetail(setData, setLoading) {
-    const toastId = toast.loading("Loading...")
+// 📋 Get All Varients Detail
+export async function getAllVarientsDetail(setData, setLoading, dispatch) {
     try {
-        const response = (await apiConnector('GET', varientEndpoints.GET_ALL_VARIENT_DETAIL)).data;
+        dispatch(addLoader("getAllVarientsDetail"));
 
-        if (response) {
-            setData(response.data)
+        const response = (await apiConnector("GET", varientEndpoints.GET_ALL_VARIENT_DETAIL)).data;
+
+        if (response.success) {
+            setData(response.data);
             setLoading(false);
+            dispatch(showSuccess({ id: "getAllVarientsDetail", message: response.message }));
         }
-
-        toast.dismiss(toastId);
-        toast.success(response.message)
     } catch (err) {
-        toast.dismiss(toastId);
-        toast.error(err.response.data.message)
+        console.log(err);
+        dispatch(showError({
+            id: "getAllVarientsDetail",
+            message: err?.response?.data?.message || "Failed to fetch variant details"
+        }));
     }
 }

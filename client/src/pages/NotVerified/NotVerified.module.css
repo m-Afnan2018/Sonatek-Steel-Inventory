@@ -1,0 +1,68 @@
+.NotVerified {
+    height: 100dvh;
+    width: 100dvw;
+    background: radial-gradient(50.00% 50.00% at 50% 50%, rgba(8, 81, 109, 1), rgba(0, 31, 43, 1) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 60dvw;
+    max-width: 500px;
+    background-color: rgb(145, 182, 214);
+    border-radius: 6px;
+    box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 1);
+    background: rgba(255, 255, 255, 1);
+}
+
+.heading {
+    background: rgba(0, 31, 43, 1);
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.heading>img {
+    width: auto;
+    height: 90%;
+}
+
+h3 {
+    text-align: center;
+    color: #001f2b;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.loaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 5rem;
+}
+
+.NotVerified button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background: rgba(9, 133, 180, 1);
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.NotVerified button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background: rgba(9, 133, 180, 1);
+}
+
+@media (max-width: 500px) {
+    .container {
+        width: 90dvw;
+    }
+}

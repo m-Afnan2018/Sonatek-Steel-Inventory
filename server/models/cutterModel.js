@@ -2,7 +2,17 @@ const { default: mongoose } = require("mongoose");
 
 const cutterSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
+    },
+    address: {
+        type: String,
+    },
+    phoneNumber: {
+        type: String,
+    },
+    visible: {
+        type: Boolean,
+        default: true,
     },
     createdAt: {
         type: Date,

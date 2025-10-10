@@ -13,8 +13,9 @@ export const userEndpoints = {
     GET_ALL_USER: `${BASE_URL}/user/getAllUsers`,
     UPDATE_USER: `${BASE_URL}/user/updateUser`,
     VERIFY_USER: `${BASE_URL}/user/verifyUser`,
+    ACTIVE_USER: `${BASE_URL}/user/activeUser`,
     DELETE_USER: `${BASE_URL}/user/deleteUser`,
-    REMOVE_USER: `${BASE_URL}/user/deleteUser`,
+    REMOVE_USER: `${BASE_URL}/user/removeUser`,
     CHANGE_DESIGNATION: `${BASE_URL}/user/changeUserDesignation`,
     GET_USER: `${BASE_URL}/user/getUser`
 }
@@ -46,4 +47,11 @@ export const bookingEndpoints = {
     CANCEL_BOOKING: `${BASE_URL}/booking/cancelBooking`,
     DELIVER_BOOKING: `${BASE_URL}/booking/deliverBooking`,
     GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`
+}
+
+export const cutterEndpoints = {
+    ADD_CUTTERS: `${BASE_URL}/cutters/addCutters`,
+    HIDE_CUTTERS: `${BASE_URL}/cutters/hideCutters`,
+    SHOW_CUTTERS: `${BASE_URL}/cutters/showCutters`,
+    GET_DATA_BY_CUTTERS: `${BASE_URL}/cutters/getDataByCutters`
 }

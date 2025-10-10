@@ -28,19 +28,31 @@ const createBooking = async (req, res) => {
                 item.quantity -= used;
                 remaining -= used;
                 totalUsed += used;
-                takenItems.push({ item: item._id, quantity: used })
+                // include an item snapshot so booking keeps item data even if Item is later removed
+                takenItems.push({ item: item._id, quantity: used, itemSnapshot: Booking.makeItemSnapshot(item) })
                 await item.save(); // update only affected items
             }
         }
 
         // if (remaining > 0) throw customError("Not enough stock to fulfill requirement", 400);
 
+        // Build bookedBy snapshot from current user data
+        const userDoc = await User.findById(userId).select('firstName lastName email phone role name fullName');
+        const bookedBySnapshot = Booking.makeBookedBySnapshot(userDoc ? {
+            _id: userDoc._id,
+            name: userDoc.name || `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim(),
+            email: userDoc.email,
+            phone: userDoc.phone,
+            role: userDoc.role
+        } : null);
+
         const newBooking = await Booking.create({
             booking_id: uuidv4(),
             items: takenItems,
             quantity: totalUsed,
             requirement,
-            bookedBy: userId
+            bookedBy: userId,
+            bookedBySnapshot
         })
 
         const populatedBookings = await Booking.findById(newBooking._id).populate({
@@ -54,13 +66,15 @@ const createBooking = async (req, res) => {
         });;
 
         const wagonInfo = populatedBookings.items
-            .filter(i => i.item) // safety check
-            .map(i => ({
-                wagonNumber: i.item.wagonNumber,
-                challanNumber: i.item.challan?.challanNumber || "N/A",
-                challanDate: i.item.challan?.challanDate || "N/A",
-                quantityTaken: i.quantity,
-            }));
+            .map(i => {
+                const src = i.item || i.itemSnapshot || {};
+                return ({
+                    wagonNumber: src.wagonNumber || "N/A",
+                    challanNumber: src.challan?.challanNumber || src.challanNumber || "N/A",
+                    challanDate: src.challan?.challanDate || src.challanDate || "N/A",
+                    quantityTaken: i.quantity,
+                })
+            });
 
         const payload = {
             _id: populatedBookings._id,
@@ -68,11 +82,11 @@ const createBooking = async (req, res) => {
             requirement: populatedBookings.requirement,
             status: populatedBookings.status,
             bookingDate: populatedBookings.bookingDate,
-            bookedBy: `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`,
-            type: populatedBookings.items[0]?.item.type || "N/A",
-            grade: populatedBookings.items[0]?.item.grade?.name || "N/A",
-            formType: populatedBookings.items[0]?.item.formType || "N/A",
-            thickness: populatedBookings.items[0]?.item.thickness?.name || "N/A",
+            bookedBy: (populatedBookings.bookedBy && `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`) || populatedBookings.bookedBySnapshot?.name || "N/A",
+            type: (populatedBookings.items[0]?.item?.type) || (populatedBookings.items[0]?.itemSnapshot?.type) || "N/A",
+            grade: (populatedBookings.items[0]?.item?.grade?.name) || (populatedBookings.items[0]?.itemSnapshot?.grade) || "N/A",
+            formType: (populatedBookings.items[0]?.item?.formType) || (populatedBookings.items[0]?.itemSnapshot?.formType) || "N/A",
+            thickness: (populatedBookings.items[0]?.item?.thickness?.name) || (populatedBookings.items[0]?.itemSnapshot?.thickness) || "N/A",
             vehicleNumber: populatedBookings.vehicleNumber || "N/A",
             wagons: wagonInfo,
         }
@@ -151,7 +165,7 @@ const getBooking = async (req, res) => {
 
 const getAllBookings = async (req, res) => {
     try {
-        const { search } = req.body;
+        const search = req?.body?.search || null;
 
         let query = {};
 
@@ -165,15 +179,58 @@ const getAllBookings = async (req, res) => {
             };
         }
 
+        // const bookings = await Booking.find(query)
+        //     .populate("item", "name quantity") // populate item name & quantity
+        //     .populate("bookingBy", "firstName lastName email") // populate user info
+        //     .sort({ bookingDate: -1 }); // latest first
+
         const bookings = await Booking.find(query)
-            .populate("item", "name quantity") // populate item name & quantity
-            .populate("bookingBy", "firstName lastName email") // populate user info
-            .sort({ bookingDate: -1 }); // latest first
+            .sort({ bookingDate: -1 })
+            .populate({
+                path: 'items.item',
+                populate: [
+                    { path: 'grade', select: 'name' },
+                    { path: 'thickness', select: 'name' },
+                ],
+            })
+            .populate({
+                path: 'bookedBy'
+            });
+
+        const allBookings = bookings.map((booking) => {
+            const firstItem = booking.items[0]?.item;
+
+            // Group items by wagon number for this booking
+            const wagonInfo = booking.items
+                .filter(i => i.item) // safety check
+                .map(i => ({
+                    wagonNumber: i.item.wagonNumber,
+                    challanNumber: i.item.challan?.challanNumber || "N/A",
+                    challanDate: i.item.challan?.challanDate || "N/A",
+                    quantityTaken: i.quantity,
+                }));
+
+            return {
+                _id: booking._id,
+                quantity: booking.quantity,
+                requirement: booking.requirement,
+                status: booking.status,
+                bookingDate: booking.bookingDate,
+                bookedBy: `${booking.bookedBy?.firstName} ${booking.bookedBy?.lastName}`,
+                type: firstItem?.type || "N/A",
+                grade: firstItem?.grade?.name || "N/A",
+                formType: firstItem?.formType || "N/A",
+                thickness: firstItem?.thickness?.name || "N/A",
+                vehicleNumber: booking.vehicleNumber || "N/A",
+                wagons: wagonInfo,
+            };
+        });
 
         res.status(200).json({
             success: true,
+            message: "Successfully fetch all the bookings",
             count: bookings.length,
-            bookings,
+            bookings: allBookings,
         });
     } catch (err) {
         errorResponse(res, err);

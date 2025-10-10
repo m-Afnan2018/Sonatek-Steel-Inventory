@@ -40,6 +40,9 @@ const bookingSlice = createSlice({
                 return booking;
             })
         },
+        setOptions(state, action) {
+            state.options = action.payload;
+        },
         addNewBooking(state, action) {
             const payload = action.payload;
             state.bookings = [...state.bookings, payload];
@@ -54,7 +57,8 @@ export const {
     setRequirement,
     setBookings,
     updateBookingStatus,
-    addNewBooking
+    addNewBooking,
+    setOptions
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer

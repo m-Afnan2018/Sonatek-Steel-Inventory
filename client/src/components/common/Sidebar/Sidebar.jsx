@@ -19,6 +19,7 @@ const Sidebar = ({ sidebar }) => {
             <div>
                 <NavLink className={`${location.pathname === '/' ? style.activeLink : ''} ${style.navlinks}`} to={'/'}>Dashboard</NavLink>
                 <NavLink className={`${location.pathname === '/manage-varient' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-varient'}>Manage Varients</NavLink>
+                <NavLink className={`${location.pathname === '/manage-cutters' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-cutters'}>Manage Cutters</NavLink>
                 <NavLink className={`${location.pathname === '/manage-inventory' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-inventory'}>Manage Inventory</NavLink>
                 <NavLink className={`${location.pathname === '/manage-bookings' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-bookings'}>Manage Booking</NavLink>
                 {(userData.role === 'admin' || userData.role === 'director') && <NavLink className={`${location.pathname === '/manage-users' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-users'}>Manange Users</NavLink>}

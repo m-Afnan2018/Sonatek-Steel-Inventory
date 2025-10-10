@@ -16,13 +16,40 @@ import Varient from 'pages/Varient/Varient';
 import { getAllVarients } from 'services/operations/varientAPI';
 import Error from 'pages/Error/Error';
 import NotVerified from 'pages/NotVerified/NotVerified';
+import toast from 'react-hot-toast';
+import { removeError, removeSuccess } from 'slices/loaderSlice';
+import { OverlayProvider } from 'hooks/useOverlay';
+import Cutter from 'pages/Cutter/Cutter';
 
 function App() {
     //  If User Logged in
     const { isLogin, token, userData } = useSelector((state) => state.auth);
+    const { loader, success, error } = useSelector((state) => state.loader);
     const [sidebar, setSidebar] = useState(false);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (loader.length > 0) {
+            toast.loading("Loading...", { id: "loader" });
+        } else {
+            toast.dismiss("loader");
+        }
+    }, [loader]);
+
+    useEffect(() => {
+        success.forEach((s) => {
+            toast.success(s.message, { position: "bottom-right" });
+            dispatch(removeSuccess(s.id))
+        })
+    }, [dispatch, success])
+    useEffect(() => {
+        error.forEach((s) => {
+            toast.error(s.message, { position: "bottom-right" });
+            dispatch(removeError(s.id))
+        })
+    }, [dispatch, error])
+
 
     useEffect(() => {
         if (!isLogin) {
@@ -51,15 +78,18 @@ function App() {
             <Navbar triggerSidebar={triggerSidebar} />
             <div className='main-container'>
                 <Sidebar sidebar={sidebar} />
-                <Routes>
-                    <Route path='/' element={<Dashboard />} />
-                    <Route path='/manage-varient' element={<Varient />} />
-                    <Route path='/manage-inventory' element={<Inventory />} />
-                    <Route path='/manage-bookings' element={<Booking />} />
-                    <Route path='/manage-users' element={<User />} />
-                    <Route path='/manage-account' element={<Account />} />
-                    <Route path='*' element={<Error />} />
-                </Routes>
+                <OverlayProvider>
+                    <Routes>
+                        <Route path='/' element={<Dashboard />} />
+                        <Route path='/manage-varient' element={<Varient />} />
+                        <Route path='/manage-inventory' element={<Inventory />} />
+                        <Route path='/manage-cutters' element={<Cutter />} />
+                        <Route path='/manage-bookings' element={<Booking />} />
+                        <Route path='/manage-users' element={<User />} />
+                        <Route path='/manage-account' element={<Account />} />
+                        <Route path='*' element={<Error />} />
+                    </Routes>
+                </OverlayProvider>
             </div>
         </div>
     );

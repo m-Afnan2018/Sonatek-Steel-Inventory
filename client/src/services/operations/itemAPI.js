@@ -1,86 +1,74 @@
-import toast from "react-hot-toast";
 import { apiConnector } from "services/apiConnector";
 import { itemEndpoints } from "services/apis";
-import { deleteFromCurrentList, setCurrentList, setSelectUpdate, updateFromCurrentList } from "slices/itemSlice";
-
+import {
+    deleteFromCurrentList,
+    setCurrentList,
+    setSelectUpdate,
+    updateFromCurrentList
+} from "slices/itemSlice";
+import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
 export async function getAllItem(data, dispatch) {
-    const toastId = toast.loading("Loading...")
     try {
+        dispatch(addLoader("getAllItem"));
         const response = (await apiConnector('POST', itemEndpoints.GET_ALL_ITEMS, data)).data;
 
-        dispatch(setCurrentList(response.items))
-        toast.dismiss(toastId);
-        toast.success(response.data.message)
+        dispatch(setCurrentList(response.items));
+        dispatch(showSuccess({ id: "getAllItem", message: response.message }));
     } catch (err) {
-        toast.dismiss(toastId);
-        // toast.error(err.response.data.message)
+        dispatch(showError({ id: "getAllItem", message: err?.response?.data?.message || "Failed to fetch items" }));
     }
 }
 
 export async function getItem(params, dispatch, purpose) {
-    const toastId = toast.loading("Loading...")
     try {
+        dispatch(addLoader("getItem"));
         const response = (await apiConnector('POST', itemEndpoints.GET_ITEM, params)).data;
 
-        if (response.success) {
-            if (purpose === 'selectUpdate') {
-                dispatch(setSelectUpdate(response.item));
-            }
+        if (response.success && purpose === 'selectUpdate') {
+            dispatch(setSelectUpdate(response.item));
         }
-        toast.dismiss(toastId);
-        toast.success(response.data.message)
+
+        dispatch(showSuccess({ id: "getItem", message: response.message }));
     } catch (err) {
-        toast.dismiss(toastId);
-        // toast.error(err.response.data.message)
+        dispatch(showError({ id: "getItem", message: err?.response?.data?.message || "Failed to fetch item" }));
     }
 }
 
-export async function addItem(data) {
-    const toastId = toast.loading("Loading...")
+export async function addItem(data, dispatch) {
     try {
+        dispatch(addLoader("addItem"));
         const response = (await apiConnector('POST', itemEndpoints.ADD_ITEM, data)).data;
 
-        if (response.data) {
-            console.log(response);
-        }
-        toast.dismiss(toastId);
-        toast.success(response.data.message)
+        dispatch(showSuccess({ id: "addItem", message: response.message }));
     } catch (err) {
-        toast.dismiss(toastId);
-        // toast.error(err.response.data.message)
+        dispatch(showError({ id: "addItem", message: err?.response?.data?.message || "Failed to add item" }));
     }
 }
 
 export async function updateItem(params, dispatch) {
-    const toastId = toast.loading("Loading...")
     try {
+        dispatch(addLoader("updateItem"));
         const response = (await apiConnector('PATCH', itemEndpoints.UPDATE_ITEM, params)).data;
 
-        dispatch(updateFromCurrentList({ id: params._id, data: response.item }))
-        toast.dismiss(toastId);
-        toast.success(response.data.message)
+        dispatch(updateFromCurrentList({ id: params._id, data: response.item }));
+        dispatch(showSuccess({ id: "updateItem", message: response.message }));
     } catch (err) {
-        toast.dismiss(toastId);
-        // toast.error(err.response.data.message)
+        dispatch(showError({ id: "updateItem", message: err?.response?.data?.message || "Failed to update item" }));
     }
 }
 
 export async function deleteItem(params, dispatch) {
-    const toastId = toast.loading("Loading...")
-    console.log(params)
     try {
+        dispatch(addLoader("deleteItem"));
         const response = (await apiConnector('DELETE', itemEndpoints.DELETE_ITEM, params)).data;
 
-        console.log(response)
-
         if (response.success) {
-            dispatch(deleteFromCurrentList(params.itemId))
+            dispatch(deleteFromCurrentList(params.itemId));
         }
-        toast.dismiss(toastId);
-        toast.success(response.data.message)
+
+        dispatch(showSuccess({ id: "deleteItem", message: response.message }));
     } catch (err) {
-        toast.dismiss(toastId);
-        // toast.error(err.response.data.message)
+        dispatch(showError({ id: "deleteItem", message: err?.response?.data?.message || "Failed to delete item" }));
     }
 }

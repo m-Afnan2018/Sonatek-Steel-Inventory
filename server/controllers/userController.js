@@ -43,7 +43,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         // Fetching
-        const { userId } = req.user;
+        const { userId } = req.body;
 
         // Validation
         if (!userId) {
@@ -66,6 +66,31 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const addUser = async (req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.body;
+
+        // Validation
+        if (!userId) {
+            throw customError("User ID is required", 404);
+        }
+        const user = await User.findByIdAndUpdate(userId, { status: 'active' });
+
+        if (!user) {
+            throw customError("Unable to find the user", 401);
+        }
+
+        // Send Response
+        res.status(200).json({
+            success: true,
+            message: "Sucessfully reactivated the user"
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 const removeUser = async (req, res) => {
     try {
         // Fetching
@@ -75,7 +100,7 @@ const removeUser = async (req, res) => {
         if (!userId) {
             throw customError("User ID is required", 404);
         }
-        const user = await User.findByIdAndDelete(userId);
+        const user = await User.findByIdAndUpdate(userId, { status: 'inactive' });
 
         if (!user) {
             throw customError("Unable to find the user", 401);
@@ -84,7 +109,7 @@ const removeUser = async (req, res) => {
         // Send Response
         res.status(200).json({
             success: true,
-            message: "Sucessfully deleted the user"
+            message: "Sucessfully suspended the user"
         })
     } catch (err) {
         errorResponse(res, err);
@@ -169,7 +194,7 @@ const updateUserRole = async (req, res) => {
 const verifyUser = async (req, res) => {
     try {
         // Fetching
-        const { userId } = req.body;
+        const { userId, role } = req.body;
         if (!userId) {
             throw customError(400, 'User ID is required');
         }
@@ -185,6 +210,7 @@ const verifyUser = async (req, res) => {
 
         // Verification logic here
         user.isVerified = true;
+        user.role = role;
         await user.save();
 
         // Response
@@ -206,4 +232,5 @@ module.exports = {
     listUsers,
     verifyUser,
     removeUser,
+    addUser
 };

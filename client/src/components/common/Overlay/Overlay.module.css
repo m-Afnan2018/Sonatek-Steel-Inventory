@@ -1,0 +1,161 @@
+.ShowOverlay {
+    position: relative;
+    padding: 1rem;
+    background-color: #f0fbff;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: 1rem;
+    box-shadow: 1px 1px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ShowOverlay>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ShowOverlay button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    color: #f0fbff;
+    background: #05516f;
+}
+
+.ShowOverlay button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    color: rgb(0 31 43);
+    background-color: #f0fbff;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.radioButton {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.radioButton input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.radioLabel {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: #001f2b;
+    border: 2px solid #001f2b;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #f0fbff;
+    transition: all 0.3s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.radioButton:hover .radioLabel {
+    background-color: #001f2b;
+    border-color: #ccc;
+}
+
+.radioButton input[type='radio']:checked+.radioLabel {
+    background-color: #001f2b;
+    border-color: #007bff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.radioButton input[type='radio']:focus+.radioLabel {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Details overlay styles */
+.DetailsOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.DetailsContent {
+    width: 90%;
+    max-width: 1000px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    color: #0b2a33;
+}
+
+.DetailsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e6eef1;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.HeaderActions { display:flex; gap: .5rem }
+.CloseButton {
+    background: transparent;
+    border: 1px solid #c7d7db;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.DetailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.Card { background: #f7fcfd; padding: 0.8rem; border-radius: 8px }
+.FullWidth { grid-column: 1 / -1 }
+
+.ItemRow { display:flex; gap:1rem; align-items:flex-start; padding: .6rem 0; border-bottom: 1px dashed #e6eef1 }
+.ItemMain { flex:1 }
+.ItemMeta { width:220px; text-align:right }
+
+.DetailsFooter { display:flex; justify-content:flex-end; margin-top:1rem }
+.PrimaryButton {
+    background: #05516f;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor:pointer;
+}
+
+.pending { color: #ff9800; font-weight:700 }
+.processing { color: #007bff; font-weight:700 }
+.delivered { color: #28a745; font-weight:700 }
+.cancelled { color: #dc3545; font-weight:700 }

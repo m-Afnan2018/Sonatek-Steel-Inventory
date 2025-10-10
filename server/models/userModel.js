@@ -33,7 +33,12 @@ const userSchema =  new mongoose.Schema({
         type: String, 
         enum: ['admin', 'director', 'inventory_associate', 'agent', 'accountant'],
         default: null
-    }, 
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
+    },
     createdAt: {
         type: Date,
         default: Date.now

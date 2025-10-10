@@ -2,9 +2,10 @@
     display: flex;
     justify-content: center;
     height: calc(100vh - 64px);
+    position: relative;
 }
 
-.main-container>:nth-child(2){
+.main-container>:nth-child(2) {
     overflow-y: auto;
     width: -webkit-fill-available;
 }

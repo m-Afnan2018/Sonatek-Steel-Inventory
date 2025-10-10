@@ -17,10 +17,16 @@ const userSlice = createSlice({
                 user._id === userId ? { ...user, isVerified: true } : user
             );
         },
-        deleteUser: (state, action) => {
+        updateRemoveUser: (state, action) => {
             const userId = action.payload;
-            state.allUsers = state.allUsers.filter(user =>
-                user._id !== userId
+            state.allUsers = state.allUsers.map(user =>
+                user._id === userId ? { ...user, status: 'inactive' } : user
+            )
+        },
+        updateAddUser: (state, action) => {
+            const userId = action.payload;
+            state.allUsers = state.allUsers.map(user =>
+                user._id === userId ? { ...user, status: 'active' } : user
             )
         },
         updateUserDesignation: (state, action) => {
@@ -28,9 +34,13 @@ const userSlice = createSlice({
             state.allUsers = state.allUsers.map(user =>
                 user._id === userId ? { ...user, role: role } : user
             );
+        },
+        updateDeleteRequest: (state, action) => {
+            const userId = action.payload;
+            state.allUsers = state.allUsers.filter(user => user._id !== userId);
         }
     }
 })
 
-export const { setAllUsers, updateUserVerification, deleteUser, updateUserDesignation } = userSlice.actions;
+export const { setAllUsers, updateUserVerification, updateAddUser, updateRemoveUser, updateUserDesignation, updateDeleteRequest } = userSlice.actions;
 export default userSlice.reducer;

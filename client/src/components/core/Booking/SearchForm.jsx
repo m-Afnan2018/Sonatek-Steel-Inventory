@@ -26,7 +26,6 @@ const SearchForm = () => {
         defaultValues: {
             quantity: '',
             type: '',
-            formType: '',
             grade: '',
             thickness: '',
             width: '',
@@ -43,19 +42,19 @@ const SearchForm = () => {
     return (
         <div className={style.SearchForm}>
             {/* Toggle button */}
-            <div style={{ height: showForm ? '0rem' : '100%' }}>
+            <div style={{ height: showForm ? '0rem' : '2rem' }}>
                 <button onClick={() => setShowForm(true)}>Create new Booking</button>
             </div>
 
             {/* Form */}
             <form
-                style={{ height: showForm ? '38rem' : '0' }}
+                style={{ height: showForm ? '25rem' : '0' }}
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <h3>Search for Booking</h3>
 
                 {/* Quantity */}
-                <div>
+                {/* <div>
                     <label>Quantity:</label>
                     <input
                         type="number"
@@ -68,7 +67,7 @@ const SearchForm = () => {
                     {errors.quantity && (
                         <span className={style.error}>{errors.quantity.message}</span>
                     )}
-                </div>
+                </div> */}
 
                 {/* Type */}
                 <div>
@@ -88,7 +87,7 @@ const SearchForm = () => {
                 </div>
 
                 {/* Form Type */}
-                <div>
+                {/* <div>
                     <label>Form Type:</label>
                     <select
                         {...register('formType', {
@@ -102,7 +101,7 @@ const SearchForm = () => {
                     {errors.formType && (
                         <span className={style.error}>{errors.formType.message}</span>
                     )}
-                </div>
+                </div> */}
 
                 {/* Grade */}
                 <div>
@@ -165,7 +164,7 @@ const SearchForm = () => {
                 </div>
 
                 {/* Buttons */}
-                <div>
+                <div style={{ justifyContent: 'center', flexDirection: 'row' }}>
                     <button type="submit">Search</button>
                     <button
                         type="button"

@@ -122,11 +122,11 @@
     color: white;
     display: flex;
     flex-direction: column;
-    justify-content: stretch;
+    justify-content: space-evenly;
     gap: 1rem;
 }
 
-.choices>div {
+.allChoices {
     display: flex;
     flex-direction: column;
     background: white;
@@ -134,7 +134,7 @@
     box-shadow: inset 0px 0px 4px 2px black;
 }
 
-.choices>div>h2 {
+.allChoices>h2 {
     color: #f0fbff;
     font-weight: 700;
     margin: auto;
@@ -361,5 +361,23 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 1rem;
+}
+
+.selectedOptions {
+    display: flex;
+    background: #065675;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    justify-content: space-between;
+    align-items: center;
+    color: #f0fbff;
+    flex-wrap: wrap;
+}
+
+.selectedOptions>div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     gap: 1rem;
 }

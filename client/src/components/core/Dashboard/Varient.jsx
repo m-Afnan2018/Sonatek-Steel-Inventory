@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import style from './Dashboard.module.css';
 import { getAllVarientsDetail } from 'services/operations/varientAPI';
+import { useDispatch } from 'react-redux';
 
 const Varient = () => {
     const [data, setData] = useState(null);
     const [activeVariant, setActiveVariant] = useState(null); // tracks which variant card is expanded
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        getAllVarientsDetail(setData, setLoading);
-    }, []);
+        getAllVarientsDetail(setData, setLoading, dispatch);
+    }, [dispatch]);
 
     if (loading) return <div className={style.loading}>Loading variants...</div>;
     if (!data) return <div className={style.empty}>No variant data found</div>;

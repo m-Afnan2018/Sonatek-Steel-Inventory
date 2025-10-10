@@ -113,6 +113,10 @@ const loginUser = async (req, res) => {
             throw customError('Invalid email or password', 401);
         }
 
+        if (user.status === 'inactive') {
+            throw customError('You are suspended', 401);
+        }
+
         const payload = {
             userId: user._id,
             firstName: user.firstName,
@@ -120,7 +124,8 @@ const loginUser = async (req, res) => {
             phoneNumber: user.phoneNumber,
             role: user.role,
             email: user.email,
-            isVerified: user.isVerified
+            isVerified: user.isVerified,
+            status: user.status
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
@@ -249,7 +254,8 @@ const getUser = async (req, res) => {
             phoneNumber: findUser.phoneNumber,
             role: findUser.role,
             email: findUser.email,
-            isVerified: findUser.isVerified
+            isVerified: findUser.isVerified,
+            status: findUser.status
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);

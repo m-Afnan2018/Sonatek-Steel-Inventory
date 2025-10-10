@@ -1,12 +1,17 @@
+/* eslint-disable no-lone-blocks */
 import React, { useEffect, useState } from 'react'
 import style from './User.module.css'
-import { changeUserDesignation, getAllUsers, removeUser, verifyUser } from 'services/operations/userAPI'
+import { activeUser, changeUserDesignation, deleteRequest, getAllUsers, removeUser, verifyUser } from 'services/operations/userAPI'
 import { useDispatch, useSelector } from 'react-redux';
-import { formatDate } from 'utils/dateHandler';
+import { formatDate, formatTime } from 'utils/dateHandler';
+import toast from 'react-hot-toast';
+import { useOverlay } from 'hooks/useOverlay';
+import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 
 const User = () => {
     const [requests, setRequests] = useState(null);
     const [listUsers, setListUsers] = useState(null);
+    const [suspendedUsers, setSuspendedUsers] = useState(null);
     const [view, setView] = useState(null);
     const [filter, setFilter] = useState({
         query: '',
@@ -25,9 +30,11 @@ const User = () => {
     useEffect(() => {
         if (allUsers) {
             setRequests(allUsers.filter(user => !user.isVerified));
-            setListUsers(allUsers);
+            setSuspendedUsers(allUsers.filter(user => user.status === 'inactive'));
+            setListUsers(allUsers.filter(user => user.isVerified && user.status === 'active' && user._id !== userData.userId));
+            setView(null);
         }
-    }, [allUsers])
+    }, [allUsers, userData.userId])
 
     const applyFilter = () => {
         let filtered = [...allUsers];
@@ -101,21 +108,6 @@ const User = () => {
         <div className={style.User}>
             <h2>Manage Users</h2>
             <div className={style.pendingRequest}>
-                <h3>Pending Requests</h3>
-                <div className={style.usersList}>
-                    {requests && requests.length > 0 && requests.map((user) => {
-                        return <div className={style.singleUser}>
-                            <p>{user.email}</p>
-                            <p style={{ textTransform: 'capitalize' }}>{user.role}</p>
-                            <button onClick={() => verifyUser(user._id, dispatch, allUsers)}>Verify</button>
-                        </div>
-                    })}
-                    {requests && requests.length === 0 && <div className={style.Nothing}>
-                        No Pending Request
-                    </div>}
-                </div>
-            </div>
-            <div className={style.pendingRequest}>
                 <h3>All Users</h3>
                 <div className={style.filters}>
                     <div>
@@ -138,12 +130,15 @@ const User = () => {
                     </div>
                     <div>
                         <button onClick={applyFilter}> Search </button>
-                        <button onClick={clearFilter}> Cancle </button>
+                        <button onClick={clearFilter}> Refresh </button>
                     </div>
                 </div>
                 <div className={style.usersList}>
                     {listUsers && listUsers.map((user) => {
-                        return <SingleUser dispatch={dispatch} user={user} userData={userData} setView={setView} view={view} key={user._id} />
+                        if (user.isVerified) {
+                            return <SingleUser dispatch={dispatch} user={user} userData={userData} setView={setView} view={view} key={user._id} />
+                        }
+                        return null;
                     })}
                     {listUsers && listUsers.length === 0 && <div className={style.Nothing}>
                         No user found
@@ -151,14 +146,56 @@ const User = () => {
                 </div>
 
             </div>
+
+            <div className={style.pendingRequest}>
+                <h3>Pending Requests</h3>
+                <div className={style.usersList}>
+                    {requests && requests.length > 0 && requests.map((user) => {
+                        return <SingleUser dispatch={dispatch} user={user} userData={userData} setView={setView} view={view} key={user._id} />
+                    })}
+                    {requests && requests.length === 0 && <div className={style.Nothing}>
+                        No Pending Request
+                    </div>}
+                </div>
+            </div>
+
+            <div className={style.pendingRequest}>
+                <h3>Suspended Users</h3>
+                <div className={style.usersList}>
+                    {suspendedUsers && suspendedUsers.length > 0 && suspendedUsers.map((user) => {
+                        {/* return <div className={style.singleUser}>
+                            <p>{user.email}</p>
+                            <p style={{ textTransform: 'capitalize' }}>{user.role}</p>
+                            <button onClick={() => verifyUser(user._id, dispatch, allUsers)}>Verify</button>
+                        </div> */}
+                        return <SingleUser dispatch={dispatch} user={user} userData={userData} setView={setView} view={view} key={user._id} />
+                    })}
+                    {suspendedUsers && suspendedUsers.length === 0 && <div className={style.Nothing}>
+                        No user is suspended
+                    </div>}
+                </div>
+            </div>
         </div>
     )
 }
 
-
 const SingleUser = ({ user, userData, view, setView, dispatch }) => {
 
-    const [role, setRole] = useState(user.role);
+    const [role, setRole] = useState(user.role || '')
+
+    const { showOverlay } = useOverlay();
+
+    const verify = () => {
+        if (role === '' || role === null) {
+            toast.error("Please select the role before verify");
+            return;
+        }
+        verifyUser({ userId: user._id, role: role }, dispatch)
+    }
+
+    const remove = () => {
+        deleteRequest(user._id, dispatch);
+    }
 
     return <div>
         <div className={style.singleUser} style={{ borderRadius: view === user._id ? '0.5rem 0.5rem 0 0' : '0.5rem' }}>
@@ -169,7 +206,7 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
         <div style={{ height: view === user._id ? '250px' : 0, padding: view === user._id ? '1rem' : 0 }} className={style.moreDetails}>
             <div>
                 <p>Name:</p>
-                <p>{user.firstName} {user.lastName}</p>
+                <p style={{ textTransform: 'capitalize' }}>{user.firstName} {user.lastName}</p>
             </div>
             <div>
                 <p>Email:</p>
@@ -177,23 +214,24 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
             </div>
             <div>
                 <p>Phone number:</p>
-                <p>{user.phoneNumber}</p>
+                <p>{user.phoneNumber || '-'}</p>
             </div>
             <div>
                 <p>Designation:</p>
-                <p>{user.role}</p>
+                <p style={{ textTransform: 'capitalize' }}>{user.role || '-'}</p>
             </div>
             <div>
                 <p>Registered on: </p>
-                <p>{formatDate(user.createdAt)}</p>
+                <p>{formatDate(user.createdAt)}, {formatTime(user.updatedAt)}</p>
             </div>
             <div>
                 <p>Last Updated on: </p>
-                <p>{formatDate(user.updatedAt)}</p>
+                <p>{formatDate(user.updatedAt)}, {formatTime(user.updatedAt)}</p>
             </div>
 
-            {userData.userId !== user._id && <div className={style.disignation}>
-                <select name='designation' onChange={(e) => setRole(e.target.value)} defaultValue={user.role}>
+            {userData.userId !== user._id && !user.isVerified && <div className={style.disignation}>
+                <select name='designation' onChange={(e) => setRole(e.target.value)} defaultValue={role}>
+                    {!user.isVerified && <option value={''} disabled>Select Designation</option>}
                     {
                         ([{ val: 'admin', show: 'Admin' },
                         { val: 'inventory_associate', show: 'Inventory Associate' },
@@ -206,8 +244,40 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
                         }))
                     }
                 </select>
-                <button onClick={() => changeUserDesignation(user._id, role, dispatch)}>Update Designation</button>
-                <button onClick={() => removeUser(user._id, dispatch)}>Remove User</button>
+                <button onClick={verify}>Verify User</button>
+                <button onClick={remove}>Remove User</button>
+
+            </div>}
+
+            {userData.userId !== user._id && user.isVerified && <div className={style.disignation}>
+                {user.status === 'active' && <select name='designation' onChange={(e) => setRole(e.target.value)} defaultValue={user.role}>
+                    {
+                        ([{ val: 'admin', show: 'Admin' },
+                        { val: 'inventory_associate', show: 'Inventory Associate' },
+                        { val: 'director', show: 'Director' },
+                        { val: 'agent', show: 'Agent' },
+                        { val: 'accountant', show: 'Accountant' }
+                            // eslint-disable-next-line array-callback-return
+                        ].map((item) => {
+                            return <option disabled={item.val === user.role} value={item.val}>{item.show}</option>
+                        }))
+                    }
+                </select>}
+                {role !== user.role && <button onClick={() => changeUserDesignation(user._id, role, dispatch)}>Update Designation</button>}
+                {user.status === 'active' && <button onClick={() => {
+                    showOverlay(ConfirmationOverlay, {
+                        message: "Are you sure you want to suspend this user ?",
+                        onAccept: ()=>removeUser(user._id, dispatch)
+                    }
+                    )
+                }}>Suspend User</button>}
+                {user.status === 'inactive' && <button onClick={() => {
+                    showOverlay(ConfirmationOverlay, {
+                        message: "Are you sure this user is rejoining the company ?",
+                        onAccept: () => activeUser(user._id, dispatch),
+
+                    })
+                }}>Rejoin User</button>}
             </div>}
         </div>
     </div>

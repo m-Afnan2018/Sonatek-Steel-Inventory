@@ -18,14 +18,13 @@ const Dashboard = () => {
     return (
         <div className={style.Dashboard}>
             <h2>Dashboard</h2>
+            <Bookings />
 
             <Staff />
 
-            <Items />
-
             <Varient />
 
-            <Bookings />
+            <Items />
         </div>
     )
 }

@@ -159,6 +159,14 @@
     cursor: pointer;
 }
 
+.heading h3,
+h4 {
+    text-align: center;
+    color: #f0fbff;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
 .view {
     background-color: rgb(41, 74, 87);
     padding: 0 0.5rem;
