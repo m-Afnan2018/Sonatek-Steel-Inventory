@@ -10,20 +10,40 @@ const Sidebar = ({ sidebar }) => {
     const location = useLocation()
     const dispatch = useDispatch();
 
+    // normalize role to a compact key for comparisons
+    const normalizeRole = (r) => (r || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const roleKey = normalizeRole(userData?.role);
+
+
     const logout = () => {
         logoutUser(dispatch);
+    }
+    const links = [
+        { to: '/', label: 'Dashboard', roles: ['admin','inventoryassociate','agent','accountant','director'] },
+        { to: '/manage-varient', label: 'Manage Varients', roles: ['admin'] },
+        { to: '/manage-cutters', label: 'Manage Cutters', roles: ['admin'] },
+        { to: '/manage-inventory', label: 'Manage Inventory', roles: ['admin','inventoryassociate','agent','accountant','director'] },
+        { to: '/manage-bookings', label: 'Manage Booking', roles: ['admin','agent','accountant','director'] },
+        { to: '/manage-users', label: 'Manange Users', roles: ['admin','director'] },
+        { to: '/manage-account', label: 'Manange Account', roles: ['admin'] },
+    ];
+
+    const canSee = (linkRoles = []) => {
+        if (!userData) return false;
+        if (roleKey === 'admin') return true; // admin sees everything
+        // normalize allowed roles
+        const normalized = linkRoles.map(r => r.toString().toLowerCase().replace(/[^a-z0-9]/g, ''));
+        return normalized.includes(roleKey);
     }
 
     return (
         <div className={style.Sidebar} style={{ width: sidebar ? '256px' : '0px' }}>
             <div>
-                <NavLink className={`${location.pathname === '/' ? style.activeLink : ''} ${style.navlinks}`} to={'/'}>Dashboard</NavLink>
-                <NavLink className={`${location.pathname === '/manage-varient' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-varient'}>Manage Varients</NavLink>
-                <NavLink className={`${location.pathname === '/manage-cutters' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-cutters'}>Manage Cutters</NavLink>
-                <NavLink className={`${location.pathname === '/manage-inventory' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-inventory'}>Manage Inventory</NavLink>
-                <NavLink className={`${location.pathname === '/manage-bookings' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-bookings'}>Manage Booking</NavLink>
-                {(userData.role === 'admin' || userData.role === 'director') && <NavLink className={`${location.pathname === '/manage-users' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-users'}>Manange Users</NavLink>}
-                <NavLink className={`${location.pathname === '/manage-account' ? style.activeLink : ''} ${style.navlinks}`} to={'/manage-account'}>Manange Account</NavLink>
+                {links.map((ln) => (
+                    canSee(ln.roles) && (
+                        <NavLink key={ln.to} className={`${location.pathname === ln.to ? style.activeLink : ''} ${style.navlinks}`} to={ln.to}>{ln.label}</NavLink>
+                    )
+                ))}
             </div>
 
             <button onClick={logout}>Logout</button>
