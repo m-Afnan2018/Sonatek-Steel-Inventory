@@ -4,11 +4,12 @@ const Booking = require("../models/bookingModel");
 const Item = require("../models/itemModel");
 const User = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
+const XLSX = require('xlsx');
 
 const createBooking = async (req, res) => {
     try {
         const { userId } = req.user;
-        const { items, requirement } = req.body;
+        const { items, requirement, formType } = req.body;
 
         if (!items?.length) throw customError("Please select items", 404);
 
@@ -85,7 +86,7 @@ const createBooking = async (req, res) => {
             bookedBy: (populatedBookings.bookedBy && `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`) || populatedBookings.bookedBySnapshot?.name || "N/A",
             type: (populatedBookings.items[0]?.item?.type) || (populatedBookings.items[0]?.itemSnapshot?.type) || "N/A",
             grade: (populatedBookings.items[0]?.item?.grade?.name) || (populatedBookings.items[0]?.itemSnapshot?.grade) || "N/A",
-            formType: (populatedBookings.items[0]?.item?.formType) || (populatedBookings.items[0]?.itemSnapshot?.formType) || "N/A",
+            formType: formType,
             thickness: (populatedBookings.items[0]?.item?.thickness?.name) || (populatedBookings.items[0]?.itemSnapshot?.thickness) || "N/A",
             vehicleNumber: populatedBookings.vehicleNumber || "N/A",
             wagons: wagonInfo,
@@ -102,7 +103,6 @@ const createBooking = async (req, res) => {
         errorResponse(res, err);
     }
 };
-
 
 const updateBooking = async (req, res) => {
     try {
@@ -400,6 +400,29 @@ const searchOptions = async (req, res) => {
     }
 };
 
+const shippedBooking = async (req, res) => {
+    try {
+        const { bookingId, vehicleNumber } = req.body;
+
+        if (!bookingId) {
+            throw customError("Please select any one booking");
+        }
+
+        const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Shipped', vehicleNumber: vehicleNumber });
+
+        if (!booking) {
+            throw customError("Unable to find the booking");
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully shipped the booking"
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 const confirmBooking = async (req, res) => {
     try {
         const { bookingId, orderId } = req.body;
@@ -546,6 +569,78 @@ const getAllBookingsDetails = async (req, res) => {
     }
 };
 
+const getExcel = async (req, res) => {
+    try {
+        const items = await Item.find().populate([
+            "challan",
+            "grade",
+            "thickness",
+            "width",
+            "shipTo",
+        ]).lean();
+
+        const payload = items.map((item) => ({
+            Date: item.createdAt?.toISOString().split("T")[0],
+            ChallanDate: item.challan?.challanDate
+                ? item.challan.challanDate.toISOString().split("T")[0]
+                : "N/A",
+            ChallanNumber: item.challan?.challanNumber || "N/A",
+            Weight: item.quantity,
+            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.formType || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
+            Cutters: item.shipTo?.name || "N/A",
+            WagonNumber: item.wagonNumber || "N/A",
+            Status: item.currentStatus,
+        }));
+
+        const workbook = XLSX.utils.book_new();
+
+        // Convert JSON data to worksheet
+        const worksheet = XLSX.utils.json_to_sheet(payload);
+
+        // Optional: Set column widths for better readability
+        worksheet['!cols'] = [
+            { wch: 12 }, // Date
+            { wch: 14 }, // ChallanDate
+            { wch: 16 }, // ChallanNumber
+            { wch: 10 }, // Weight
+            { wch: 30 }, // Description
+            { wch: 12 }, // Cutters
+            { wch: 14 }, // WagonNumber
+            { wch: 12 }  // Status
+        ];
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Stock Data');
+
+        // Generate buffer
+        const excelBuffer = XLSX.write(workbook, {
+            type: 'buffer',
+            bookType: 'xlsx'
+        });
+
+        // Set headers for file download
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename=stock-data-${Date.now()}.xlsx`
+        );
+        res.setHeader('Content-Length', excelBuffer.length);
+
+        // Send the buffer
+        res.send(excelBuffer);
+
+    } catch (error) {
+        console.error('Error generating Excel:', error);
+        res.status(500).json({
+            message: 'Error generating Excel file',
+            error: error.message
+        });
+    }
+};
+
 
 module.exports = {
     createBooking,
@@ -556,7 +651,9 @@ module.exports = {
     getMyBookings,
     searchOptions,
     confirmBooking,
+    shippedBooking,
     cancelBooking,
     deliverBooking,
-    getAllBookingsDetails
+    getAllBookingsDetails,
+    getExcel
 }

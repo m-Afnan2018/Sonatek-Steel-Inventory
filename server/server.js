@@ -8,7 +8,8 @@ app.use(express.json());
 app.use(bodyParser.json())
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.CORS_URL,
+    origin: 'http://localhost:3000',
+    // origin: process.env.CORS_URL,
     credentials: true,
 }))
 
@@ -41,5 +42,5 @@ app.use('/api/v1/item', itemRoutes);
 app.use('/api/v1/booking', bookingRoutes);
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}:  http://localhost:${port}`);
+    console.log(`Server is running on port ${port}:  http://localhost:${port}`, process.env.CORS_URL);
 });

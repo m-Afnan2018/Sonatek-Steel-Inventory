@@ -23,11 +23,6 @@ const itemSchema = new mongoose.Schema({
         ref: 'Grade',
         required: true,
     },
-    formType: {
-        type: String,
-        required: true,
-        enum: ['Sheet', 'Coil']
-    },
     width: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Width',

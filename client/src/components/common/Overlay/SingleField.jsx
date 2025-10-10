@@ -77,6 +77,7 @@ const SingleField = ({ message, onAccept, close }) => {
                 <input
                     type='number'
                     min='1'
+                    step={'any'}
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className={style.inputField}

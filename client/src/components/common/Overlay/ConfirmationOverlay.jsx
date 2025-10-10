@@ -4,7 +4,7 @@ import style from './Overlay.module.css'
 const ConfirmationOverlay = ({ message, onAccept, close }) => {
     return (
         <div className={style.ShowOverlay}>
-            <h4>{message}</h4>
+            <h4 style={{ color: '#001f2b' }}>{message}</h4>
             <div>
                 <button onClick={onAccept}>Ok</button>
                 <button onClick={close}>Cancel</button>

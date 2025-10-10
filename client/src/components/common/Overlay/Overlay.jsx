@@ -11,9 +11,7 @@ const Overlay = ({ data, close }) => {
             <div className={style.DetailsContent} onClick={(e) => e.stopPropagation()}>
                 <div className={style.DetailsHeader}>
                     <h2>Booking Details</h2>
-                    <div className={style.HeaderActions}>
-                        <button className={style.CloseButton} onClick={close}>Close</button>
-                    </div>
+                    
                 </div>
 
                 <div className={style.DetailsGrid}>

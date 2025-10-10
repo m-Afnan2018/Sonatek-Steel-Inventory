@@ -68,18 +68,18 @@ const Bookings = () => {
             <h2 className={styles.heading}>Bookings Overview</h2>
 
             {/* Summary Cards */}
-            <div className={styles.summaryGrid}>
+            {summary && <div className={styles.summaryGrid}>
                 {Object.entries(summary).map(([key, value]) => (
                     <div key={key} className={`${styles.card} ${styles[key]}`}>
                         <h4 className={styles.cardTitle}>{key.toUpperCase()}</h4>
                         <p className={styles.cardValue}>{value}</p>
                     </div>
                 ))}
-            </div>
+            </div>}
 
             {/* Agents Summary */}
-            <div className={styles.agentsSection}>
-                <h3>Agent-wise Report</h3>
+            {agents && <div className={styles.agentsSection}>
+                <h2>Agent-wise Report</h2>
                 <div className={styles.agentGrid}>
                     {Object.entries(agents).map(([agent, info]) => (
                         <div key={agent} className={styles.agentCard}>
@@ -94,29 +94,11 @@ const Bookings = () => {
                         </div>
                     ))}
                 </div>
-            </div>
-
-            {/* Top controls: Search and pagination info */}
-            <div className={styles.controlsRow}>
-                <form onSubmit={onSearch} className={styles.searchForm}>
-                    <input
-                        type="text"
-                        placeholder="Search bookings..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className={styles.searchInput}
-                    />
-                    <button type="submit" className={styles.searchButton}>Search</button>
-                </form>
-
-                <div className={styles.paginationInfo}>
-                    Page {page} of {pagination?.totalPages || 1}
-                </div>
-            </div>
+            </div>}
 
             {/* Bookings Table */}
             <div className={styles.tableContainer}>
-                <h3>All Bookings</h3>
+                <h2>All Bookings</h2>
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -125,9 +107,6 @@ const Bookings = () => {
                             <th onClick={onSortByStatus} style={{ cursor: "pointer" }}>
                                 Status {sortBy === "status" ? "▲" : ""}
                             </th>
-                            <th>Quantity</th>
-                            <th>Requirement</th>
-                            <th>Vehicle</th>
                             <th>Date</th>
                             <th>Items</th>
                         </tr>
@@ -135,7 +114,7 @@ const Bookings = () => {
                     <tbody>
                         {bookings.map((booking) => (
                             <tr key={booking._id} onClick={() => viewData(booking)} style={{ cursor: "pointer" }}>
-                                <td>{booking.booking_id}</td>
+                                <td>{booking.orderId || 'Processing'}</td>
                                 <td
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -147,9 +126,6 @@ const Bookings = () => {
                                 <td className={styles[booking.status.toLowerCase()]}>
                                     {booking.status}
                                 </td>
-                                <td>{booking.quantity}</td>
-                                <td>{booking.requirement}</td>
-                                <td>{booking.vehicleNumber || "N/A"}</td>
                                 <td>{new Date(booking.bookingDate).toLocaleDateString()}</td>
                                 <td>
                                     {booking.items.map((it, idx) => (
@@ -158,7 +134,7 @@ const Bookings = () => {
                                                 {it.item?.type} | {it.item?.grade?.name} | {" "}
                                                 {it.item?.width?.name}mm | {it.item?.thickness?.name}mm
                                             </p>
-                                            <small>Qty: {it.quantity}</small>
+                                            <small>Qty: {it.quantity}ton</small>
                                         </div>
                                     ))}
                                 </td>
@@ -167,18 +143,36 @@ const Bookings = () => {
                     </tbody>
                 </table>
 
-                {/* Pagination controls */}
-                <div className={styles.paginationControls}>
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-                        Prev
-                    </button>
-                    <button
-                        onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
-                        disabled={page >= (pagination?.totalPages || 1)}
-                    >
-                        Next
-                    </button>
+                {/* Top controls: Search and pagination info */}
+                <div className={styles.controlsRow}>
+                    <form onSubmit={onSearch} className={styles.searchForm}>
+                        <input
+                            type="text"
+                            placeholder="Search bookings..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                        <button type="submit" className={styles.searchButton}>Search</button>
+                    </form>
+
+                    <div className={styles.paginationControls}>
+                        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                            Prev
+                        </button>
+                        <div className={styles.paginationInfo}>
+                            Page {page} of {pagination?.totalPages || 1}
+                        </div>
+                        <button
+                            onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
+                            disabled={page >= (pagination?.totalPages || 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
+
+                {/* Pagination controls */}
             </div>
 
             {/* Details modal / panel */}

@@ -21,8 +21,6 @@ const Staff = () => {
             <h3 className={style.heading}>Staff Details</h3>
 
             <div className={style.card}>
-                <h4>All Users</h4>
-
                 {loading ? (
                     <div className={style.loading}>Loading users...</div>
                 ) : listUsers.length === 0 ? (

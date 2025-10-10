@@ -49,7 +49,6 @@ const Form = ({ setShowForm, showForm }) => {
         const formattedData = {
             type: data.type,
             grade: data.grade,
-            formType: data.formType,
             width: data.width,
             thickness: data.thickness,
             wagonNumber: data.wagonNumber,
@@ -115,29 +114,6 @@ const Form = ({ setShowForm, showForm }) => {
                     ))}
                 </select>
                 {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-            </div>
-
-            <div>
-                <label>Form Type:</label>
-                <div className={style.radioGroup}>
-                    <label className={style.radioButton}>
-                        <input
-                            type='radio'
-                            value='Sheet'
-                            {...register('formType', { required: 'Form Type is required' })}
-                        />
-                        <span className={style.radioLabel}>Sheet</span>
-                    </label>
-                    <label className={style.radioButton}>
-                        <input
-                            type='radio'
-                            value='Coil'
-                            {...register('formType', { required: 'Form Type is required' })}
-                        />
-                        <span className={style.radioLabel}>Coil</span>
-                    </label>
-                </div>
-                {errors.type && <span className={style.error}>{errors.type.message}</span>}
             </div>
 
             <div>
@@ -210,6 +186,7 @@ const Form = ({ setShowForm, showForm }) => {
                 <input
                     id='quantity'
                     type='number'
+                    step="any"
                     placeholder='Enter quantity'
                     {...register('quantity', {
                         required: 'Quantity is required',

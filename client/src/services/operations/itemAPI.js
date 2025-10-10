@@ -1,6 +1,7 @@
 import { apiConnector } from "services/apiConnector";
 import { itemEndpoints } from "services/apis";
 import {
+    addToCurrentList,
     deleteFromCurrentList,
     setCurrentList,
     setSelectUpdate,
@@ -39,6 +40,8 @@ export async function addItem(data, dispatch) {
     try {
         dispatch(addLoader("addItem"));
         const response = (await apiConnector('POST', itemEndpoints.ADD_ITEM, data)).data;
+
+        dispatch(addToCurrentList(response.item));
 
         dispatch(showSuccess({ id: "addItem", message: response.message }));
     } catch (err) {

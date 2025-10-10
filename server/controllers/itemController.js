@@ -9,11 +9,11 @@ const Width = require('../models/widthModel')
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, formType, width, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
+        const { type, grade, width, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
         const { challanNumber, challanDate } = challan;
 
         // Validation
-        if (!type || !grade || !formType || !width || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
+        if (!type || !grade || !width || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
             throw customError('All fields are required', 400);
         }
         const cutterChecker = await Cutter.findById(shipTo);
@@ -38,7 +38,6 @@ const addItem = async (req, res) => {
         const newItem = new Item({
             type,
             grade,
-            formType,
             width,
             thickness,
             wagonNumber,
@@ -50,11 +49,27 @@ const addItem = async (req, res) => {
             quantity,
         });
 
-        await newItem.save();
+        const item = await newItem.save({ new: true });
+
+        const formattedItems = {
+            _id: item._id,
+            name: `${item.wagonNumber} - ${item.type}`,
+            type: item.type,
+            grade: gradeChecker.name,
+            width: widthChecker.name,
+            quantity: item.quantity,
+            wagonNumber: item.wagonNumber,
+            challanNumber: item.challan.challanNumber,
+            challanDate: item.challan.challanDate,
+            thickness: thicknessChecker.name,
+            shipTo: cutterChecker.name,
+            createdAt: item.createdAt,
+        };
 
         res.status(201).json({
             success: true,
             message: "Item added successfully",
+            item: formattedItems
         });
     } catch (err) {
         errorResponse(res, err);
@@ -90,7 +105,6 @@ const updateItem = async (req, res) => {
             name: `${updatedItem.wagonNumber} - ${updatedItem.type} - ${updatedItem.formType}`,
             type: updatedItem.type,
             grade: updatedItem.grade.name,
-            formType: updatedItem.formType,
             width: updatedItem.width.name,
             remaining: updatedItem.remaining,
             thickness: updatedItem.thickness.name,
@@ -174,16 +188,16 @@ const getAllItem = async (req, res) => {
         // 🏷 Map with custom "name"
         const formattedItems = items.map((item) => ({
             _id: item._id,
-            name: `${item.wagonNumber} - ${item.type} - ${item.formType}`,
+            name: `${item.wagonNumber} - ${item.type}`,
             type: item.type,
             grade: item.grade.name,
-            formType: item.formType,
             width: item.width.name,
             quantity: item.quantity,
             wagonNumber: item.wagonNumber,
             challanNumber: item.challan.challanNumber,
             challanDate: item.challan.challanDate,
             thickness: item.thickness.name,
+            shipTo: item.shipTo.name,
             createdAt: item.createdAt,
         }));
 

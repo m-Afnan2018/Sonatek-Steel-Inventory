@@ -51,15 +51,18 @@ const Varient = () => {
                             setActiveVariant(activeVariant === key ? null : key)
                         }
                     >
-                        <h4>{key.charAt(0).toUpperCase() + key.slice(1)}</h4>
-                        <p>Total: {data[key].total}</p>
+                        <h4>{key.charAt(0).toUpperCase() + key.slice(1)} - {data[key].total}</h4>
+                        {/* <p>Total: {data[key].total}</p> */}
 
+                        <div className={style.detailTable}>
+                            {renderVariantDetails(data[key])}
+                        </div>
                         {/* Show table if this card is active */}
-                        {activeVariant === key && (
+                        {/* {activeVariant === key && (
                             <div className={style.detailTable}>
                                 {renderVariantDetails(data[key])}
                             </div>
-                        )}
+                        )} */}
                     </div>
                 ))}
             </div>

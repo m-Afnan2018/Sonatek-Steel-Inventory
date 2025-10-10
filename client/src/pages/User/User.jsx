@@ -130,7 +130,7 @@ const User = () => {
                     </div>
                     <div>
                         <button onClick={applyFilter}> Search </button>
-                        <button onClick={clearFilter}> Refresh </button>
+                        <button onClick={clearFilter}> Reset </button>
                     </div>
                 </div>
                 <div className={style.usersList}>

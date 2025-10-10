@@ -11,6 +11,7 @@ const ViewAll = () => {
     const [select, setSelect] = useState(null);
     const [field, setField] = useState(null);
     const [error, setError] = useState(false);
+    const [errorCancel, setErrorCancel] = useState(false);
     // const [height, setHeight] = useState(0);
 
     const dispatch = useDispatch();
@@ -39,42 +40,52 @@ const ViewAll = () => {
 
     useEffect(() => {
         setError(false);
+        setField('')
+        console.log("running")
     }, [select])
 
-    useEffect(() => { setField(null) }, [])
-
-    const cancel = (id) => {
+    const cancel = (id, e) => {
+        e.stopPropagation();
+        if (field === null || field === '') {
+            setErrorCancel(true);
+            setError(false);
+            return;
+        }
         cancelBooking({ bookingId: id }, dispatch);
+        setField('');
     }
 
     const confirm = (id, e) => {
         e.stopPropagation();
         if (field === null || field === '') {
             setError(true);
+            setErrorCancel(false);
             return;
         }
         confirmBooking({ bookingId: id, orderId: field }, dispatch);
-        setField(null);
+        setField('');
     }
 
     const ship = (id, e) => {
         e.stopPropagation();
         if (field === null || field === '') {
             setError(true);
+            setErrorCancel(false);
             return;
         }
-        shipBooking({ bookingId: id, vehicle_number: field }, dispatch);
-        setField(null);
+        shipBooking({ bookingId: id, vehicleNumber: field }, dispatch);
+        setField('');
     }
 
     const deliver = (id, e) => {
         e.stopPropagation();
         if (field === null || field === '') {
             setError(true);
+            setErrorCancel(false);
             return;
         }
         deliverBooking({ bookingId: id, description: field }, dispatch);
-        setField(null);
+        setField('');
     }
 
     const selectItem = (id) => {
@@ -91,6 +102,8 @@ const ViewAll = () => {
             // setHeight(height)
         }
     }
+
+    useEffect(() => console.log("Change"), [field]);
 
     return (
         <div className={style.viewAll}>
@@ -109,7 +122,7 @@ const ViewAll = () => {
                         (listing && listing.length !== 0) && listing.map((booking) => {
                             return <div className={style.items} onClick={() => selectItem(booking._id)}>
                                 <h2>{userData.role === 'admin' ? `${booking.bookedBy} - ` : ''}{formatDate(booking.bookingDate)} - {formatTime(booking.bookingDate)}</h2>
-                                <div style={{ height: select === booking._id ? `35rem` : '0' }}>
+                                <div style={{ height: select === booking._id ? `45rem` : '0' }}>
                                     <div>
                                         <h4>Booking Date</h4>
                                         <h5>{formatDate(booking.bookingDate)}</h5>
@@ -146,14 +159,18 @@ const ViewAll = () => {
                                         <h4>Thickness</h4>
                                         <h5>{booking.thickness}</h5>
                                     </div>
-                                    {booking.orderId && <div>
+                                    <div>
                                         <h4>Order ID</h4>
-                                        <h5>{booking.orderId}</h5>
-                                    </div>}
-                                    {booking.vehicle_number && <div>
+                                        <h5>{booking.orderId || 'NA'}</h5>
+                                    </div>
+                                    <div>
                                         <h4>Vehicle Number</h4>
-                                        <h5>{booking.vehicle_number}</h5>
-                                    </div>}
+                                        <h5>{booking.vehicleNumber || 'NA'}</h5>
+                                    </div>
+                                    <div>
+                                        <h4>{booking.status === 'Cancelled' ? 'Reason for cancellation' : 'Description'}</h4>
+                                        <h5>{booking.description || 'NA'}</h5>
+                                    </div>
                                     <div className={style.wagons}>
                                         {
                                             booking.wagons.map((wagon) => {
@@ -179,11 +196,12 @@ const ViewAll = () => {
                                         }
                                     </div>
                                     {(booking.status === 'Pending' || booking.status === 'Processing' || booking.status === 'Shipped') && <div className={style.inputField}>
-                                        <input type='text' placeholder={booking.status === 'Pending' ? 'Enter the Order id to confirm order.' : booking.status === 'Processing' ? 'Enter the Vechicle number to confirm deliver it' : 'Enter the description to confirm delivery'} value={field} onClick={(e) => e.stopPropagation()} onChange={(e) => setField(e.target.value)} />
+                                        <input value={field} type='text' placeholder={booking.status === 'Pending' ? 'Enter the Order id to confirm order or reason to cancel' : booking.status === 'Processing' ? 'Enter the Vechicle number to confirm deliver it or reason to cancel' : 'Enter the description to confirm delivery or reason to cancel or reason to cancel'} onClick={(e) => e.stopPropagation()} onChange={(e) => setField(e.target.value)} />
                                         <span style={{ height: error ? '1rem' : '0' }}>Please enter the {booking.status === 'Pending' ? 'Order ID.' : booking.status === 'Processing' ? 'Vechicle Number.' : 'Description.'}</span>
+                                        <span style={{ height: errorCancel ? '1rem' : '0' }}>Please enter the Reason for cancellation</span>
                                     </div>}
                                     {booking.status !== 'Cancelled' && <div style={{ borderBottom: '0' }}>
-                                        {booking.status !== 'Delivered' && <button onClick={() => cancel(booking._id)}>Cancel Booking</button>}
+                                        {booking.status !== 'Delivered' && <button onClick={(e) => cancel(booking._id, e)}>Cancel Booking</button>}
                                         {booking.status === 'Pending' && booking.status !== 'Processing' && <button onClick={(e) => confirm(booking._id, e)}>Confirm Booking</button>}
                                         {booking.status === 'Processing' && <button onClick={(e) => ship(booking._id, e)}>Shipped</button>}
                                         {booking.status === 'Shipped' && <button onClick={(e) => deliver(booking._id, e)}>Delivered</button>}

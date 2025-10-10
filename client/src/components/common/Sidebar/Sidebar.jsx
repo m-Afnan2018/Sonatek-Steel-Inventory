@@ -21,7 +21,7 @@ const Sidebar = ({ sidebar }) => {
     const links = [
         { to: '/', label: 'Dashboard', roles: ['admin','inventoryassociate','agent','accountant','director'] },
         { to: '/manage-varient', label: 'Manage Varients', roles: ['admin'] },
-        { to: '/manage-cutters', label: 'Manage Cutters', roles: ['admin'] },
+        // { to: '/manage-cutters', label: 'Manage Cutters', roles: ['admin'] },
         { to: '/manage-inventory', label: 'Manage Inventory', roles: ['admin','inventoryassociate','agent','accountant','director'] },
         { to: '/manage-bookings', label: 'Manage Booking', roles: ['admin','agent','accountant','director'] },
         { to: '/manage-users', label: 'Manange Users', roles: ['admin','director'] },

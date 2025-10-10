@@ -13,7 +13,9 @@ const itemSlice = createSlice({
         setCurrentList(state, action) {
             state.currentList = action.payload;
         },
-
+        addToCurrentList(state, action) {
+            state.currentList = [action.payload, ...state.currentList];
+        },
         updateFromCurrentList(state, action) {
             const { id, data } = action.payload; // { id, data: {name: 'newName', ...} }
             state.currentList = state.currentList.map(item =>
@@ -36,6 +38,7 @@ const itemSlice = createSlice({
 
 export const {
     setCurrentList,
+    addToCurrentList,
     updateFromCurrentList,
     deleteFromCurrentList,
     setLoader,

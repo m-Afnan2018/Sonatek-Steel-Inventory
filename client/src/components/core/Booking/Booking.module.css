@@ -315,8 +315,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: space-evenly;
+    align-items: center;
     gap: 0.25rem;
 }
 

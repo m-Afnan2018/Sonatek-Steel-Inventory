@@ -44,6 +44,7 @@ export const bookingEndpoints = {
     GET_ALL_BOOKING: `${BASE_URL}/booking/getAllBookings`,
     UPDATE_BOOKING: `${BASE_URL}/booking/updateBooking`,
     CONFIRM_BOOKING: `${BASE_URL}/booking/confirmBooking`,
+    SHIPPED_BOOKING: `${BASE_URL}/booking/shippedBooking`,
     CANCEL_BOOKING: `${BASE_URL}/booking/cancelBooking`,
     DELIVER_BOOKING: `${BASE_URL}/booking/deliverBooking`,
     GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`

@@ -6,7 +6,15 @@ const Items = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
+    const [search, setSearch] = useState("");
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState(null);
     const { currentList } = useSelector(state => state.item);
+
+    const onSearch = (e) => {
+        e.preventDefault();
+        // Implement search functionality
+    }
 
     // Fetch all items
     useEffect(() => {
@@ -21,8 +29,6 @@ const Items = () => {
             <h3 className={style.heading}>Inventory Items</h3>
 
             <div className={style.card}>
-                <h4>All Items</h4>
-
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
                 ) : items.length === 0 ? (
@@ -34,7 +40,6 @@ const Items = () => {
                                 <tr>
                                     <th>Type</th>
                                     <th>Grade</th>
-                                    <th>Form</th>
                                     <th>Width</th>
                                     <th>Thickness</th>
                                     <th>Quantity</th>
@@ -50,8 +55,39 @@ const Items = () => {
                         </table>
                     </div>
                 )}
+
+
+                {/* Pagination controls */}
             </div>
-        </div>
+            {/* Top controls: Search and pagination info */}
+            <div className={style.controlsRow}>
+                <form onSubmit={onSearch} className={style.searchForm}>
+                    <input
+                        type="text"
+                        placeholder="Search bookings..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className={style.searchInput}
+                    />
+                    <button type="submit" className={style.searchButton}>Search</button>
+                </form>
+
+                <div className={style.paginationControls}>
+                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                        Prev
+                    </button>
+                    <div className={style.paginationInfo}>
+                        Page {page} of {pagination?.totalPages || 1}
+                    </div>
+                    <button
+                        onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
+                        disabled={page >= (pagination?.totalPages || 1)}
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div >
     );
 };
 
@@ -67,7 +103,6 @@ const SingleItem = ({ item, setView, view }) => {
         >
             <td>{item.type}</td>
             <td>{item.grade || '-'}</td>
-            <td>{item.formType}</td>
             <td>{item.width || '-'}</td>
             <td>{item.thickness || '-'}</td>
             <td>{item.quantity}</td>

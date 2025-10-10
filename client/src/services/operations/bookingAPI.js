@@ -98,17 +98,17 @@ export async function cancelBooking(params, dispatch) {
 
 export async function shipBooking(params, dispatch) {
     try {
-        dispatch(addLoader("confirmBooking"));
+        dispatch(addLoader("shipBooking"));
 
-        const response = (await apiConnector('PATCH', bookingEndpoints.CONFIRM_BOOKING, params)).data;
+        const response = (await apiConnector('PATCH', bookingEndpoints.SHIPPED_BOOKING, params)).data;
 
         if (response.success) {
-            dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
+            dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped'}));
         }
 
-        dispatch(showSuccess({ id: "confirmBooking", message: response.message }));
+        dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
-        dispatch(showError({ id: "confirmBooking", message: err?.response?.data?.message || "Confirm booking failed" }));
+        dispatch(showError({ id: "shipBooking", message: err?.response?.data?.message || "Ship booking failed" }));
     }
 }
 

@@ -28,9 +28,13 @@ const Inventory = () => {
         getAllItem({ search: search }, dispatch)
     }
 
+    const onReset = () => {
+        setSearch('');
+        getAllItem({ search: '' }, dispatch)
+    }
+
     useEffect(() => {
         const scrollToTop = () => {
-            console.log('here')
             document.querySelector(`.${style.Inventory}`).scrollTo({
                 top: 0,
                 behavior: 'smooth',
@@ -58,6 +62,7 @@ const Inventory = () => {
                     <input type='text' placeholder='Search Item' value={search} onChange={(e) => setSearch(e.target.value)} />
                     {/* <button onClick={() => setFilterOptions(!filterOptions)}>Filter</button> */}
                     <button onClick={onSearch}>Search</button>
+                    <button onClick={onReset}>Reset</button>
                     <select>
                         <option value='' disabled>Sort By</option>
                         <option value='weight'>Weight</option>

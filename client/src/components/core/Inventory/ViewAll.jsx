@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import { formatDate } from 'utils/dateHandler';
 
 const ViewAll = ({ list }) => {
-
     const [view, setView] = useState(null);
 
     const onView = (id) => {
