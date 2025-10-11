@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import style from './Inventory.module.css'
 import { deleteItem, getItem } from 'services/operations/itemAPI';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { formatDate } from 'utils/dateHandler';
+import { useOverlay } from 'hooks/useOverlay';
+import AddItemForm from 'components/common/Overlay/AddItemForm';
 
 const ViewAll = ({ list }) => {
     const [view, setView] = useState(null);
@@ -18,27 +20,54 @@ const ViewAll = ({ list }) => {
     return (
         <div className={style.viewAll}>
             {
-                (list === null || list.length === 0) && <div className={style.noItem}>
+                (list === null || list?.length === 0) && <div className={style.noItem}>
                     No Item found
                 </div>
             }
             {
-                list && list.length > 0 && list.map((item) => {
+                list && list?.length > 0 && list.map((item) => {
                     return <div key={item._id}>
-                        <div className={style.heading} style={{ borderRadius: item._id === view ? '0.5rem 0.5rem 0 0' : '0.5rem' }} onClick={() => onView(item._id)}>
-                            <h3>{item.name}</h3>
-                            <h4>{item.remaining}</h4>
+                        <div className={style.heading} style={{ borderRadius: item.wagonNumber === view ? '0.5rem 0.5rem 0 0' : '0.5rem' }} onClick={() => onView(item.wagonNumber)}>
+                            <h3>{item.wagonNumber}</h3>
                         </div>
-                        <View view={item} show={item._id === view} />
+                        <ViewMaterial data={item} show={item.wagonNumber === view} />
                     </div>
                 })
             }
-        </div>
+        </div >
     )
+}
+
+const ViewMaterial = ({ data, show }) => {
+    const [showMore, setShowMore] = useState(null);
+    const onView = (id) => {
+        if (showMore && showMore === id) {
+            setShowMore(null);
+        } else {
+            setShowMore(id)
+        }
+    }
+    useEffect(() => setShowMore(null), [show]);
+    return <div className={style.view} style={{ height: show ? `${(data.items.length * 2.5) + (showMore ? 22 : 0)}rem` : 0 }}>
+        {data.items.map((i, index) => {
+            return <div className={style.subHeading} onClick={() => onView(index + 1)}>
+                <h4>{i.name}</h4>
+                <View view={i.data} show={index + 1 === showMore} />
+            </div>
+        })}
+    </div>
 }
 
 const View = ({ view, show }) => {
     const dispatch = useDispatch()
+
+    const { selectUpdate } = useSelector((state) => state.item);
+    const { showOverlay } = useOverlay();
+    useEffect(() => {
+        if (selectUpdate) {
+            showOverlay(AddItemForm);
+        }
+    }, [selectUpdate, showOverlay])
 
     const onUpdate = () => {
         getItem({ itemId: view._id }, dispatch, 'selectUpdate');
@@ -49,7 +78,7 @@ const View = ({ view, show }) => {
     }
 
     return (
-        <div className={style.view} style={{ height: show ? '25rem' : 0 }}>
+        <div className={style.viewMore} style={{ height: show ? '22rem' : 0 }}>
             <div>
                 <h4>Type:</h4>
                 <h5>{view.type}</h5>
@@ -57,10 +86,6 @@ const View = ({ view, show }) => {
             <div>
                 <h4>Grade:</h4>
                 <h5>{view.grade}</h5>
-            </div>
-            <div>
-                <h4>Form type: </h4>
-                <h5>{view.formType}</h5>
             </div>
             <div>
                 <h4>Width: </h4>

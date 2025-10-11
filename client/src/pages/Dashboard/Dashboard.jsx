@@ -11,7 +11,7 @@ import { getAllItem } from 'services/operations/itemAPI'
 const Dashboard = () => {
     const dispatch = useDispatch();
 
-    const { token } = useSelector((state) => state.auth);
+    const { token, userData } = useSelector((state) => state.auth);
     useEffect(() => {
         getAllUsers(dispatch);
         getAllItem({ search: '' }, dispatch)
@@ -47,9 +47,9 @@ const Dashboard = () => {
         <div className={style.Dashboard}>
             <h2>Dashboard</h2>
             <button onClick={onDownload}>Download Excel</button>
-            <Bookings />
+            {['admin', 'director', 'inventory_associate'].includes(userData.role) && <Bookings />}
 
-            <Staff />
+            {['admin', 'director', 'ad'].includes(userData.role) && <Staff />}
 
             <Varient />
 

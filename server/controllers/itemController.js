@@ -51,6 +51,33 @@ const addItem = async (req, res) => {
 
         const item = await newItem.save({ new: true });
 
+        const wagon = item.wagonNumber || "Unknown Wagon";
+
+        if (!grouped[wagon]) {
+            grouped[wagon] = {
+                wagonNumber: wagon,
+                items: [],
+            };
+        }
+
+        grouped[wagon].items.push({
+            name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
+            data: {
+                _id: item._id,
+                type: item.type,
+                grade: item.grade?.name,
+                width: item.width?.name,
+                thickness: item.thickness?.name,
+                quantity: item.quantity,
+                challanNumber: item.challan?.challanNumber,
+                challanDate: item.challan?.challanDate,
+                shipTo: item.shipTo?.name,
+                createdAt: item.createdAt,
+            }
+        });
+
+        const formattedResponse = Object.values(grouped);
+
         const formattedItems = {
             _id: item._id,
             name: `${item.wagonNumber} - ${item.type}`,
@@ -69,7 +96,8 @@ const addItem = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "Item added successfully",
-            item: formattedItems
+            item: formattedResponse,
+            listView: formattedItems
         });
     } catch (err) {
         errorResponse(res, err);
@@ -100,9 +128,39 @@ const updateItem = async (req, res) => {
             .populate("grade width thickness shipTo");
         if (!updatedItem) throw customError('Item not found', 404);
 
+
+        const item = await newItem.save({ new: true });
+
+        const wagon = item.wagonNumber || "Unknown Wagon";
+
+        if (!grouped[wagon]) {
+            grouped[wagon] = {
+                wagonNumber: wagon,
+                items: [],
+            };
+        }
+
+        grouped[wagon].items.push({
+            name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
+            data: {
+                _id: item._id,
+                type: item.type,
+                grade: item.grade?.name,
+                width: item.width?.name,
+                thickness: item.thickness?.name,
+                quantity: item.quantity,
+                challanNumber: item.challan?.challanNumber,
+                challanDate: item.challan?.challanDate,
+                shipTo: item.shipTo?.name,
+                createdAt: item.createdAt,
+            }
+        });
+
+        const formattedResponse = Object.values(grouped);
+
         const formattedItems = {
             _id: updatedItem._id,
-            name: `${updatedItem.wagonNumber} - ${updatedItem.type} - ${updatedItem.formType}`,
+            name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
             type: updatedItem.type,
             grade: updatedItem.grade.name,
             width: updatedItem.width.name,
@@ -114,7 +172,8 @@ const updateItem = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Item updated successfully",
-            item: formattedItems
+            item: formattedResponse,
+            listView: formattedItems
         });
     } catch (err) {
         errorResponse(res, err);
@@ -155,64 +214,96 @@ const getAllItem = async (req, res) => {
 
         let query = {};
 
-        // 🔍 Search (regex on multiple fields)
+        // 🔍 Search
         if (search) {
             query.$or = [
                 { type: { $regex: search, $options: "i" } },
                 { wagonNumber: { $regex: search, $options: "i" } },
-                { formType: { $regex: search, $options: "i" } }
+                { formType: { $regex: search, $options: "i" } },
             ];
         }
 
-        // 🎯 Filtering (dynamic from query params)
+        // 🎯 Filters
         Object.keys(filters).forEach((key) => {
-            if (filters[key]) {
-                query[key] = filters[key];
-            }
+            if (filters[key]) query[key] = filters[key];
         });
 
-        // 📊 Pagination setup
         const skip = (page - 1) * limit;
 
         // 📦 Fetch items
-        // .select('type formType wagonNumber')
         const items = await Item.find(query)
             .populate("grade width thickness shipTo challan")
             .sort({ [sortBy]: order === "asc" ? 1 : -1 })
             .skip(skip)
             .limit(parseInt(limit));
 
-        // 📈 Total count for frontend
         const total = await Item.countDocuments(query);
 
-        // 🏷 Map with custom "name"
-        const formattedItems = items.map((item) => ({
-            _id: item._id,
-            name: `${item.wagonNumber} - ${item.type}`,
-            type: item.type,
-            grade: item.grade.name,
-            width: item.width.name,
-            quantity: item.quantity,
-            wagonNumber: item.wagonNumber,
-            challanNumber: item.challan.challanNumber,
-            challanDate: item.challan.challanDate,
-            thickness: item.thickness.name,
-            shipTo: item.shipTo.name,
-            createdAt: item.createdAt,
-        }));
+        // 🧩 Group by wagonNumber
+        const grouped = {};
+
+        const listView = [];
+
+        items.forEach((item) => {
+            const formattedItems = {
+                _id: item._id,
+                name: `${item.wagonNumber} - ${item.type}`,
+                type: item.type,
+                grade: item.grade.name,
+                width: item.width.name,
+                quantity: item.quantity,
+                thickness: item.thickness.name,
+                createdAt: item.createdAt,
+                wagonNumber: item.wagonNumber,
+                challanNumber: item.challan?.challanNumber,
+                challanDate: item.challan?.challanDate
+            };
+
+            listView.push(formattedItems);
+
+            const wagon = item.wagonNumber || "Unknown Wagon";
+
+            if (!grouped[wagon]) {
+                grouped[wagon] = {
+                    wagonNumber: wagon,
+                    items: [],
+                };
+            }
+
+            grouped[wagon].items.push({
+                name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
+                data: {
+                    _id: item._id,
+                    type: item.type,
+                    grade: item.grade?.name,
+                    width: item.width?.name,
+                    thickness: item.thickness?.name,
+                    quantity: item.quantity,
+                    challanNumber: item.challan?.challanNumber,
+                    challanDate: item.challan?.challanDate,
+                    shipTo: item.shipTo?.name,
+                    createdAt: item.createdAt,
+                    wagonNumber: wagon
+                }
+            });
+        });
+
+        const formattedResponse = Object.values(grouped);
 
         res.status(200).json({
             success: true,
-            messsage: "Successfully get all the Items",
+            message: "Successfully fetched grouped items",
             total,
             page: Number(page),
             pages: Math.ceil(total / limit),
-            items: formattedItems,
+            wagons: formattedResponse,
+            listView: listView
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const deleteItem = async (req, res) => {
     try {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import style from './Dashboard.module.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllItem } from 'services/operations/itemAPI';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -9,20 +10,26 @@ const Items = () => {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState(null);
-    const { currentList } = useSelector(state => state.item);
+    const { listViewList } = useSelector(state => state.item);
+    const dispatch = useDispatch();
 
     const onSearch = (e) => {
         e.preventDefault();
         // Implement search functionality
+        getAllItem({ search: search }, dispatch);
     }
 
     // Fetch all items
     useEffect(() => {
-        if (currentList) {
-            setItems(currentList);
+        if (listViewList) {
+            setItems(listViewList);
             setLoading(false);
         }
-    }, [currentList]);
+    }, [listViewList]);
+
+    useEffect(() => {
+        getAllItem({ search: search, page }, dispatch);
+    }, [dispatch, page, search])
 
     return (
         <div className={style.staffContainer}>

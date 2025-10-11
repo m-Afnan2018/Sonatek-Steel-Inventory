@@ -2,6 +2,7 @@ const { createSlice } = require("@reduxjs/toolkit");
 
 const initialState = {
     currentList: null,
+    listViewList: null,
     selectUpdate: null,
     loader: false,
 };
@@ -26,7 +27,9 @@ const itemSlice = createSlice({
             const id = action.payload; // just id
             state.currentList = state.currentList.filter(item => item._id !== id);
         },
-
+        setListviewList(state, action) {
+            state.listViewList = action.payload;
+        },
         setLoader(state, action) {
             state.loader = action.payload;
         },
@@ -43,6 +46,7 @@ export const {
     deleteFromCurrentList,
     setLoader,
     setSelectUpdate,
+    setListviewList,
 } = itemSlice.actions;
 
 export default itemSlice.reducer;

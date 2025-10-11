@@ -96,7 +96,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -109,7 +109,7 @@
     background: #fff;
     border-radius: 12px;
     padding: 1.25rem;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     color: #0b2a33;
 }
 
@@ -122,7 +122,11 @@
     margin-bottom: 0.75rem;
 }
 
-.HeaderActions { display:flex; gap: .5rem }
+.HeaderActions {
+    display: flex;
+    gap: .5rem
+}
+
 .CloseButton {
     background: transparent;
     border: 1px solid #c7d7db;
@@ -138,24 +142,231 @@
     margin-top: 0.5rem;
 }
 
-.Card { background: #f7fcfd; padding: 0.8rem; border-radius: 8px }
-.FullWidth { grid-column: 1 / -1 }
+.Card {
+    background: #f7fcfd;
+    padding: 0.8rem;
+    border-radius: 8px
+}
 
-.ItemRow { display:flex; gap:1rem; align-items:flex-start; padding: .6rem 0; border-bottom: 1px dashed #e6eef1 }
-.ItemMain { flex:1 }
-.ItemMeta { width:220px; text-align:right }
+.FullWidth {
+    grid-column: 1 / -1
+}
 
-.DetailsFooter { display:flex; justify-content:flex-end; margin-top:1rem }
+.ItemRow {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: .6rem 0;
+    border-bottom: 1px dashed #e6eef1
+}
+
+.ItemMain {
+    flex: 1
+}
+
+.ItemMeta {
+    width: 220px;
+    text-align: right
+}
+
+.DetailsFooter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem
+}
+
 .PrimaryButton {
     background: #05516f;
     color: #fff;
     border: none;
     padding: 0.6rem 1rem;
     border-radius: 8px;
-    cursor:pointer;
+    cursor: pointer;
 }
 
-.pending { color: #ff9800; font-weight:700 }
-.processing { color: #007bff; font-weight:700 }
-.delivered { color: #28a745; font-weight:700 }
-.cancelled { color: #dc3545; font-weight:700 }
+.pending {
+    color: #ff9800;
+    font-weight: 700
+}
+
+.processing {
+    color: #007bff;
+    font-weight: 700
+}
+
+.delivered {
+    color: #28a745;
+    font-weight: 700
+}
+
+.cancelled {
+    color: #dc3545;
+    font-weight: 700
+}
+
+/* Add Item Form Styles */
+.AddItemForm {
+    position: relative;
+    padding: 1rem;
+    background-color: #f0fbff;
+    width: 90%;
+    height: 90%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: 1rem;
+    box-shadow: 1px 1px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
+    overflow: scroll;
+}
+
+.AddItemForm>div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.AddItemForm>div>div {
+    background: #001f2b;
+    color: #f0fbff;
+    padding: 0.25rem 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    font-weight: 700;
+    width: max-content;
+}
+
+.twoInOne>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.formBlock>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    position: relative;
+    width: 100%;
+}
+
+.formBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    gap: 1.65rem;
+    background: #001f2b;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.formBlock button {
+    padding: 0rem 3rem;
+    border-radius: 8px;
+    color: rgb(0 31 43);
+    border: none;
+    background-color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    height: 2rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.formBlock button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background-color: #05516f;
+    color: #f0fbff;
+}
+
+.formBlock input {
+    padding: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    border-style: solid;
+    width: 100%;
+}
+
+.formBlock input[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.formBlock label {
+    color: #f0fbff;
+    font-weight: 700;
+    width: 100%;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.radioButton {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.radioButton input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.radioLabel {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: #001f2b;
+    border: 2px solid #001f2b;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #f0fbff;
+    transition: all 0.3s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.radioButton:hover .radioLabel {
+    background-color: #001f2b;
+    border-color: #ccc;
+}
+
+.radioButton input[type='radio']:checked+.radioLabel {
+    background-color: #001f2b;
+    border-color: #007bff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.radioButton input[type='radio']:focus+.radioLabel {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.error {
+    display: block;
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+    position: absolute;
+    right: 0;
+    bottom: -1rem;
+    font-weight: 700;
+}

@@ -148,6 +148,25 @@
     padding: 2rem;
 }
 
+.subHeading {
+    background: #001f2b;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.subHeading h3,
+h4 {
+    text-align: center;
+    color: #f0fbff;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
 .heading {
     background: #001f2b;
     padding: 0.5rem;
@@ -180,8 +199,34 @@ h4 {
     gap: 0.5rem;
 }
 
+.viewMore {
+    background-color: rgb(41, 74, 87);
+    padding: 0 0.5rem;
+    box-shadow: black 0px 4px 10px -1px inset;
+    border-radius: 0px 0px 0.5rem 0.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+}
+
 .view>div {
     display: flex;
+    flex-direction: column;
+    gap: 0;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px #f0fbff75 solid;
+    padding: 4px;
+}
+
+.viewMore>div {
+    display: flex;
+    gap: 0;
     justify-content: space-between;
     align-items: center;
     width: 100%;

@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import style from './Inventory.module.css'
-import Form from 'components/core/Inventory/Form'
 import Filter from 'components/core/Inventory/Filter';
 import { getAllItem } from 'services/operations/itemAPI';
 import ViewAll from 'components/core/Inventory/ViewAll';
 import { useDispatch, useSelector } from 'react-redux';
+import { useOverlay } from 'hooks/useOverlay';
+import AddItemForm from 'components/common/Overlay/AddItemForm';
 
 const Inventory = () => {
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 
+    const { showOverlay } = useOverlay();
+
     const { currentList } = useSelector(state => state.item);
+    const { userData } = useSelector(state => state.auth);
 
     const [search, setSearch] = useState("");
 
@@ -34,16 +38,22 @@ const Inventory = () => {
     }
 
     useEffect(() => {
-        const scrollToTop = () => {
-            document.querySelector(`.${style.Inventory}`).scrollTo({
-                top: 0,
-                behavior: 'smooth',
-            });
-        };
         if (showForm) {
-            scrollToTop();
+            showOverlay(AddItemForm, { showForm, setShowForm })
         }
-    }, [showForm])
+    }, [showForm, showOverlay])
+
+    // useEffect(() => {
+    //     const scrollToTop = () => {
+    //         document.querySelector(`.${style.Inventory}`).scrollTo({
+    //             top: 0,
+    //             behavior: 'smooth',
+    //         });
+    //     };
+    //     if (showForm) {
+    //         scrollToTop();
+    //     }
+    // }, [showForm])
 
     useEffect(() => {
         getAllItem({ search: '' }, dispatch);
@@ -52,10 +62,12 @@ const Inventory = () => {
     return (
         <div className={style.Inventory}>
             <h2>Manage Inventory</h2>
-            <div className={style.addNew}>
-                <button style={{ height: showForm ? '0' : '2rem' }} onClick={() => setShowForm(!showForm)}>Add new Item</button>
-                <Form setShowForm={setShowForm} showForm={showForm} />
-            </div>
+            {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
+                <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button>
+                {/* <Form setShowForm={setShowForm} showForm={showForm} /> */}
+
+
+            </div>}
             <div className={style.allItems}>
                 <h3>All Items</h3>
                 <div className={style.search}>

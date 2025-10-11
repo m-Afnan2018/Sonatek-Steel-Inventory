@@ -4,6 +4,7 @@ import {
     addToCurrentList,
     deleteFromCurrentList,
     setCurrentList,
+    setListviewList,
     setSelectUpdate,
     updateFromCurrentList
 } from "slices/itemSlice";
@@ -14,7 +15,8 @@ export async function getAllItem(data, dispatch) {
         dispatch(addLoader("getAllItem"));
         const response = (await apiConnector('POST', itemEndpoints.GET_ALL_ITEMS, data)).data;
 
-        dispatch(setCurrentList(response.items));
+        dispatch(setListviewList(response.listView));
+        dispatch(setCurrentList(response.wagons));
         dispatch(showSuccess({ id: "getAllItem", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getAllItem", message: err?.response?.data?.message || "Failed to fetch items" }));
