@@ -8,13 +8,13 @@ import { addItem, updateItem } from 'services/operations/itemAPI';
 const AddItemForm = ({ close }) => {
     const { grades, widths, thicknesses, cutters } = useSelector(state => state.varient)
     const { selectUpdate } = useSelector(state => state.item);
-    const [wagonNumber, setWagonNumber] = useState('');
-    const [editWagonNumber, setEditWagonNumber] = useState('');
+    // const [wagonNumber, setWagonNumber] = useState('');
+    // const [editWagonNumber, setEditWagonNumber] = useState('');
     const [added, setAdded] = useState([]);
     const [update, setUpdate] = useState(null);
     const dispatch = useDispatch();
 
-    const { register, handleSubmit, formState: { errors }, reset, setError, clearErrors } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             type: '',
             grade: '',
@@ -31,7 +31,7 @@ const AddItemForm = ({ close }) => {
 
     useEffect(() => {
         if (selectUpdate) {
-            setWagonNumber(selectUpdate.wagonNumber)
+            // setWagonNumber(selectUpdate.wagonNumber)
             reset({
                 type: selectUpdate.type,
                 grade: selectUpdate.grade._id,
@@ -49,24 +49,19 @@ const AddItemForm = ({ close }) => {
     }, [dispatch, reset, selectUpdate])
 
     const onSubmit = (data) => {
-        if (wagonNumber.trim() === '') {
-            setError('wagonNumber', { type: 'manual', message: 'Wagon Number is required' });
-            setEditWagonNumber(true);
-            document.querySelector(`.${style.formBlock} > div:nth-child(1)`).scrollIntoViewIfNeeded({ behavior: 'smooth' });
-            return;
-        }
+        // if (wagonNumber.trim() === '') {
+        //     setError('wagonNumber', { type: 'manual', message: 'Wagon Number is required' });
+        //     setEditWagonNumber(true);
+        //     document.querySelector(`.${style.formBlock} > div:nth-child(1)`).scrollIntoViewIfNeeded({ behavior: 'smooth' });
+        //     return;
+        // }
         // Transform data to match your API structure
         const formattedData = {
             type: data.type,
             grade: data.grade,
             width: data.width,
             thickness: data.thickness,
-            wagonNumber: wagonNumber,
-            challan: {
-                challanDate: data.challanDate,
-                challanNumber: data.challanNumber,
-            },
-            quantity: parseInt(data.quantity),
+            quantity: data.quantity,
             shipTo: data.shipTo,
         }
 
@@ -76,13 +71,8 @@ const AddItemForm = ({ close }) => {
         } else {
             addItem(formattedData, dispatch);
         }
-        setAdded((prev) => [...prev, `${thicknesses.filter(t => t._id === data.thickness)[0].name} X ${widths.filter(t => t._id === data.width)[0].name} X ${cutters.filter(t => t._id === data.shipTo)[0].name}`])
+        setAdded((prev) => [...prev, `${thicknesses.filter(t => t._id === data.thickness)[0].name} X ${widths.filter(t => t._id === data.width)[0].name} X ${grades.filter(t => t._id === data.grade)[0].name}`])
         reset()
-    }
-
-    const changeWagonNumber = (value) => {
-        clearErrors('wagonNumber');
-        setWagonNumber(value);
     }
 
     const handleCancel = () => {
@@ -99,41 +89,6 @@ const AddItemForm = ({ close }) => {
                 })}
             </div>}
             <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <label htmlFor='wagonNumber'>Wagon Number:</label>
-                    <input
-                        disabled={editWagonNumber ? true : false}
-                        id='wagonNumber'
-                        type='text'
-                        placeholder='Enter wagon number'
-                        value={wagonNumber}
-                        onChange={(e) => { changeWagonNumber(e.target.value) }}
-                    />
-                    <button type='button' onClick={() => setEditWagonNumber(!editWagonNumber)}>{editWagonNumber ? 'Edit' : 'Set'}</button>
-                    {errors.wagonNumber && <span className={style.error}>{errors.wagonNumber.message}</span>}
-                </div>
-
-                <div className={style.twoInOne}>
-                    <div>
-                        <label htmlFor='challanNumber'>Challan Number</label>
-                        <input
-                            id='challanNumber'
-                            type='text'
-                            placeholder='Enter challan number'
-                            {...register('challanNumber', { required: 'Challan number is required' })}
-                        />
-                        {errors.challanNumber && <span className={style.error}>{errors.challanNumber.message}</span>}
-                    </div>
-                    <div>
-                        <label htmlFor='challanDate'>Challan Date</label>
-                        <input
-                            id='challanDate'
-                            type='date'
-                            {...register('challanDate', { required: 'Challan date is required' })}
-                        />
-                        {errors.challanDate && <span className={style.error}>{errors.challanDate.message}</span>}
-                    </div>
-                </div>
 
                 <div>
                     <label>Type: </label>
@@ -215,7 +170,6 @@ const AddItemForm = ({ close }) => {
                         placeholder='Enter quantity'
                         {...register('quantity', {
                             required: 'Quantity is required',
-                            min: { value: 1, message: 'Quantity must be at least 1' }
                         })}
                     />
                     {errors.quantity && <span className={style.error}>{errors.quantity.message}</span>}
@@ -225,7 +179,7 @@ const AddItemForm = ({ close }) => {
                     <label htmlFor='shipTo'>Ship To:</label>
                     <select
                         id='shipTo'
-                        {...register('shipTo', { required: 'Ship To is required' })}
+                        {...register('shipTo')}
                     >
                         <option value=''>Select cutter</option>
                         {cutters && cutters.map((cutter) => (

@@ -195,12 +195,12 @@ const ViewAll = () => {
                                             })
                                         }
                                     </div>
-                                    {(booking.status === 'Pending' || booking.status === 'Processing' || booking.status === 'Shipped') && <div className={style.inputField}>
+                                    {['admin', 'director', 'accountant'].includes(userData.role) && (booking.status === 'Pending' || booking.status === 'Processing' || booking.status === 'Shipped') && <div className={style.inputField}>
                                         <input value={field} type='text' placeholder={booking.status === 'Pending' ? 'Enter the Order id to confirm order or reason to cancel' : booking.status === 'Processing' ? 'Enter the Vechicle number to confirm deliver it or reason to cancel' : 'Enter the description to confirm delivery or reason to cancel or reason to cancel'} onClick={(e) => e.stopPropagation()} onChange={(e) => setField(e.target.value)} />
                                         <span style={{ height: error ? '1rem' : '0' }}>Please enter the {booking.status === 'Pending' ? 'Order ID.' : booking.status === 'Processing' ? 'Vechicle Number.' : 'Description.'}</span>
                                         <span style={{ height: errorCancel ? '1rem' : '0' }}>Please enter the Reason for cancellation</span>
                                     </div>}
-                                    {booking.status !== 'Cancelled' && <div style={{ borderBottom: '0' }}>
+                                    {['admin', 'director', 'accountant'].includes(userData.role) && booking.status !== 'Cancelled' && <div style={{ borderBottom: '0' }}>
                                         {booking.status !== 'Delivered' && <button onClick={(e) => cancel(booking._id, e)}>Cancel Booking</button>}
                                         {booking.status === 'Pending' && booking.status !== 'Processing' && <button onClick={(e) => confirm(booking._id, e)}>Confirm Booking</button>}
                                         {booking.status === 'Processing' && <button onClick={(e) => ship(booking._id, e)}>Shipped</button>}

@@ -44,6 +44,12 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search>input{
+    width: 100%;
 }
 
 .allItems button {

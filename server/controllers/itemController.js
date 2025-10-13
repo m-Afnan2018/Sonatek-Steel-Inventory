@@ -9,14 +9,16 @@ const Width = require('../models/widthModel')
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, width, thickness, wagonNumber, challan, quantity, shipTo } = req.body;
-        const { challanNumber, challanDate } = challan;
+        const { type, grade, width, thickness, quantity, shipTo } = req.body;
 
         // Validation
-        if (!type || !grade || !width || !thickness || !wagonNumber || !challanNumber || !challanDate || !quantity) {
+        if (!type || !grade || !width || !thickness || !quantity) {
             throw customError('All fields are required', 400);
         }
-        const cutterChecker = await Cutter.findById(shipTo);
+        let cutterChecker = true;
+        if (shipTo.trim() !== "") {
+            cutterChecker = await Cutter.findById(shipTo);
+        }
         const widthChecker = await Width.findById(width);
         const thicknessChecker = await Thickness.findById(thickness);
         const gradeChecker = await Grade.findById(grade)
@@ -40,12 +42,7 @@ const addItem = async (req, res) => {
             grade,
             width,
             thickness,
-            wagonNumber,
-            challan: {
-                challanNumber,
-                challanDate
-            },
-            shipTo,
+            shipTo: shipTo.trim() === "" ? null : shipTo,
             quantity,
         });
 
@@ -53,14 +50,16 @@ const addItem = async (req, res) => {
 
         const wagon = item.wagonNumber || "Unknown Wagon";
 
-        if (!grouped[wagon]) {
-            grouped[wagon] = {
-                wagonNumber: wagon,
-                items: [],
-            };
-        }
+        // let grouped;
 
-        grouped[wagon].items.push({
+        // if (!grouped[wagon]) {
+        //     grouped[wagon] = {
+        //         wagonNumber: wagon,
+        //         items: [],
+        //     };
+        // }
+
+        let formattedResponse = ({
             name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
             data: {
                 _id: item._id,
@@ -76,20 +75,20 @@ const addItem = async (req, res) => {
             }
         });
 
-        const formattedResponse = Object.values(grouped);
+        // const formattedResponse = Object.values(grouped);
 
         const formattedItems = {
             _id: item._id,
             name: `${item.wagonNumber} - ${item.type}`,
             type: item.type,
-            grade: gradeChecker.name,
-            width: widthChecker.name,
+            grade: gradeChecker,
+            width: widthChecker,
             quantity: item.quantity,
             wagonNumber: item.wagonNumber,
-            challanNumber: item.challan.challanNumber,
-            challanDate: item.challan.challanDate,
-            thickness: thicknessChecker.name,
-            shipTo: cutterChecker.name,
+            challanNumber: item.challan?.challanNumber,
+            challanDate: item.challan?.challanDate,
+            thickness: thicknessChecker,
+            shipTo: shipTo,
             createdAt: item.createdAt,
         };
 
@@ -128,36 +127,6 @@ const updateItem = async (req, res) => {
             .populate("grade width thickness shipTo");
         if (!updatedItem) throw customError('Item not found', 404);
 
-
-        const item = await newItem.save({ new: true });
-
-        const wagon = item.wagonNumber || "Unknown Wagon";
-
-        if (!grouped[wagon]) {
-            grouped[wagon] = {
-                wagonNumber: wagon,
-                items: [],
-            };
-        }
-
-        grouped[wagon].items.push({
-            name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
-            data: {
-                _id: item._id,
-                type: item.type,
-                grade: item.grade?.name,
-                width: item.width?.name,
-                thickness: item.thickness?.name,
-                quantity: item.quantity,
-                challanNumber: item.challan?.challanNumber,
-                challanDate: item.challan?.challanDate,
-                shipTo: item.shipTo?.name,
-                createdAt: item.createdAt,
-            }
-        });
-
-        const formattedResponse = Object.values(grouped);
-
         const formattedItems = {
             _id: updatedItem._id,
             name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
@@ -167,12 +136,15 @@ const updateItem = async (req, res) => {
             remaining: updatedItem.remaining,
             thickness: updatedItem.thickness.name,
             createdAt: updatedItem.createdAt,
+            wagonNumber: updatedItem.wagonNumber,
+            challanNumber: updatedItem?.challan?.challanNumber,
+            challanDate: updatedItem?.challan?.challanDate,
+            quantity: updatedItem.quantity,
         };
 
         res.status(200).json({
             success: true,
             message: "Item updated successfully",
-            item: formattedResponse,
             listView: formattedItems
         });
     } catch (err) {
@@ -209,10 +181,12 @@ const getAllItem = async (req, res) => {
             order = "desc",
             page = 1,
             limit = 50,
-            ...filters
+            filters = null
         } = req.body;
 
         let query = {};
+
+        query.wagonNumber = { $ne: null };
 
         // 🔍 Search
         if (search) {
@@ -224,71 +198,54 @@ const getAllItem = async (req, res) => {
         }
 
         // 🎯 Filters
-        Object.keys(filters).forEach((key) => {
-            if (filters[key]) query[key] = filters[key];
-        });
+        if (filters) {
+            Object.keys(filters).forEach((key) => {
+                const value = filters[key];
+                if (!value) return;
+
+                if (key === 'remaining') {
+                    if (value === 'remaining') {
+                        query.quantity = { $gt: 0 };
+                    } else if (value === 'finished') {
+                        query.quantity = 0;
+                    }
+                    return; // ✅ prevent overwriting below
+                }
+
+                // Default case
+                query[key] = value;
+            });
+        }
 
         const skip = (page - 1) * limit;
 
         // 📦 Fetch items
         const items = await Item.find(query)
             .populate("grade width thickness shipTo challan")
-            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
-            .skip(skip)
-            .limit(parseInt(limit));
+            .sort({ createdAt: - 1 })
 
         const total = await Item.countDocuments(query);
 
         // 🧩 Group by wagonNumber
-        const grouped = {};
 
         const listView = [];
 
         items.forEach((item) => {
             const formattedItems = {
                 _id: item._id,
-                name: `${item.wagonNumber} - ${item.type}`,
+                wagonNumber: item.wagonNumber,
+                challanNumber: item?.challan?.challanNumber,
+                challanDate: item?.challan?.challanDate,
                 type: item.type,
                 grade: item.grade.name,
                 width: item.width.name,
                 quantity: item.quantity,
                 thickness: item.thickness.name,
                 createdAt: item.createdAt,
-                wagonNumber: item.wagonNumber,
-                challanNumber: item.challan?.challanNumber,
-                challanDate: item.challan?.challanDate
             };
 
             listView.push(formattedItems);
-
-            const wagon = item.wagonNumber || "Unknown Wagon";
-
-            if (!grouped[wagon]) {
-                grouped[wagon] = {
-                    wagonNumber: wagon,
-                    items: [],
-                };
-            }
-
-            grouped[wagon].items.push({
-                name: `${item.thickness.name} X ${item.width.name} X ${item.grade.name}`,
-                data: {
-                    _id: item._id,
-                    type: item.type,
-                    grade: item.grade?.name,
-                    width: item.width?.name,
-                    thickness: item.thickness?.name,
-                    quantity: item.quantity,
-                    challanNumber: item.challan?.challanNumber,
-                    challanDate: item.challan?.challanDate,
-                    shipTo: item.shipTo?.name,
-                    createdAt: item.createdAt,
-                    wagonNumber: wagon
-                }
-            });
         });
-
-        const formattedResponse = Object.values(grouped);
 
         res.status(200).json({
             success: true,
@@ -296,14 +253,12 @@ const getAllItem = async (req, res) => {
             total,
             page: Number(page),
             pages: Math.ceil(total / limit),
-            wagons: formattedResponse,
             listView: listView
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 const deleteItem = async (req, res) => {
     try {
@@ -387,6 +342,7 @@ const getAllVarients = async (req, res) => {
         errorResponse(res, err);
     }
 }
+
 const getAllDetailVarient = async (req, res) => {
     try {
         // Function to get total items per variant
@@ -443,7 +399,6 @@ const getAllDetailVarient = async (req, res) => {
         errorResponse(res, err);
     }
 };
-
 
 const getVarients = async (req, res) => {
     try {
@@ -558,6 +513,42 @@ const deleteVarient = async (req, res) => {
     }
 };
 
+const getUpcomingItem = async (req, res) => {
+    try {
+
+        const items = await Item.find({ wagonNumber: null })
+            .populate("grade width thickness shipTo challan")
+            .sort({ createdAt: 1 })
+
+        let listView = [];
+
+        items.forEach((item) => {
+            const formattedItems = {
+                _id: item._id,
+                wagonNumber: item.wagonNumber,
+                challanNumber: item?.challan?.challanNumber,
+                challanDate: item?.challan?.challanDate,
+                type: item.type,
+                grade: item.grade,
+                width: item.width,
+                quantity: item.quantity,
+                thickness: item.thickness,
+                createdAt: item.createdAt,
+            };
+
+            listView.push(formattedItems);
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched the upcoming item",
+            items: listView
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 module.exports = {
     addItem,
     updateItem,
@@ -569,5 +560,6 @@ module.exports = {
     getAllVarients,
     updateVarient,
     deleteVarient,
-    getAllDetailVarient
+    getAllDetailVarient,
+    getUpcomingItem
 }

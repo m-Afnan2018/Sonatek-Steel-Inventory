@@ -1,12 +1,13 @@
 import { apiConnector } from "services/apiConnector";
 import { itemEndpoints } from "services/apis";
 import {
-    addToCurrentList,
+    addUpcomingItem,
     deleteFromCurrentList,
     setCurrentList,
     setListviewList,
     setSelectUpdate,
-    updateFromCurrentList
+    setUpcomingItem,
+    updateListViewList
 } from "slices/itemSlice";
 import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
@@ -43,7 +44,8 @@ export async function addItem(data, dispatch) {
         dispatch(addLoader("addItem"));
         const response = (await apiConnector('POST', itemEndpoints.ADD_ITEM, data)).data;
 
-        dispatch(addToCurrentList(response.item));
+        // dispatch(addToCurrentList(response.listView));
+        dispatch(addUpcomingItem(response.listView))
 
         dispatch(showSuccess({ id: "addItem", message: response.message }));
     } catch (err) {
@@ -56,7 +58,9 @@ export async function updateItem(params, dispatch) {
         dispatch(addLoader("updateItem"));
         const response = (await apiConnector('PATCH', itemEndpoints.UPDATE_ITEM, params)).data;
 
-        dispatch(updateFromCurrentList({ id: params._id, data: response.item }));
+        // dispatch(updateFromCurrentList({ id: params._id, data: response.item }));
+        dispatch(updateListViewList(response.listView))
+
         dispatch(showSuccess({ id: "updateItem", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "updateItem", message: err?.response?.data?.message || "Failed to update item" }));
@@ -77,3 +81,19 @@ export async function deleteItem(params, dispatch) {
         dispatch(showError({ id: "deleteItem", message: err?.response?.data?.message || "Failed to delete item" }));
     }
 }
+
+export async function getUpcomingItem(params, dispatch) {
+    try {
+        dispatch(addLoader("getUpcomingItem"));
+        const response = (await apiConnector('GET', itemEndpoints.GET_UPCOMING_ITEM, params)).data;
+
+        if (response.success) {
+            dispatch(setUpcomingItem(response.items));
+        }
+
+        dispatch(showSuccess({ id: "getUpcomingItem", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "getUpcomingItem", message: err?.response?.data?.message || "Failed to get upcoming item" }));
+    }
+}
+

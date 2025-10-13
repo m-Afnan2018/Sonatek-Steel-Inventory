@@ -33,7 +33,8 @@ export const itemEndpoints = {
     ADD_ITEM: `${BASE_URL}/item/addItem`,
     UPDATE_ITEM: `${BASE_URL}/item/updateItem`,
     GET_ITEM: `${BASE_URL}/item/getItem`,
-    DELETE_ITEM: `${BASE_URL}/item/deleteItem`
+    DELETE_ITEM: `${BASE_URL}/item/deleteItem`,
+    GET_UPCOMING_ITEM: `${BASE_URL}/item/getUpcomingItems`
 }
 
 export const bookingEndpoints = {

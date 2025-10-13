@@ -370,3 +370,235 @@
     bottom: -1rem;
     font-weight: 700;
 }
+
+/* Varient Details */
+/* ...existing code... */
+
+.Overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 22, 28, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+}
+
+.VarientDetailCard {
+    width: min(1100px, 96%);
+    max-height: 90vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(10, 20, 40, 0.16);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.overlayHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #eef2f6;
+    padding-bottom: 8px;
+}
+
+.title {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f1724;
+    font-weight: 600;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #475569;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.closeBtn:hover {
+    background: #f1f5f9;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.card {
+    background: #fbfcfd;
+    border: 1px solid #eef2f6;
+    padding: 14px;
+    border-radius: 8px;
+}
+
+.cardTitle {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: #0b1220;
+    font-weight: 600;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eef2f6;
+    align-items: center;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.label {
+    color: #556070;
+    font-size: 0.86rem;
+}
+
+.address {
+    text-align: right;
+    color: #334155;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 96px;
+    background: linear-gradient(180deg, #ffffff, #f7fbff);
+    border: 1px solid #e6eef8;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.chipLabel {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.chipValue {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #0b1220;
+    margin-top: 6px;
+}
+
+.sectionTitle {
+    margin: 12px 0 8px;
+    font-size: 0.92rem;
+    color: #0b1220;
+    font-weight: 600;
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.listItem {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eef2f6;
+    background: #fff;
+}
+
+.itemTitle {
+    font-weight: 600;
+    color: #0b1220;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status {
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    background: #f1f5f9;
+    color: #0b1220;
+    border: 1px solid #e2e8f0;
+}
+
+.itemMeta {
+    display: flex;
+    gap: 12px;
+    color: #475569;
+    font-size: 0.88rem;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.qty {
+    font-weight: 700;
+    color: #0f1724;
+}
+
+.small {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.bookingsSection {
+    margin-top: 8px;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    border-top: 1px solid #eef2f6;
+    padding-top: 10px;
+}
+
+.closePrimary {
+    background: linear-gradient(180deg, #0ea5a9, #047481);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.closePrimary:hover {
+    opacity: 0.95;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chip {
+        min-width: 84px;
+    }
+}

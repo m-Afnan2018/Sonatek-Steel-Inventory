@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import style from './Dashboard.module.css'
-import Staff from 'components/core/Dashboard/Staff'
+// import Staff from 'components/core/Users/Staff'
 import Items from 'components/core/Dashboard/Items'
 import Varient from 'components/core/Dashboard/Varient'
 import Bookings from 'components/core/Dashboard/Bookings'
@@ -49,7 +49,7 @@ const Dashboard = () => {
             <button onClick={onDownload}>Download Excel</button>
             {['admin', 'director', 'inventory_associate'].includes(userData.role) && <Bookings />}
 
-            {['admin', 'director', 'ad'].includes(userData.role) && <Staff />}
+            {/* {['admin', 'director', 'ad'].includes(userData.role) && <Staff />} */}
 
             <Varient />
 

@@ -4,6 +4,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useLocation } from 'react-router-dom';
 import { resetPassword } from 'services/operations/authAPI';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 const ResetPassword = ({ setPath }) => {
     const [email, setEmail] = useState('');
@@ -12,6 +13,8 @@ const ResetPassword = ({ setPath }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setshowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState('');
+
+    const dispatch = useDispatch();
 
     const { search } = useLocation(); // gives "?otp=123456&email=test@gmail.com"
 
@@ -32,7 +35,7 @@ const ResetPassword = ({ setPath }) => {
             return;
         }
         e.preventDefault();
-        resetPassword({ email, otp, password }, setPath)
+        resetPassword({ email, otp, password }, setPath, dispatch);
     }
 
     return (

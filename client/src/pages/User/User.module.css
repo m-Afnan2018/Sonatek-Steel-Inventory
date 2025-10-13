@@ -96,8 +96,9 @@
 
 .filters select {
     border-radius: 1rem;
-    padding: 0.25rem 0.5rem;
-    font-weight: 600;
+    padding: 0.5rem 0.5rem;
+    font-weight: 600;    
+    border: none;
 }
 
 .filters input,

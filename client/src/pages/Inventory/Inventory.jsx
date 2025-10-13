@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import style from './Inventory.module.css'
-import Filter from 'components/core/Inventory/Filter';
-import { getAllItem } from 'services/operations/itemAPI';
-import ViewAll from 'components/core/Inventory/ViewAll';
+import { getAllItem, getUpcomingItem } from 'services/operations/itemAPI';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOverlay } from 'hooks/useOverlay';
 import AddItemForm from 'components/common/Overlay/AddItemForm';
+import Items from 'components/core/Dashboard/Items';
+import Upcoming from 'components/core/Inventory/Upcoming';
 
 const Inventory = () => {
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 
     const { showOverlay } = useOverlay();
-
-    const { currentList } = useSelector(state => state.item);
     const { userData } = useSelector(state => state.auth);
-
-    const [search, setSearch] = useState("");
 
     // const [items, setItems] = useState([]);
     // const [limit, setLimit] = useState(50);
@@ -25,17 +21,6 @@ const Inventory = () => {
     // const [booking, setOrder] = useState("desc");
     // const [page, setPage] = useState(1);
     // const [pages, setPages] = useState(1);
-
-    const [filterOptions, setFilterOptions] = useState(false);
-
-    const onSearch = () => {
-        getAllItem({ search: search }, dispatch)
-    }
-
-    const onReset = () => {
-        setSearch('');
-        getAllItem({ search: '' }, dispatch)
-    }
 
     useEffect(() => {
         if (showForm) {
@@ -57,6 +42,7 @@ const Inventory = () => {
 
     useEffect(() => {
         getAllItem({ search: '' }, dispatch);
+        getUpcomingItem({}, dispatch);
     }, [dispatch])
 
     return (
@@ -68,11 +54,11 @@ const Inventory = () => {
 
 
             </div>}
-            <div className={style.allItems}>
+            <Upcoming />
+            {/* <div className={style.allItems}>
                 <h3>All Items</h3>
                 <div className={style.search}>
                     <input type='text' placeholder='Search Item' value={search} onChange={(e) => setSearch(e.target.value)} />
-                    {/* <button onClick={() => setFilterOptions(!filterOptions)}>Filter</button> */}
                     <button onClick={onSearch}>Search</button>
                     <button onClick={onReset}>Reset</button>
                     <select>
@@ -84,8 +70,9 @@ const Inventory = () => {
                     </select>
                 </div>
                 <Filter filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
-                {<ViewAll list={currentList} />}
-            </div>
+                <ViewAll list={currentList} />
+            </div> */}
+            <Items />
         </div>
     )
 }

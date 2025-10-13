@@ -224,6 +224,17 @@ const verifyUser = async (req, res) => {
     }
 }
 
+const userDashData = async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 module.exports = {
     updateUser,
     deleteUser,

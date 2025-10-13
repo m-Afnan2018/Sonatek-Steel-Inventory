@@ -1,5 +1,5 @@
 exports.forgetPasswordMail = (email, otp) => {
-    return `
+  return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
   xmlns="http://www.w3.org/1999/xhtml"
@@ -352,7 +352,7 @@ exports.forgetPasswordMail = (email, otp) => {
                                       align="center"
                                     >
                                       <a
-                                        href="http://localhost:3000"
+                                        href="http://localhost:3000/resetPassword/?email=${email}&otp=${otp}"
                                         target="_blank"
                                         style="
                                           color: rgb(22, 26, 57);

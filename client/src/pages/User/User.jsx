@@ -7,6 +7,7 @@ import { formatDate, formatTime } from 'utils/dateHandler';
 import toast from 'react-hot-toast';
 import { useOverlay } from 'hooks/useOverlay';
 import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
+import Staff from 'components/core/Users/Staff';
 
 const User = () => {
     const [requests, setRequests] = useState(null);
@@ -106,6 +107,7 @@ const User = () => {
 
     return (
         <div className={style.User}>
+            <Staff />
             <h2>Manage Users</h2>
             <div className={style.pendingRequest}>
                 <h3>All Users</h3>
@@ -267,7 +269,7 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
                 {user.status === 'active' && <button onClick={() => {
                     showOverlay(ConfirmationOverlay, {
                         message: "Are you sure you want to suspend this user ?",
-                        onAccept: ()=>removeUser(user._id, dispatch)
+                        onAccept: () => removeUser(user._id, dispatch)
                     }
                     )
                 }}>Suspend User</button>}

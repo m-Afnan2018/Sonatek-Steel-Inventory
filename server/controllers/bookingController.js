@@ -311,6 +311,7 @@ const searchOptions = async (req, res) => {
 
         // Always filter for items with remaining quantity > 0
         query.quantity = { $gt: 0 };
+        query.wagonNumber = { $ne: null };
 
         const findAll = await Item.find(query)
             .select('-__v') // Exclude version key
@@ -515,8 +516,8 @@ const getAllBookingsDetails = async (req, res) => {
         const { role } = req.user;
 
         let query = {};
-        if(role === 'agent'){
-            query = { bookedBy: role.userId}
+        if (role === 'agent') {
+            query = { bookedBy: role.userId }
         }
 
         // Fetch all bookings with related details populated

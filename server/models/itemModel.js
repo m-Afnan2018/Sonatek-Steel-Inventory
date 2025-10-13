@@ -23,6 +23,11 @@ const itemSchema = new mongoose.Schema({
         ref: 'Grade',
         required: true,
     },
+    form: {
+        type: String,
+        enum: ['Sheet', 'Coil'],
+        default: 'Coil'
+    },
     width: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Width',
@@ -35,11 +40,10 @@ const itemSchema = new mongoose.Schema({
     },
     wagonNumber: {
         type: String,
-        required: true,
+        default: null,
     },
     challan: {
         type: challanSchema,
-        required: true,
     },
     currentStatus: {
         type: String,
@@ -53,7 +57,10 @@ const itemSchema = new mongoose.Schema({
     shipTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cutter',
-        required: true
+    },
+    transport: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transport'
     },
     createdAt: {
         type: Date,

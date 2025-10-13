@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import style from './Dashboard.module.css';
+import style from './Users.module.css';
 import { useSelector } from 'react-redux';
 
 const Staff = () => {
