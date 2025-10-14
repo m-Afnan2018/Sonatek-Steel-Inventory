@@ -1,7 +1,7 @@
 .Navbar {
     background: rgba(0, 31, 43, 1);
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: 64px;
     padding: 0.5rem;
@@ -14,9 +14,18 @@
 }
 
 .Navbar>svg {
-    position: absolute;
-    left: 1rem;
+    /* position: absolute;
+    left: 1rem; */
     color: #ffffff;
     font-size: 2rem;
     cursor: pointer;
+}
+
+.Navbar>div>h2 {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: right;
+    width: 100%;
+    text-transform: uppercase;
 }

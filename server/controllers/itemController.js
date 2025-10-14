@@ -121,6 +121,8 @@ const updateItem = async (req, res) => {
             delete updateData.challanDate;
         }
 
+        console.log(updateData)
+
         updateData.updatedAt = Date.now();
 
         const updatedItem = await Item.findByIdAndUpdate(id, updateData, { new: true })
@@ -139,6 +141,7 @@ const updateItem = async (req, res) => {
             wagonNumber: updatedItem.wagonNumber,
             challanNumber: updatedItem?.challan?.challanNumber,
             challanDate: updatedItem?.challan?.challanDate,
+            shipTo: updatedItem?.shipTo?.name,
             quantity: updatedItem.quantity,
         };
 
@@ -241,6 +244,7 @@ const getAllItem = async (req, res) => {
                 width: item.width.name,
                 quantity: item.quantity,
                 thickness: item.thickness.name,
+                shipTo: item?.shipTo?.name,
                 createdAt: item.createdAt,
             };
 

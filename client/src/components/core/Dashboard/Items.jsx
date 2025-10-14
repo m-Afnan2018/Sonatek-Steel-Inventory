@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import style from './Dashboard.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllItem } from 'services/operations/itemAPI';
+import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 
 const Items = () => {
@@ -13,7 +13,7 @@ const Items = () => {
     // eslint-disable-next-line no-unused-vars
     const [pagination, setPagination] = useState(null);
     const { listViewList } = useSelector(state => state.item);
-    
+
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
         type: '',
@@ -129,17 +129,150 @@ const SingleItem = ({ item, setView, view }) => {
         ? new Date(item.challanDate).toLocaleDateString()
         : '-';
 
+    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+    const dispatch = useDispatch();
+
+    const [select, setSelect] = useState('');
+    const [value, setValue] = useState('');
+
+    const clickHandler = (type) => {
+        setSelect(type);
+        setValue(item[type]);
+    };
+
+    const handleSave = (e) => {
+        e.stopPropagation(); const grade = grades.find(g => g.name === item.grade)._id;
+        const thickness = thicknesses.find(t => t.name === item.thickness)._id;
+        const width = widths.find(w => w.name === item.width)._id;
+        const cutter = cutters.find(c => c.name === item.shipTo)._id;
+        let Item = { ...item, grade, thickness, width, shipTo: cutter };
+        console.log(Item)
+        let updatedItem = { ...Item, [select]: value };
+        updateItem(updatedItem, dispatch);
+        setSelect('');
+    };
+
+    const handleCancel = (e) => {
+        e.stopPropagation();
+        setValue(item[select]);
+        setSelect('');
+    };
+
+    const renderEditableField = (type, inputType = 'text') => (
+        <div onClick={(e) => e.stopPropagation()}>
+            <input
+                type={inputType}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                autoFocus
+            />
+            <div className={style.inlineButtons}>
+                <button type="button" onClick={handleSave}>Save</button>
+                <button type="button" onClick={handleCancel}>Cancel</button>
+            </div>
+        </div>
+    );
+
+    const renderDropdownField = (type, options) => (
+        <div onClick={(e) => e.stopPropagation()}>
+            <select
+                value={value._id}
+                onChange={(e) => setValue(e.target.value)}
+                autoFocus
+            >
+                <option value="">Select</option>
+                {options.map((opt) => (
+                    <option key={opt._id} value={opt._id}>
+                        {opt.name || opt.value}
+                    </option>
+                ))}
+            </select>
+            <div className={style.inlineButtons}>
+                <button type="button" onClick={handleSave}>Save</button>
+                <button type="button" onClick={handleCancel}>Cancel</button>
+            </div>
+        </div>
+    );
+
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ''}`}
             onClick={() => setView(item._id)}
         >
-            <td>{item.wagonNumber}</td>
-            <td> {challanDate}  </td>
-            <td> {item.challanNumber || '-'} <br /> </td>
-            <td>{item.type}</td>
-            <td>{item.thickness ? `${item.thickness} X ${item.width} X ${item.grade}` : '-'}</td>
-            <td>{item.quantity}</td>
+            {/* Wagon Number */}
+            <td onClick={() => clickHandler('wagonNumber')}>
+                {select === 'wagonNumber'
+                    ? renderEditableField('wagonNumber')
+                    : item.wagonNumber || '-'}
+            </td>
+
+            {/* Challan Date */}
+            <td onClick={() => clickHandler('challanDate')}>
+                {select === 'challanDate'
+                    ? renderEditableField('challanDate', 'date')
+                    : challanDate || '-'}
+            </td>
+
+            {/* Challan Number */}
+            <td onClick={() => clickHandler('challanNumber')}>
+                {select === 'challanNumber'
+                    ? renderEditableField('challanNumber')
+                    : item.challanNumber || '-'}
+            </td>
+
+            {/* Type */}
+            <td onClick={() => clickHandler('type')}>
+                {select === 'type' ? (
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <select
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                            autoFocus
+                        >
+                            <option value="">Select</option>
+                            <option value="Hot Rolled">Hot Rolled</option>
+                            <option value="Cold Rolled">Cold Rolled</option>
+                        </select>
+                        <div className={style.inlineButtons}>
+                            <button type="button" onClick={handleSave}>Save</button>
+                            <button type="button" onClick={handleCancel}>Cancel</button>
+                        </div>
+                    </div>
+                ) : (
+                    item.type
+                )}
+            </td>
+
+            {/* Thickness x Width x Grade */}
+            <td style={{ display: 'flex', gap: '5px' }}>
+                {/* Thickness */}
+                <div onClick={() => clickHandler('thickness')}>
+                    {select === 'thickness'
+                        ? renderDropdownField('thickness', thicknesses)
+                        : <span>{item.thickness}</span>}
+                </div>
+                X
+                {/* Width */}
+                <div onClick={() => clickHandler('width')}>
+                    {select === 'width'
+                        ? renderDropdownField('width', widths)
+                        : <span>{item.width}</span>}
+                </div>
+                X
+                {/* Grade */}
+                <div onClick={() => clickHandler('grade')}>
+                    {select === 'grade'
+                        ? renderDropdownField('grade', grades)
+                        : <span>{item.grade}</span>}
+                </div>
+            </td>
+
+            {/* Quantity */}
+            <td onClick={() => clickHandler('quantity')}>
+                {select === 'quantity'
+                    ? renderEditableField('quantity', 'number')
+                    : item.quantity}
+            </td>
         </tr>
     );
 };

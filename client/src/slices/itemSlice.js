@@ -14,7 +14,6 @@ const itemSlice = createSlice({
     initialState,
     reducers: {
         setCurrentList(state, action) {
-            console.log(action.payloadn)
             state.currentList = action.payload;
         },
         addToCurrentList(state, action) {
@@ -62,7 +61,7 @@ const itemSlice = createSlice({
             state.listViewList = action.payload;
         },
         updateListViewList(state, action) {
-            state.listViewList = [action.payload, ...state.listViewList];
+            state.listViewList = [action.payload, ...(state.listViewList.filter((item) => item._id !== action.payload._id))];
             state.upcomingItem = state.upcomingItem.filter((item) => item._id !== action.payload._id);
         },
         setLoader(state, action) {
