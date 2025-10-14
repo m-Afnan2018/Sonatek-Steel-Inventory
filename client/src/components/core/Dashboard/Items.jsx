@@ -43,10 +43,6 @@ const Items = () => {
         }
     }, [listViewList]);
 
-    useEffect(() => {
-        getAllItem({ search: search, page }, dispatch);
-    }, [dispatch, page, search])
-
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items</h3>
@@ -312,8 +308,8 @@ const Filters = ({ setFilters }) => {
                 {...register('remaining')}
             >
                 <option value=''>All</option>
-                <option value='remaining'> Remaining </option>
-                <option value='finished'> Finished </option>
+                <option value='remaining'> In Stock </option>
+                <option value='finished'> Sold Out </option>
             </select>
             {errors.grade && <span className={style.error}>{errors.remaining.message}</span>}
         </div>

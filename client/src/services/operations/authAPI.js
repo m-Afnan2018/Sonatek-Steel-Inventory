@@ -11,6 +11,7 @@ export async function login(email, password, dispatch) {
         const response = await apiConnector('POST', authEndpoints.LOGIN, { email, password });
 
         localStorage.setItem('isLogin', true);
+        sessionStorage.setItem('id', response.data.token);
         dispatch(setUserData(response.data.user));
         dispatch(setToken(response.data.token));
 
