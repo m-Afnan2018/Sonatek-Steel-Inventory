@@ -370,6 +370,7 @@
       text-align: center;
       font-size: 0.875rem;
       font-weight: 600;
+      justify-content: center;
   }
 
   .Bookings .table th {

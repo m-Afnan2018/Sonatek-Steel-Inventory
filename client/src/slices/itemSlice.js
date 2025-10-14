@@ -61,6 +61,7 @@ const itemSlice = createSlice({
             state.listViewList = action.payload;
         },
         updateListViewList(state, action) {
+            console.log(action.payload)
             state.listViewList = [action.payload, ...(state.listViewList.filter((item) => item._id !== action.payload._id))];
             state.upcomingItem = state.upcomingItem.filter((item) => item._id !== action.payload._id);
         },

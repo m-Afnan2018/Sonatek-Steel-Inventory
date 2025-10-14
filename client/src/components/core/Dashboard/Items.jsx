@@ -74,6 +74,7 @@ const Items = () => {
                                     <th>Type</th>
                                     <th>Material Description</th>
                                     <th>Quantity</th>
+                                    <th>Ship To</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -142,8 +143,8 @@ const SingleItem = ({ item, setView, view }) => {
         const width = widths.find(w => w.name === item.width)._id;
         const cutter = cutters.find(c => c.name === item.shipTo)._id;
         let Item = { ...item, grade, thickness, width, shipTo: cutter };
-        console.log(Item)
         let updatedItem = { ...Item, [select]: value };
+        console.log(`Item: ${item.shipTo}, Cutter: ${cutter}`)
         updateItem(updatedItem, dispatch);
         setSelect('');
     };
@@ -172,7 +173,7 @@ const SingleItem = ({ item, setView, view }) => {
     const renderDropdownField = (type, options) => (
         <div onClick={(e) => e.stopPropagation()}>
             <select
-                value={value._id}
+                value={value?._id}
                 onChange={(e) => setValue(e.target.value)}
                 autoFocus
             >
@@ -268,6 +269,19 @@ const SingleItem = ({ item, setView, view }) => {
                 {select === 'quantity'
                     ? renderEditableField('quantity', 'number')
                     : item.quantity}
+            </td>
+
+            {/* Ship To */}
+            <td onClick={() => clickHandler('shipTo')}>
+                {select === 'shipTo' ? (
+                    <div onClick={() => clickHandler('shipTo')}>
+                        {select === 'shipTo'
+                            ? renderDropdownField('shipTo', cutters)
+                            : <span>{item.width}</span>}
+                    </div>
+                ) : (
+                    item.shipTo
+                )}
             </td>
         </tr>
     );
