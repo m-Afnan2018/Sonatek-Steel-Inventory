@@ -48,7 +48,7 @@
     gap: 1rem;
 }
 
-.search>input{
+.search>input {
     width: 100%;
 }
 
@@ -84,9 +84,11 @@ select {
 
 .addNew {
     margin: 2rem;
-    background: #001f2b;
+    color: #001f2b;
     border-radius: 1rem;
-    color: #f0fbff;
+    background: #f0fbff;
+    display: flex;
+    gap: 1rem;
 }
 
 .addNew>button {

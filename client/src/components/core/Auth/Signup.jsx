@@ -14,6 +14,7 @@ const Signup = ({ setPath }) => {
     const [showPassword, setshowPassword] = useState(false);
     const [showConfirmPassword, setshowConfirmPassword] = useState(false);
 
+    // eslint-disable-next-line no-unused-vars
     const [showError, setShowError] = useState(false);
 
     const dispatch = useDispatch();

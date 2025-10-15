@@ -577,108 +577,39 @@ const getAllBookingsDetails = async (req, res) => {
     }
 };
 
-const getExcelItem = async (req, res) => {
-    try {
-        const items = await Item.find().populate([
-            "challan",
-            "grade",
-            "thickness",
-            "width",
-            "shipTo",
-        ]).lean();
-
-        const payload = items.map((item) => ({
-            Date: item.createdAt?.toISOString().split("T")[0],
-            ChallanDate: item.challan?.challanDate
-                ? item.challan.challanDate.toISOString().split("T")[0]
-                : "N/A",
-            ChallanNumber: item.challan?.challanNumber || "N/A",
-            Weight: item.quantity,
-            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
-            Cutters: item.shipTo?.name || "N/A",
-            WagonNumber: item.wagonNumber || "N/A",
-            Status: item.currentStatus,
-        }));
-
-        const workbook = XLSX.utils.book_new();
-
-        // Convert JSON data to worksheet
-        const worksheet = XLSX.utils.json_to_sheet(payload);
-
-        // Optional: Set column widths for better readability
-        worksheet['!cols'] = [
-            { wch: 12 }, // Date
-            { wch: 14 }, // ChallanDate
-            { wch: 16 }, // ChallanNumber
-            { wch: 10 }, // Weight
-            { wch: 30 }, // Description
-            { wch: 12 }, // Cutters
-            { wch: 14 }, // WagonNumber
-            { wch: 12 }  // Status
-        ];
-
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Stock Data');
-
-        // Generate buffer
-        const excelBuffer = XLSX.write(workbook, {
-            type: 'buffer',
-            bookType: 'xlsx'
-        });
-
-        // Set headers for file download
-        res.setHeader(
-            'Content-Type',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
-        res.setHeader(
-            'Content-Disposition',
-            `attachment; filename=stock-data-${Date.now()}.xlsx`
-        );
-        res.setHeader('Content-Length', excelBuffer.length);
-
-        // Send the buffer
-        res.send(excelBuffer);
-
-    } catch (error) {
-        console.error('Error generating Excel:', error);
-        res.status(500).json({
-            message: 'Error generating Excel file',
-            error: error.message
-        });
-    }
-};
-
 const getExcelBooking = async (req, res) => {
     try {
-        const bookings = await Booking.find().populate([
-            "challan",
-            "grade",
-            "thickness",
-            "width",
-            "shipTo",
-        ]).lean();
+        // Fetch all bookings (no populate needed; data is inside snapshots)
+        const bookings = await Booking.find().lean();
 
-        const payload = bookings.map((item) => ({
-            Date: item.createdAt?.toISOString().split("T")[0],
-            ChallanDate: item.challan?.challanDate
-                ? item.challan.challanDate.toISOString().split("T")[0]
-                : "N/A",
-            ChallanNumber: item.challan?.challanNumber || "N/A",
-            Weight: item.quantity,
-            Description: `${item.type || ""} X ${item.grade?.name || "N/A"} X ${item.thickness?.name || "N/A"} ${item.width?.name || "N/A"}`,
-            Cutters: item.shipTo?.name || "N/A",
-            WagonNumber: item.wagonNumber || "N/A",
-            Status: item.currentStatus,
-        }));
+        // Flatten items so each booked item becomes one Excel row
+        const payload = bookings.flatMap((booking) =>
+            booking.items.map((it) => {
+                const snap = it.itemSnapshot || {};
+                return {
+                    Date: booking.bookingDate
+                        ? new Date(booking.bookingDate).toISOString().split("T")[0]
+                        : "N/A",
+                    ChallanDate: snap.challan?.challanDate
+                        ? new Date(snap.challan.challanDate).toISOString().split("T")[0]
+                        : "N/A",
+                    ChallanNumber: snap.challan?.challanNumber || "N/A",
+                    Weight: it.quantity || "N/A",
+                    Description: `${snap.type || ""} X ${snap.grade || "N/A"} X ${snap.thickness || "N/A"
+                        } ${snap.width || "N/A"}`,
+                    Cutters: snap.shipTo?.name || "N/A",
+                    WagonNumber: snap.wagonNumber || "N/A",
+                    Status: snap.currentStatus || booking.status || "N/A",
+                };
+            })
+        );
 
+        // Create workbook and sheet
         const workbook = XLSX.utils.book_new();
-
-        // Convert JSON data to worksheet
         const worksheet = XLSX.utils.json_to_sheet(payload);
 
-        // Optional: Set column widths for better readability
-        worksheet['!cols'] = [
+        // Optional: set column widths
+        worksheet["!cols"] = [
             { wch: 12 }, // Date
             { wch: 14 }, // ChallanDate
             { wch: 16 }, // ChallanNumber
@@ -686,37 +617,32 @@ const getExcelBooking = async (req, res) => {
             { wch: 30 }, // Description
             { wch: 12 }, // Cutters
             { wch: 14 }, // WagonNumber
-            { wch: 12 }  // Status
+            { wch: 12 }, // Status
         ];
 
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Stock Data');
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
 
-        // Generate buffer
         const excelBuffer = XLSX.write(workbook, {
-            type: 'buffer',
-            bookType: 'xlsx'
+            type: "buffer",
+            bookType: "xlsx",
         });
 
-        // Set headers for file download
         res.setHeader(
-            'Content-Type',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         );
         res.setHeader(
-            'Content-Disposition',
-            `attachment; filename=stock-data-${Date.now()}.xlsx`
+            "Content-Disposition",
+            `attachment; filename=bookings-${Date.now()}.xlsx`
         );
-        res.setHeader('Content-Length', excelBuffer.length);
+        res.setHeader("Content-Length", excelBuffer.length);
 
-        // Send the buffer
         res.send(excelBuffer);
-
     } catch (error) {
-        console.error('Error generating Excel:', error);
+        console.error("Error generating Excel:", error);
         res.status(500).json({
-            message: 'Error generating Excel file',
-            error: error.message
+            message: "Error generating Excel file",
+            error: error.message,
         });
     }
 };
@@ -736,5 +662,4 @@ module.exports = {
     deliverBooking,
     getAllBookingsDetails,
     getExcelBooking,
-    getExcelItem,
 }

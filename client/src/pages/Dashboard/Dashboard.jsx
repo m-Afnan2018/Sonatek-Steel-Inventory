@@ -7,6 +7,7 @@ import Bookings from 'components/core/Dashboard/Bookings'
 import { getAllUsers } from 'services/operations/userAPI'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllItem } from 'services/operations/itemAPI'
+// import UploadCSV from 'components/core/Inventory/UploadCSV'
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -19,13 +20,27 @@ const Dashboard = () => {
 
     const onDownload = async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
+            // const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
+            //     }
+            // });
+            const response = await fetch('http://localhost:4000/api/v1/item/downloadTemplate', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem(token)}`
                 }
             });
+            // const response = await fetch('http://localhost:4000/api/v1/item/getExcelItem', {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
+            //     }
+            // });
             const blob = await response.blob();
 
             // Create download link
@@ -47,6 +62,7 @@ const Dashboard = () => {
         <div className={style.Dashboard}>
             <h2>Dashboard</h2>
             <button onClick={onDownload}>Download Excel</button>
+            {/* <UploadCSV /> */}
             {['admin', 'director', 'inventory_associate'].includes(userData.role) && <Bookings />}
 
             {/* {['admin', 'director', 'ad'].includes(userData.role) && <Staff />} */}

@@ -256,6 +256,11 @@ h4 {
     border-radius: 1rem;
 }
 
+.Upcoming td input {
+    padding: 0.15rem;
+    border: 1px solid;
+}
+
 .Upcoming h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem 16px;
@@ -337,4 +342,232 @@ h4 {
     .heading {
         font-size: 1.2rem;
     }
+}
+
+/* Items */
+.staffContainer {
+    font-family: "Poppins", sans-serif;
+    color: #222;
+    margin: 2rem;
+    padding: 1rem;
+    background: #001f2b;
+    border-radius: 1rem;
+}
+
+.staffContainer h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem 16px;
+    color: #f0fbff;
+}
+
+.heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.searchForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.searchForm button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    color: rgb(0 31 43);
+    border: none;
+    background-color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.searchForm button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background: #05516f;
+    color: #f0fbff;
+}
+
+.searchForm input {
+    border-radius: 1rem;
+    padding: 0.5rem 0.5rem;
+    font-weight: 600;
+    border: none;
+    width: 100%;
+}
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    height: 500px;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-size: 1rem;
+}
+
+.loader {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2rem;
+}
+
+.tableWrapper {
+    overflow: scroll;
+    height: 100%;
+    border-radius: 1rem;
+    /* overflow-x: auto; */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.table th {
+    background-color: #f5f6fa;
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background-color: #f9fafc;
+}
+
+.controlsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.searchForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.activeRow {
+    background-color: #e9f5ff;
+}
+
+.formBlock {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-family: "Inter", sans-serif;
+    margin-bottom: 1rem;
+}
+
+.formBlock label {
+    display: block;
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.formBlock input,
+.formBlock select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.formBlock input:focus,
+.formBlock select:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.error {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.twoInOne {
+    display: flex;
+    gap: 1rem;
+}
+
+.twoInOne>div {
+    flex: 1;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-end;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+}
+
+.buttonGroup button {
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.buttonGroup button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background-color: rgb(0 31 43);
+    color: #f0fbff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.buttonGroup button:hover {
+    background-color: #f0fbff;
+    color: rgb(0 31 43);
+}
+
+/* Responsive tweak for smaller screens */
+@media (max-width: 600px) {
+    .formBlock {
+        grid-template-columns: 1fr;
+    }
+
+    .buttonGroup {
+        justify-content: center;
+    }
+}
+
+.AddForm {
+    margin: 2rem;
+    /* background: #001f2b;
+    color: white; */
+    padding: 1rem;
+    border-radius: 1rem;
 }

@@ -4,7 +4,15 @@ require('dotenv').config();
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 const cors = require('cors')
+app.use(
+    fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp",
+        limits: { fileSize: 50 * 1024 * 1024 },
+    })
+)
 app.use(express.json());
 app.use(bodyParser.json())
 app.use(cookieParser());
@@ -40,6 +48,9 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/item', itemRoutes);
 app.use('/api/v1/booking', bookingRoutes);
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}:  http://localhost:${port}`);

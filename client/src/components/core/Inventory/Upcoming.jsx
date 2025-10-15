@@ -33,7 +33,6 @@ const Upcoming = () => {
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Type</th>
                                     <th>Material Description</th>
                                     <th>Quantity</th>
                                     <th>Wagon No.</th>
@@ -56,7 +55,7 @@ const Upcoming = () => {
 }
 
 const SingleItem = ({ item }) => {
-    const [wagonNumber, setWagonNumber] = useState('');
+    const [wagonNumber, setWagonNumber] = useState(item.wagonNumber || '');
     const [challanNumber, setChallanNumber] = useState('');
     const [challanDate, setChallanDate] = useState('');
 
@@ -69,7 +68,6 @@ const SingleItem = ({ item }) => {
     return (
         <tr>
             <td>{formatDateMini(item.createdAt)}</td>
-            <td>{item.type}</td>
             <td>{item.thickness ? `${item.thickness.name} X ${item.width.name} X ${item.grade.name}` : '-'}</td>
             <td>{item.quantity}</td>
             <td><input onChange={(e) => setWagonNumber(e.target.value)} value={wagonNumber} type='text' /></td>

@@ -10,8 +10,6 @@ const Account = () => {
     const { firstName, lastName, email, phoneNumber, role } = userData;
     const dispatch = useDispatch();
 
-    useEffect(() => { console.log(userData) }, [])
-
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             firstName: firstName || '',
@@ -34,8 +32,6 @@ const Account = () => {
     }, [userData, reset, firstName, lastName, email, phoneNumber, role]);
 
     const onSubmit = (data) => {
-        console.log('Form Data:', data);
-
         // Add your API call or Redux action here to save the data
         updateUser(data, dispatch)
         setEditted(false);

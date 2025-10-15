@@ -4,13 +4,24 @@ const { default: mongoose } = require("mongoose");
 const challanSchema = new mongoose.Schema({
     challanDate: {
         type: Date,
-        required: true,
     },
     challanNumber: {
         type: String,
-        required: true,
     },
 });
+
+
+const transportSchema = new mongoose.Schema({
+    vehicleNumber: {
+        type: String,
+    },
+    loader: {
+        type: String,
+    },
+    transporterName: {
+        type: String,
+    }
+})
 
 const itemSchema = new mongoose.Schema({
     type: {
@@ -50,6 +61,10 @@ const itemSchema = new mongoose.Schema({
         enum: ['In Stock', 'Sold', 'Reserved', 'Cancelled'],
         default: 'In Stock',
     },
+    originalQuanity: {
+        type: Number,
+        required: true
+    },
     quantity: {
         type: Number,
         required: true,
@@ -59,8 +74,7 @@ const itemSchema = new mongoose.Schema({
         ref: 'Cutter',
     },
     transport: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transport'
+        type: transportSchema,
     },
     createdAt: {
         type: Date,

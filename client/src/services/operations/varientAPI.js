@@ -128,7 +128,6 @@ export async function getAllVarientsDetail(setData, setLoading, dispatch) {
             dispatch(showSuccess({ id: "getAllVarientsDetail", message: response.message }));
         }
     } catch (err) {
-        console.log(err);
         dispatch(showError({
             id: "getAllVarientsDetail",
             message: err?.response?.data?.message || "Failed to fetch variant details"

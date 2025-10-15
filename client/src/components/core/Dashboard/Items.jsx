@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import style from './Dashboard.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllItem, updateItem } from 'services/operations/itemAPI';
+import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 
 const Items = () => {
@@ -13,6 +13,7 @@ const Items = () => {
     // eslint-disable-next-line no-unused-vars
     const [pagination, setPagination] = useState(null);
     const { listViewList } = useSelector(state => state.item);
+    const { token } = useSelector((state) => state.auth);
 
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
@@ -42,6 +43,47 @@ const Items = () => {
             setLoading(false);
         }
     }, [listViewList]);
+
+    const onDownload = async () => {
+        try {
+            // const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
+            //     }
+            // });
+            // const response = await fetch('http://localhost:4000/api/v1/item/downloadTemplate', {
+            //     method: 'GET',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
+            //     }
+            // });
+            const response = await fetch('http://localhost:4000/api/v1/item/getExcelItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': 'http://localhost:3000'
+                },
+                body: JSON.stringify({ search, filters })
+            });
+            const blob = await response.blob();
+
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Item-Data-${Date.now()}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download error:', error);
+        }
+    };
 
     return (
         <div className={style.staffContainer}>
@@ -75,6 +117,9 @@ const Items = () => {
                                     <th>Material Description</th>
                                     <th>Quantity</th>
                                     <th>Ship To</th>
+                                    <th>Vehicle Number</th>
+                                    <th>Loader</th>
+                                    <th>Transport</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,7 +136,8 @@ const Items = () => {
             </div>
             {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
-                <form onSubmit={onSearch} className={style.searchForm}>
+                <button onClick={onDownload}>Download</button>
+                {/* <form onSubmit={onSearch} className={style.searchForm}>
                     <input
                         type="text"
                         placeholder="Search bookings..."
@@ -100,7 +146,7 @@ const Items = () => {
                         className={style.searchInput}
                     />
                     <button type="submit" className={style.searchButton}>Search</button>
-                </form>
+                </form> */}
 
                 <div className={style.paginationControls}>
                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
@@ -121,340 +167,384 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ item, setView, view }) => {
+const SingleItem = ({ item, view, setView }) => {
     const challanDate = item.challanDate
         ? new Date(item.challanDate).toLocaleDateString()
-        : '-';
-
-    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
-    const dispatch = useDispatch();
-
-    const [select, setSelect] = useState('');
-    const [value, setValue] = useState('');
-
-    const clickHandler = (type) => {
-        setSelect(type);
-        setValue(item[type]);
-    };
-
-    const handleSave = (e) => {
-        e.stopPropagation(); const grade = grades.find(g => g.name === item.grade)._id;
-        const thickness = thicknesses.find(t => t.name === item.thickness)._id;
-        const width = widths.find(w => w.name === item.width)._id;
-        const cutter = cutters.find(c => c.name === item.shipTo)._id;
-        let Item = { ...item, grade, thickness, width, shipTo: cutter };
-        let updatedItem = { ...Item, [select]: value };
-        console.log(`Item: ${item.shipTo}, Cutter: ${cutter}`)
-        updateItem(updatedItem, dispatch);
-        setSelect('');
-    };
-
-    const handleCancel = (e) => {
-        e.stopPropagation();
-        setValue(item[select]);
-        setSelect('');
-    };
-
-    const renderEditableField = (type, inputType = 'text') => (
-        <div onClick={(e) => e.stopPropagation()}>
-            <input
-                type={inputType}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            />
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div>
-        </div>
-    );
-
-    const renderDropdownField = (type, options) => (
-        <div onClick={(e) => e.stopPropagation()}>
-            <select
-                value={value?._id}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            >
-                <option value="">Select</option>
-                {options.map((opt) => (
-                    <option key={opt._id} value={opt._id}>
-                        {opt.name || opt.value}
-                    </option>
-                ))}
-            </select>
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div>
-        </div>
-    );
+        : "-";
 
     return (
         <tr
-            className={`${view === item._id ? style.activeRow : ''}`}
+            className={`${view === item._id ? style.activeRow : ""}`}
             onClick={() => setView(item._id)}
         >
-            {/* Wagon Number */}
-            <td onClick={() => clickHandler('wagonNumber')}>
-                {select === 'wagonNumber'
-                    ? renderEditableField('wagonNumber')
-                    : item.wagonNumber || '-'}
+            <td>{item.wagonNumber || "-"}</td>
+            <td>{challanDate}</td>
+            <td>{item.challanNumber || "-"}</td>
+            <td>{item.type || "-"}</td>
+
+            <td style={{ display: "flex", gap: "5px" }}>
+                <span>{item.thickness || "-"}</span> X
+                <span>{item.width || "-"}</span> X
+                <span>{item.grade || "-"}</span>
             </td>
 
-            {/* Challan Date */}
-            <td onClick={() => clickHandler('challanDate')}>
-                {select === 'challanDate'
-                    ? renderEditableField('challanDate', 'date')
-                    : challanDate || '-'}
-            </td>
-
-            {/* Challan Number */}
-            <td onClick={() => clickHandler('challanNumber')}>
-                {select === 'challanNumber'
-                    ? renderEditableField('challanNumber')
-                    : item.challanNumber || '-'}
-            </td>
-
-            {/* Type */}
-            <td onClick={() => clickHandler('type')}>
-                {select === 'type' ? (
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <select
-                            value={value}
-                            onChange={(e) => setValue(e.target.value)}
-                            autoFocus
-                        >
-                            <option value="">Select</option>
-                            <option value="Hot Rolled">Hot Rolled</option>
-                            <option value="Cold Rolled">Cold Rolled</option>
-                        </select>
-                        <div className={style.inlineButtons}>
-                            <button type="button" onClick={handleSave}>Save</button>
-                            <button type="button" onClick={handleCancel}>Cancel</button>
-                        </div>
-                    </div>
-                ) : (
-                    item.type
-                )}
-            </td>
-
-            {/* Thickness x Width x Grade */}
-            <td style={{ display: 'flex', gap: '5px' }}>
-                {/* Thickness */}
-                <div onClick={() => clickHandler('thickness')}>
-                    {select === 'thickness'
-                        ? renderDropdownField('thickness', thicknesses)
-                        : <span>{item.thickness}</span>}
-                </div>
-                X
-                {/* Width */}
-                <div onClick={() => clickHandler('width')}>
-                    {select === 'width'
-                        ? renderDropdownField('width', widths)
-                        : <span>{item.width}</span>}
-                </div>
-                X
-                {/* Grade */}
-                <div onClick={() => clickHandler('grade')}>
-                    {select === 'grade'
-                        ? renderDropdownField('grade', grades)
-                        : <span>{item.grade}</span>}
-                </div>
-            </td>
-
-            {/* Quantity */}
-            <td onClick={() => clickHandler('quantity')}>
-                {select === 'quantity'
-                    ? renderEditableField('quantity', 'number')
-                    : item.quantity}
-            </td>
-
-            {/* Ship To */}
-            <td onClick={() => clickHandler('shipTo')}>
-                {select === 'shipTo' ? (
-                    <div onClick={() => clickHandler('shipTo')}>
-                        {select === 'shipTo'
-                            ? renderDropdownField('shipTo', cutters)
-                            : <span>{item.width}</span>}
-                    </div>
-                ) : (
-                    item.shipTo
-                )}
-            </td>
+            <td>{item.quantity ?? "-"}</td>
+            <td>{item.shipTo || "-"}</td>
+            <td>{item.vehicleNumber || "-"}</td>
+            <td>{item.loader || "-"}</td>
+            <td>{item.transport || "-"}</td>
         </tr>
     );
 };
 
+// const SingleItem = ({ item, setView, view }) => {
+//     const challanDate = item.challanDate
+//         ? new Date(item.challanDate).toLocaleDateString()
+//         : '-';
+
+//     const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+//     const dispatch = useDispatch();
+
+//     const [select, setSelect] = useState('');
+//     const [value, setValue] = useState('');
+
+//     const clickHandler = (type) => {
+//         setSelect(type);
+//         setValue(item[type]);
+//     };
+
+//     const handleSave = (e) => {
+//         e.stopPropagation(); const grade = grades.find(g => g.name === item.grade)._id;
+//         const thickness = thicknesses.find(t => t.name === item.thickness)._id;
+//         const width = widths.find(w => w.name === item.width)._id;
+//         const cutter = cutters.find(c => c.name === item.shipTo)?._id;
+//         let Item = { ...item, grade, thickness, width, shipTo: cutter };
+//         let updatedItem = { ...Item, [select]: value };
+//         updateItem(updatedItem, dispatch);
+//         setSelect('');
+//     };
+
+//     const handleCancel = (e) => {
+//         e.stopPropagation();
+//         setValue(item[select]);
+//         setSelect('');
+//     };
+
+//     const renderEditableField = (type, inputType = 'text') => (
+//         <div onClick={(e) => e.stopPropagation()}>
+//             <input
+//                 type={inputType}
+//                 value={value}
+//                 onChange={(e) => setValue(e.target.value)}
+//                 autoFocus
+//             />
+//             <div className={style.inlineButtons}>
+//                 <button type="button" onClick={handleSave}>Save</button>
+//                 <button type="button" onClick={handleCancel}>Cancel</button>
+//             </div>
+//         </div>
+//     );
+
+//     const renderDropdownField = (type, options) => (
+//         <div onClick={(e) => e.stopPropagation()}>
+//             <select
+//                 value={value?._id}
+//                 onChange={(e) => setValue(e.target.value)}
+//                 autoFocus
+//             >
+//                 <option value="">Select</option>
+//                 {options.map((opt) => (
+//                     <option key={opt._id} value={opt._id}>
+//                         {opt.name || opt.value}
+//                     </option>
+//                 ))}
+//             </select>
+//             <div className={style.inlineButtons}>
+//                 <button type="button" onClick={handleSave}>Save</button>
+//                 <button type="button" onClick={handleCancel}>Cancel</button>
+//             </div>
+//         </div>
+//     );
+
+//     return (
+//         <tr
+//             className={`${view === item._id ? style.activeRow : ''}`}
+//             onClick={() => setView(item._id)}
+//         >
+//             {/* Wagon Number */}
+//             <td>
+//                 {select === 'wagonNumber'
+//                     ? renderEditableField('wagonNumber')
+//                     : item.wagonNumber || '-'}
+//             </td>
+
+//             {/* Challan Date */}
+//             <td>
+//                 {select === 'challanDate'
+//                     ? renderEditableField('challanDate', 'date')
+//                     : challanDate || '-'}
+//             </td>
+
+//             {/* Challan Number */}
+//             <td>
+//                 {select === 'challanNumber'
+//                     ? renderEditableField('challanNumber')
+//                     : item.challanNumber || '-'}
+//             </td>
+
+//             {/* Type */}
+//             <td>
+//                 {select === 'type' ? (
+//                     <div onClick={(e) => e.stopPropagation()}>
+//                         <select
+//                             value={value}
+//                             onChange={(e) => setValue(e.target.value)}
+//                             autoFocus
+//                         >
+//                             <option value="">Select</option>
+//                             <option value="Hot Rolled">Hot Rolled</option>
+//                             <option value="Cold Rolled">Cold Rolled</option>
+//                         </select>
+//                         <div className={style.inlineButtons}>
+//                             <button type="button" onClick={handleSave}>Save</button>
+//                             <button type="button" onClick={handleCancel}>Cancel</button>
+//                         </div>
+//                     </div>
+//                 ) : (
+//                     item.type
+//                 )}
+//             </td>
+
+//             {/* Thickness x Width x Grade */}
+//             <td style={{ display: 'flex', gap: '5px' }}>
+//                 {/* Thickness */}
+//                 <div>
+//                     {select === 'thickness'
+//                         ? renderDropdownField('thickness', thicknesses)
+//                         : <span>{item.thickness}</span>}
+//                 </div>
+//                 X
+//                 {/* Width */}
+//                 <div onClick={() => clickHandler('width')}>
+//                     {select === 'width'
+//                         ? renderDropdownField('width', widths)
+//                         : <span>{item.width}</span>}
+//                 </div>
+//                 X
+//                 {/* Grade */}
+//                 <div onClick={() => clickHandler('grade')}>
+//                     {select === 'grade'
+//                         ? renderDropdownField('grade', grades)
+//                         : <span>{item.grade}</span>}
+//                 </div>
+//             </td>
+
+//             {/* Quantity */}
+//             <td onClick={() => clickHandler('quantity')}>
+//                 {select === 'quantity'
+//                     ? renderEditableField('quantity', 'number')
+//                     : item.quantity}
+//             </td>
+
+//             {/* Ship To */}
+//             <td onClick={() => clickHandler('shipTo')}>
+//                 {select === 'shipTo' ? (
+//                     <div onClick={() => clickHandler('shipTo')}>
+//                         {select === 'shipTo'
+//                             ? renderDropdownField('shipTo', cutters)
+//                             : <span>{item.width}</span>}
+//                     </div>
+//                 ) : (
+//                     item.shipTo
+//                 )}
+//             </td>
+
+//             {/* Vehicle */}
+//             <td onClick={() => clickHandler('vehicleNumber')}>
+//                 {select === 'vehicleNumber'
+//                     ? renderEditableField('vehicleNumber')
+//                     : item.vehicleNumber || '-'}
+//             </td>
+
+//             {/* Ship To */}
+//             <td onClick={() => clickHandler('loader')}>
+//                 {select === 'loader'
+//                     ? renderEditableField('loader')
+//                     : item.loader || '-'}
+//             </td>
+
+//             {/* Ship To */}
+//             <td onClick={() => clickHandler('transporterName')}>
+//                 {select === 'transporterName'
+//                     ? renderEditableField('transporterName')
+//                     : item.transport || '-'}
+//             </td>
+//         </tr>
+//     );
+// };
+
 const Filters = ({ setFilters }) => {
-    const { grades, thicknesses, cutters, widths } = useSelector(state => state.varient)
+    const { grades, thicknesses, cutters, widths } = useSelector(
+        (state) => state.varient
+    );
     const dispatch = useDispatch();
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, reset } = useForm({
         defaultValues: {
-            type: '',
-            grade: '',
-            formType: '',
-            width: '',
-            thickness: '',
-            wagonNumber: '',
-            challanNumber: '',
-            challanDate: '',
-            quantity: '',
-            shipTo: '',
-        }
-    })
+            type: "",
+            grade: "",
+            formType: "",
+            width: "",
+            thickness: "",
+            wagonNumber: "",
+            challanNumber: "",
+            challanDate: "",
+            quantity: "",
+            shipTo: "",
+            fromDate: "",
+            toDate: "",
+        },
+    });
 
     const onSubmit = (filters) => {
+        setFilters(filters)
         getAllItem({ filters }, dispatch);
-    }
+    };
 
     const handleReset = () => {
         getAllItem({}, dispatch);
-    }
+        reset();
+    };
 
-    return <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
-        <div>
-            <label htmlFor='remaining'>Quantity:</label>
-            <select
-                id='remaining'
-                {...register('remaining')}
-            >
-                <option value=''>All</option>
-                <option value='remaining'> In Stock </option>
-                <option value='finished'> Sold Out </option>
-            </select>
-            {errors.grade && <span className={style.error}>{errors.remaining.message}</span>}
-        </div>
+    return (
+        <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
+            {/* Quantity Filter */}
+            <div>
+                <label htmlFor="remaining">Quantity:</label>
+                <select id="remaining" {...register("remaining")}>
+                    <option value="">All</option>
+                    <option value="remaining">In Stock</option>
+                    <option value="finished">Sold Out</option>
+                </select>
+            </div>
 
+            {/* Type */}
+            <div>
+                <label htmlFor="type">Type:</label>
+                <select id="type" {...register("type")}>
+                    <option value="">All</option>
+                    <option value="Hot Rolled">Hot Rolled</option>
+                    <option value="Cold Rolled">Cold Rolled</option>
+                </select>
+            </div>
 
-        <div>
-            <label htmlFor='type'>Type:</label>
-            <select
-                id='type'
-                {...register('type')}
-            >
-                <option value=''>All</option>
-                <option value='Hot Rolled'>  Hot Rolled </option>
-                <option value='Cold Rolled'>  Cold Rolled </option>
-            </select>
-            {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-        </div>
+            {/* Grade */}
+            <div>
+                <label htmlFor="grade">Grade:</label>
+                <select id="grade" {...register("grade")}>
+                    <option value="">All</option>
+                    {grades?.map((grade) => (
+                        <option key={grade._id} value={grade._id}>
+                            {grade.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
+            {/* Width */}
+            <div>
+                <label htmlFor="width">Width:</label>
+                <select id="width" {...register("width")}>
+                    <option value="">All</option>
+                    {widths?.map((width) => (
+                        <option key={width._id} value={width._id}>
+                            {width.value || width.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-        <div>
-            <label htmlFor='grade'>Grade:</label>
-            <select
-                id='grade'
-                {...register('grade')}
-            >
-                <option value=''>All</option>
-                {grades && grades.map((grade) => (
-                    <option key={grade._id} value={grade._id}>
-                        {grade.name}
-                    </option>
-                ))}
-            </select>
-            {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-        </div>
+            {/* Thickness */}
+            <div>
+                <label htmlFor="thickness">Thickness:</label>
+                <select id="thickness" {...register("thickness")}>
+                    <option value="">All</option>
+                    {thicknesses?.map((thickness) => (
+                        <option key={thickness._id} value={thickness._id}>
+                            {thickness.value || thickness.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-        <div>
-            <label htmlFor='width'>Width: </label>
-            <select
-                id='width'
-                {...register('width')}
-            >
-                <option value=''>All</option>
-                {widths && widths.map((width) => (
-                    <option key={width._id} value={width._id}>
-                        {width.value || width.name}
-                    </option>
-                ))}
-            </select>
-            {errors.width && <span className={style.error}>{errors.width.message}</span>}
-        </div>
+            {/* Wagon Number */}
+            <div>
+                <label htmlFor="wagonNumber">Wagon Number:</label>
+                <input
+                    id="wagonNumber"
+                    type="text"
+                    placeholder="Enter wagon number"
+                    {...register("wagonNumber")}
+                />
+            </div>
 
-        <div>
-            <label htmlFor='thickness'>Thickness: </label>
-            <select
-                id='thickness'
-                {...register('thickness')}
-            >
-                <option value=''>All</option>
-                {thicknesses && thicknesses.map((thickness) => (
-                    <option key={thickness._id} value={thickness._id}>
-                        {thickness.value || thickness.name}
-                    </option>
-                ))}
-            </select>
-            {errors.thickness && <span className={style.error}>{errors.thickness.message}</span>}
-        </div>
+            {/* Challan Number */}
+            <div>
+                <label htmlFor="challanNumber">Challan Number:</label>
+                <input
+                    id="challanNumber"
+                    type="text"
+                    placeholder="Enter challan number"
+                    {...register("challanNumber")}
+                />
+            </div>
 
-        <div>
-            <label htmlFor='wagonNumber'>Wagon Number:</label>
-            <input
-                id='wagonNumber'
-                type='text'
-                placeholder='Enter wagon number'
-                {...register('wagonNumber')}
-            />
-            {errors.wagonNumber && <span className={style.error}>{errors.wagonNumber.message}</span>}
-        </div>
+            {/* 📅 Date Range Filter */}
+            <div>
+                <label>From Date:</label>
+                <input type="date" {...register("fromDate")} />
+            </div>
 
-        <div>
-            <label htmlFor='challanNumber'>Challan Number</label>
-            <input
-                id='challanNumber'
-                type='text'
-                placeholder='Enter challan number'
-                {...register('challanNumber')}
-            />
-            {errors.challanNumber && <span className={style.error}>{errors.challanNumber.message}</span>}
-        </div>
-        <div>
-            <label htmlFor='challanDate'>Challan Date</label>
-            <input
-                id='challanDate'
-                type='date'
-                {...register('challanDate')}
-            />
-            {errors.challanDate && <span className={style.error}>{errors.challanDate.message}</span>}
-        </div>
+            <div>
+                <label>To Date:</label>
+                <input type="date" {...register("toDate")} />
+            </div>
 
-        <div>
-            <label htmlFor='quantity'>Quantity</label>
-            <input
-                id='quantity'
-                type='number'
-                step="any"
-                placeholder='Enter quantity'
-                {...register('quantity')}
-            />
-            {errors.quantity && <span className={style.error}>{errors.quantity.message}</span>}
-        </div>
+            {/* Quantity */}
+            <div>
+                <label htmlFor="quantity">Quantity:</label>
+                <input
+                    id="quantity"
+                    type="number"
+                    step="any"
+                    placeholder="Enter quantity"
+                    {...register("quantity")}
+                />
+            </div>
 
-        <div>
-            <label htmlFor='shipTo'>Ship To:</label>
-            <select
-                id='shipTo'
-                {...register('shipTo')}
-            >
-                <option value=''>All</option>
-                {cutters && cutters.map((cutter) => (
-                    <option key={cutter._id} value={cutter._id}>
-                        {cutter.name}
-                    </option>
-                ))}
-            </select>
-            {errors.shipTo && <span className={style.error}>{errors.shipTo.message}</span>}
-        </div>
+            {/* Ship To */}
+            <div>
+                <label htmlFor="shipTo">Ship To:</label>
+                <select id="shipTo" {...register("shipTo")}>
+                    <option value="">All</option>
+                    {cutters?.map((cutter) => (
+                        <option key={cutter._id} value={cutter._id}>
+                            {cutter.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-        <div className={style.buttonGroup}>
-            <button type='submit'>Filter</button>
-            <button type='button' onClick={handleReset}>Reset</button>
-        </div>
-    </form>
-}
+            {/* Buttons */}
+            <div className={style.buttonGroup}>
+                <button type="submit">Filter</button>
+                <button type="button" onClick={handleReset}>
+                    Reset
+                </button>
+            </div>
+        </form>
+    );
+};
+
 
 export default Items;

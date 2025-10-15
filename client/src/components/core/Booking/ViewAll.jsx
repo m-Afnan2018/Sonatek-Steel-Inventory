@@ -41,7 +41,6 @@ const ViewAll = () => {
     useEffect(() => {
         setError(false);
         setField('')
-        console.log("running")
     }, [select])
 
     const cancel = (id, e) => {
@@ -98,12 +97,9 @@ const ViewAll = () => {
             // if (item.status === 'Pending' || item.status === 'Processing') {
             //     height += 3.5 + 2.725;
             // }
-            // console.log(height)
             // setHeight(height)
         }
     }
-
-    useEffect(() => console.log("Change"), [field]);
 
     return (
         <div className={style.viewAll}>

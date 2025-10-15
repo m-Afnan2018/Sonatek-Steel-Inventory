@@ -51,25 +51,25 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* ===== Scrollbar CSS ===== */
 /* Firefox */
-* {
-    scrollbar-width: 1px;
-    /* scrollbar-color: var(--cerulean) var(--light-orange); */
-}
+/* * {
+    scrollbar-width: 10px;
+    scrollbar-color: var(--cerulean) var(--light-orange);
+} */
 
 /* Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-    width: 1px;
-}
+/* *::-webkit-scrollbar {
+    width: 10px;
+} */
 
-*::-webkit-scrollbar-track {
+/* *::-webkit-scrollbar-track {
     background: var(--light-orange);
-}
+} */
 
-*::-webkit-scrollbar-thumb {
+/* *::-webkit-scrollbar-thumb {
     background-color: var(--cerulean);
     border-radius: 10px;
     border: 0px solid var(--light-orange);
-}
+} */
 
 /* HTML: <div class="loader"></div> */
 .loader {
