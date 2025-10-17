@@ -402,14 +402,14 @@ const getAllVarients = async (req, res) => {
 
 const getAllDetailVarient = async (req, res) => {
     try {
-        // Function to get total items per variant
-        const getVariantWithItemCount = async (Model, field) => {
+        // Function to get total items & total quantity per variant
+        const getVariantWithItemStats = async (Model, field) => {
             return await Model.aggregate([
                 {
                     $lookup: {
-                        from: "items", // collection name
+                        from: "items", // collection name in MongoDB
                         localField: "_id",
-                        foreignField: field, // e.g., shipTo, grade, thickness, width
+                        foreignField: field, // field in items (e.g. shipTo, grade, etc.)
                         as: "items",
                     },
                 },
@@ -417,17 +417,26 @@ const getAllDetailVarient = async (req, res) => {
                     $project: {
                         name: 1,
                         totalItems: { $size: "$items" },
+                        totalQuantity: {
+                            $sum: {
+                                $map: {
+                                    input: "$items",
+                                    as: "item",
+                                    in: "$$item.quantity"
+                                }
+                            }
+                        }
                     },
                 },
             ]);
         };
 
-        // Get all variant details
+        // Run in parallel
         const [cutters, grades, thicknesses, widths] = await Promise.all([
-            getVariantWithItemCount(Cutter, "shipTo"),
-            getVariantWithItemCount(Grade, "grade"),
-            getVariantWithItemCount(Thickness, "thickness"),
-            getVariantWithItemCount(Width, "width"),
+            getVariantWithItemStats(Cutter, "shipTo"),
+            getVariantWithItemStats(Grade, "grade"),
+            getVariantWithItemStats(Thickness, "thickness"),
+            getVariantWithItemStats(Width, "width"),
         ]);
 
         res.status(200).json({

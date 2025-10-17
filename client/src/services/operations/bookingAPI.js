@@ -10,7 +10,7 @@ import {
     updateBookingStatus
 } from "slices/bookingSlice";
 import { setPagination } from "slices/itemSlice";
-import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
+import { addLoader, removeLoader, showError } from "slices/loaderSlice";
 
 export async function searchOptions(params, dispatch) {
     try {
@@ -24,7 +24,7 @@ export async function searchOptions(params, dispatch) {
             dispatch(setAllChoices(response.allItems));
         }
 
-        dispatch(showSuccess({ id: "searchOptions", message: response.message }));
+        // dispatch(showSuccess({ id: "searchOptions", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "searchOptions", message: err?.response?.data?.message || "Search failed" }));
     }
@@ -43,7 +43,7 @@ export async function bookingItems(params, dispatch) {
             dispatch(addNewBooking(response.item));
         }
 
-        dispatch(showSuccess({ id: "bookingItems", message: response.message }));
+        // dispatch(showSuccess({ id: "bookingItems", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "bookingItems", message: err?.response?.data?.message || "Booking failed" }));
     }
@@ -60,7 +60,7 @@ export async function getAllBookings(dispatch) {
             dispatch(setPagination(response.pagination))
         }
 
-        dispatch(showSuccess({ id: "getAllBookings", message: response.message }));
+        // dispatch(showSuccess({ id: "getAllBookings", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getAllBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
@@ -76,7 +76,7 @@ export async function getMyBookings(dispatch) {
             dispatch(setBookings(response.bookings));
         }
 
-        dispatch(showSuccess({ id: "getMyBookings", message: response.message }));
+        // dispatch(showSuccess({ id: "getMyBookings", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getMyBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
@@ -92,7 +92,7 @@ export async function cancelBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Cancelled' }));
         }
 
-        dispatch(showSuccess({ id: "cancelBooking", message: response.message }));
+        // dispatch(showSuccess({ id: "cancelBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "cancelBooking", message: err?.response?.data?.message || "Cancel booking failed" }));
     }
@@ -108,7 +108,7 @@ export async function shipBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
         }
 
-        dispatch(showSuccess({ id: "shipBooking", message: response.message }));
+        // dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "shipBooking", message: err?.response?.data?.message || "Ship booking failed" }));
     }
@@ -124,7 +124,7 @@ export async function confirmBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Processing' }));
         }
 
-        dispatch(showSuccess({ id: "confirmBooking", message: response.message }));
+        // dispatch(showSuccess({ id: "confirmBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "confirmBooking", message: err?.response?.data?.message || "Confirm booking failed" }));
     }
@@ -140,7 +140,7 @@ export async function deliverBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Delivered' }));
         }
 
-        dispatch(showSuccess({ id: "deliverBooking", message: response.message }));
+        // dispatch(showSuccess({ id: "deliverBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "deliverBooking", message: err?.response?.data?.message || "Delivery update failed" }));
     }
@@ -157,7 +157,7 @@ export async function getAllBookingsDetails(setBookings, setLoading, dispatch) {
             setLoading(false);
         }
 
-        dispatch(showSuccess({ id: "getAllBookingsDetails", message: response.message }));
+        // dispatch(showSuccess({ id: "getAllBookingsDetails", message: response.message }));
         dispatch(removeLoader("getAllBookingsDetails"));
     } catch (err) {
         dispatch(removeLoader("getAllBookingsDetails"));
@@ -179,7 +179,7 @@ export async function fetchBookings(params = {}, setBookings, setLoading, dispat
             setLoading(false);
         }
 
-        dispatch(showSuccess({ id: "fetchBookings", message: response.message }));
+        // dispatch(showSuccess({ id: "fetchBookings", message: response.message }));
         dispatch(removeLoader("fetchBookings"));
     } catch (err) {
         dispatch(removeLoader("fetchBookings"));

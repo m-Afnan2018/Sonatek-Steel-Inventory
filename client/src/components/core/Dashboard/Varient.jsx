@@ -23,7 +23,8 @@ const Varient = () => {
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Total Items</th>
+                        <th>Total Coils</th>
+                        <th>Total Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,6 +32,7 @@ const Varient = () => {
                         <tr key={v._id}>
                             <td>{v.name}</td>
                             <td>{v.totalItems}</td>
+                            <td>{v.totalQuantity.toFixed(3)}</td>
                         </tr>
                     ))}
                 </tbody>

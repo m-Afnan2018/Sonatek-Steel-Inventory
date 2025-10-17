@@ -9,7 +9,7 @@ import {
     updateUserDesignation,
     updateUserVerification,
 } from "slices/userSlice";
-import { addLoader, showError, showSuccess } from "slices/loaderSlice";
+import { addLoader, showError } from "slices/loaderSlice";
 
 // 🧩 Get All Users
 export async function getAllUsers(dispatch) {
@@ -20,7 +20,7 @@ export async function getAllUsers(dispatch) {
         dispatch(setAllUsers(response.data.users));
 
         dispatch(
-            showSuccess({ id: "getAllUsers", message: "Successfully fetched all users" })
+            // showSuccess({ id: "getAllUsers", message: "Successfully fetched all users" })
         );
     } catch (err) {
         dispatch(
@@ -43,7 +43,7 @@ export async function verifyUser(params, dispatch) {
 
         if (response.success) {
             dispatch(updateUserVerification(params.userId));
-            dispatch(showSuccess({ id: "verifyUser", message: response.message }));
+            // dispatch(showSuccess({ id: "verifyUser", message: response.message }));
         } else {
             dispatch(showError({ id: "verifyUser", message: response.message }));
         }
@@ -68,7 +68,7 @@ export async function activeUser(id, dispatch) {
 
         if (response.success) {
             dispatch(updateAddUser(id));
-            dispatch(showSuccess({ id: "activeUser", message: response.message }));
+            // dispatch(showSuccess({ id: "activeUser", message: response.message }));
         } else {
             dispatch(showError({ id: "activeUser", message: response.message }));
         }
@@ -93,7 +93,7 @@ export async function deleteRequest(id, dispatch) {
 
         if (response.success) {
             dispatch(updateDeleteRequest(id));
-            dispatch(showSuccess({ id: "deleteRequest", message: response.message }));
+            // dispatch(showSuccess({ id: "deleteRequest", message: response.message }));
         } else {
             dispatch(showError({ id: "deleteRequest", message: response.message }));
         }
@@ -118,7 +118,7 @@ export async function removeUser(id, dispatch) {
 
         if (response.success) {
             dispatch(updateRemoveUser(id));
-            dispatch(showSuccess({ id: "removeUser", message: response.message }));
+            // dispatch(showSuccess({ id: "removeUser", message: response.message }));
         } else {
             dispatch(showError({ id: "removeUser", message: response.message }));
         }
@@ -146,7 +146,7 @@ export async function changeUserDesignation(id, role, dispatch) {
 
         if (response.success) {
             dispatch(updateUserDesignation({ userId: id, role }));
-            dispatch(showSuccess({ id: "changeUserDesignation", message: response.message }));
+            // dispatch(showSuccess({ id: "changeUserDesignation", message: response.message }));
         } else {
             dispatch(showError({ id: "changeUserDesignation", message: response.message }));
         }
@@ -171,7 +171,7 @@ export async function updateUser(params, dispatch) {
 
         if (response.success) {
             dispatch(setUserData(response.user));
-            dispatch(showSuccess({ id: "updateUser", message: response.message }));
+            // dispatch(showSuccess({ id: "updateUser", message: response.message }));
         } else {
             dispatch(showError({ id: "updateUser", message: response.message }));
         }

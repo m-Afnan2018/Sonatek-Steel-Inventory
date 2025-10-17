@@ -1,6 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { cutterEndpoints } from "services/apis";
-import { addLoader, showError, showSuccess } from "slices/loaderSlice";
+import { addLoader, showError } from "slices/loaderSlice";
 import { setCutters } from "slices/varientSlice";
 
 
@@ -16,7 +16,7 @@ export async function addCutter(params, dispatch, list) {
 
             dispatch(setCutters(newList));
 
-            dispatch(showSuccess({ id: "addCutter", message: response.message }));
+            // dispatch(showSuccess({ id: "addCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -38,7 +38,7 @@ export async function showCutter(params, dispatch, list) {
 
             dispatch(setCutters(newList));
 
-            dispatch(showSuccess({ id: "showCutter", message: response.message }));
+            // dispatch(showSuccess({ id: "showCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -60,7 +60,7 @@ export async function hideCutter(params, dispatch, list) {
 
             dispatch(setCutters(newList));
 
-            dispatch(showSuccess({ id: "hideCutter", message: response.message }));
+            // dispatch(showSuccess({ id: "hideCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
