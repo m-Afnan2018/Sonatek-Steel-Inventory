@@ -381,3 +381,36 @@
     align-items: center;
     gap: 1rem;
 }
+
+.controlsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.controlsRow>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 900;
+}
+
+.controlsRow button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    color: rgb(0 31 43);
+    border: none;
+    background-color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.controlsRow button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background: #05516f;
+    color: #f0fbff;
+}

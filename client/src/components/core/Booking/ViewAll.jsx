@@ -3,10 +3,11 @@ import style from './Booking.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { formatDate, formatTime } from 'utils/dateHandler';
 import { cancelBooking, confirmBooking, deliverBooking, shipBooking } from 'services/operations/bookingAPI';
+import { getExcelBooking } from 'services/operations/utilAPI';
 
 const ViewAll = () => {
     const [view, setView] = useState('all');
-    const { bookings } = useSelector(state => state.booking);
+    const { bookings, pagination } = useSelector(state => state.booking);
     const { userData } = useSelector((state) => state.auth);
     const [select, setSelect] = useState(null);
     const [field, setField] = useState(null);
@@ -74,6 +75,13 @@ const ViewAll = () => {
         }
         shipBooking({ bookingId: id, vehicleNumber: field }, dispatch);
         setField('');
+    }
+
+    const onClickNext = () => {
+
+    }
+    const onClickPrev = () => {
+
     }
 
     const deliver = (id, e) => {
@@ -211,6 +219,26 @@ const ViewAll = () => {
                 {(listing === null || listing.length === 0) && <div className={style.notFound}>
                     No booking found
                 </div>}
+
+                {/* Top controls: Search and pagination info */}
+                <div className={style.controlsRow}>
+                    <button onClick={getExcelBooking}>Download</button>
+
+                    <div className={style.paginationControls}>
+                        <button onClick={onClickPrev} disabled={pagination?.page === 1}>
+                            Prev
+                        </button>
+                        <div className={style.paginationInfo}>
+                            Page {pagination?.page} of {pagination?.totalPages || 1}
+                        </div>
+                        <button
+                            onClick={onClickNext}
+                            disabled={pagination?.page >= (pagination?.totalPages || 1)}
+                        >s
+                            Next
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div >

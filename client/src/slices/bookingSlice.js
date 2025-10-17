@@ -5,6 +5,7 @@ const initialState = {
     bestSuggestion: null,
     allSuggestion: null,
     allChoices: null,
+    pagination: null,
     requirement: null,
     options: null,
     bookings: null,
@@ -45,7 +46,10 @@ const bookingSlice = createSlice({
         },
         addNewBooking(state, action) {
             const payload = action.payload;
-            state.bookings = [...state.bookings, payload];
+            state.bookings = [payload, ...state.bookings];
+        },
+        setPagination(state, action) {
+            state.pagination = action.payload
         }
     }
 })

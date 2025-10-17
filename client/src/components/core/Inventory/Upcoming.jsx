@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import style from './Inventory.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { updateItem } from 'services/operations/itemAPI';
-import { formatDateMini } from 'utils/dateHandler';
 
 const Upcoming = () => {
     const [loading, setLoading] = useState(true);
@@ -32,7 +31,6 @@ const Upcoming = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th>Date</th>
                                     <th>Material Description</th>
                                     <th>Quantity</th>
                                     <th>Wagon No.</th>
@@ -61,18 +59,32 @@ const SingleItem = ({ item }) => {
 
     const dispatch = useDispatch();
 
+
+    const { cutters } = useSelector(state => state.varient);
+
     const onSubmit = () => {
         updateItem({ ...item, wagonNumber, challanNumber, challanDate }, dispatch)
     }
 
     return (
         <tr>
-            <td>{formatDateMini(item.createdAt)}</td>
             <td>{item.thickness ? `${item.thickness.name} X ${item.width.name} X ${item.grade.name}` : '-'}</td>
             <td>{item.quantity}</td>
             <td><input onChange={(e) => setWagonNumber(e.target.value)} value={wagonNumber} type='text' /></td>
             <td><input type='date' value={challanDate} onChange={(e) => setChallanDate(e.target.value)} /> </td>
             <td><input onChange={(e) => setChallanNumber(e.target.value)} value={challanNumber} type='text' /></td>
+            <td>
+                <select
+                    id='cutters'
+                >
+                    <option value=''>Select Cutter</option>
+                    {cutters && cutters.map((cutter) => (
+                        <option key={cutter._id} value={cutter._id}>
+                            {cutter.name}
+                        </option>
+                    ))}
+                </select>
+            </td>
             <td><button onClick={onSubmit}>Submit</button></td>
         </tr>
     );

@@ -5,6 +5,7 @@ import {
     deleteFromCurrentList,
     setCurrentList,
     setListviewList,
+    setPagination,
     setSelectUpdate,
     setUpcomingItem,
     updateListViewList
@@ -17,6 +18,7 @@ export async function getAllItem(data, dispatch) {
         const response = (await apiConnector('POST', itemEndpoints.GET_ALL_ITEMS, data)).data;
 
         dispatch(setListviewList(response.listView));
+        dispatch(setPagination({ totalPages: response.pages, page: response.page }));
         dispatch(setCurrentList(response.wagons));
         dispatch(showSuccess({ id: "getAllItem", message: response.message }));
     } catch (err) {

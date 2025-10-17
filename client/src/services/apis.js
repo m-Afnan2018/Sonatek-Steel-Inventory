@@ -57,3 +57,10 @@ export const cutterEndpoints = {
     SHOW_CUTTERS: `${BASE_URL}/cutters/showCutters`,
     GET_DATA_BY_CUTTERS: `${BASE_URL}/cutters/getDataByCutters`
 }
+
+export const utilEndpoints = {
+    DOWNLOAD_TEMPLATE: `${BASE_URL}/item/downloadTemplate`,
+    GET_EXCEL_ITEM: `${BASE_URL}/item/getExcelItem`,
+    UPLOAD_CSV: `${BASE_URL}/item/uploadCSV`,
+    GET_EXCEL_BOOKING: `${BASE_URL}/booking/getExcelBooking`
+}

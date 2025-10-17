@@ -38,20 +38,6 @@ const Items = () => {
 
     const onDownload = async () => {
         try {
-            // const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
-            //     method: 'GET',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
-            //     }
-            // });
-            // const response = await fetch('http://localhost:4000/api/v1/item/downloadTemplate', {
-            //     method: 'GET',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
-            //     }
-            // });
             const response = await fetch('http://localhost:4000/api/v1/item/getExcelItem', {
                 method: 'POST',
                 headers: {
@@ -134,6 +120,7 @@ const Items = () => {
 
                 {/* Pagination controls */}
             </div>
+
             {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
                 <button onClick={onDownload}>Download</button>
@@ -337,7 +324,7 @@ const SingleItem = ({ item, setView, view }) => {
             <td onClick={() => clickHandler('transporterName')}>
                 {select === 'transporterName'
                     ? renderEditableField('transporterName')
-                    : item.transport || '-'}
+                    : item.transporterName || '-'}
             </td>
         </tr>
     );

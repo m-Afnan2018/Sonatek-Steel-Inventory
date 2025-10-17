@@ -9,10 +9,9 @@ const Items = () => {
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
     const [search, setSearch] = useState("");
-    const [page, setPage] = useState(1);
     // eslint-disable-next-line no-unused-vars
-    const [pagination, setPagination] = useState(null);
-    const { listViewList } = useSelector(state => state.item);
+    // const [pagination, setPagination] = useState(null);
+    const { listViewList, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
 
     // eslint-disable-next-line no-unused-vars
@@ -26,7 +25,21 @@ const Items = () => {
         challanNumber: '',
         challanDate: '',
         shipTo: '',
+        from: '',
+        to: ''
     })
+
+    // useEffect(() => {
+    //     getAllItem({ filters, search, page }, dispatch)
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [page])
+
+    const onClickNext = () => {
+        getAllItem({ filters, search, page: pagination.page + 1 }, dispatch);
+    }
+    const onClickPrev = () => {
+        getAllItem({ filters, search, page: pagination.page - 1 }, dispatch);
+    }
 
     const dispatch = useDispatch();
 
@@ -137,30 +150,18 @@ const Items = () => {
             {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
                 <button onClick={onDownload}>Download</button>
-                {/* <form onSubmit={onSearch} className={style.searchForm}>
-                    <input
-                        type="text"
-                        placeholder="Search bookings..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className={style.searchInput}
-                    />
-                    <button type="submit" className={style.searchButton}>Search</button>
-                </form> */}
 
                 <div className={style.paginationControls}>
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    {pagination?.page !== 1 && <button onClick={onClickPrev}>
                         Prev
-                    </button>
+                    </button>}
                     <div className={style.paginationInfo}>
-                        Page {page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
-                    <button
-                        onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
-                        disabled={page >= (pagination?.totalPages || 1)}
-                    >
+                    {pagination?.page < (pagination?.totalPages) && <button
+                        onClick={onClickNext}>
                         Next
-                    </button>
+                    </button>}
                 </div>
             </div>
         </div >
@@ -197,192 +198,6 @@ const SingleItem = ({ item, view, setView }) => {
     );
 };
 
-// const SingleItem = ({ item, setView, view }) => {
-//     const challanDate = item.challanDate
-//         ? new Date(item.challanDate).toLocaleDateString()
-//         : '-';
-
-//     const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
-//     const dispatch = useDispatch();
-
-//     const [select, setSelect] = useState('');
-//     const [value, setValue] = useState('');
-
-//     const clickHandler = (type) => {
-//         setSelect(type);
-//         setValue(item[type]);
-//     };
-
-//     const handleSave = (e) => {
-//         e.stopPropagation(); const grade = grades.find(g => g.name === item.grade)._id;
-//         const thickness = thicknesses.find(t => t.name === item.thickness)._id;
-//         const width = widths.find(w => w.name === item.width)._id;
-//         const cutter = cutters.find(c => c.name === item.shipTo)?._id;
-//         let Item = { ...item, grade, thickness, width, shipTo: cutter };
-//         let updatedItem = { ...Item, [select]: value };
-//         updateItem(updatedItem, dispatch);
-//         setSelect('');
-//     };
-
-//     const handleCancel = (e) => {
-//         e.stopPropagation();
-//         setValue(item[select]);
-//         setSelect('');
-//     };
-
-//     const renderEditableField = (type, inputType = 'text') => (
-//         <div onClick={(e) => e.stopPropagation()}>
-//             <input
-//                 type={inputType}
-//                 value={value}
-//                 onChange={(e) => setValue(e.target.value)}
-//                 autoFocus
-//             />
-//             <div className={style.inlineButtons}>
-//                 <button type="button" onClick={handleSave}>Save</button>
-//                 <button type="button" onClick={handleCancel}>Cancel</button>
-//             </div>
-//         </div>
-//     );
-
-//     const renderDropdownField = (type, options) => (
-//         <div onClick={(e) => e.stopPropagation()}>
-//             <select
-//                 value={value?._id}
-//                 onChange={(e) => setValue(e.target.value)}
-//                 autoFocus
-//             >
-//                 <option value="">Select</option>
-//                 {options.map((opt) => (
-//                     <option key={opt._id} value={opt._id}>
-//                         {opt.name || opt.value}
-//                     </option>
-//                 ))}
-//             </select>
-//             <div className={style.inlineButtons}>
-//                 <button type="button" onClick={handleSave}>Save</button>
-//                 <button type="button" onClick={handleCancel}>Cancel</button>
-//             </div>
-//         </div>
-//     );
-
-//     return (
-//         <tr
-//             className={`${view === item._id ? style.activeRow : ''}`}
-//             onClick={() => setView(item._id)}
-//         >
-//             {/* Wagon Number */}
-//             <td>
-//                 {select === 'wagonNumber'
-//                     ? renderEditableField('wagonNumber')
-//                     : item.wagonNumber || '-'}
-//             </td>
-
-//             {/* Challan Date */}
-//             <td>
-//                 {select === 'challanDate'
-//                     ? renderEditableField('challanDate', 'date')
-//                     : challanDate || '-'}
-//             </td>
-
-//             {/* Challan Number */}
-//             <td>
-//                 {select === 'challanNumber'
-//                     ? renderEditableField('challanNumber')
-//                     : item.challanNumber || '-'}
-//             </td>
-
-//             {/* Type */}
-//             <td>
-//                 {select === 'type' ? (
-//                     <div onClick={(e) => e.stopPropagation()}>
-//                         <select
-//                             value={value}
-//                             onChange={(e) => setValue(e.target.value)}
-//                             autoFocus
-//                         >
-//                             <option value="">Select</option>
-//                             <option value="Hot Rolled">Hot Rolled</option>
-//                             <option value="Cold Rolled">Cold Rolled</option>
-//                         </select>
-//                         <div className={style.inlineButtons}>
-//                             <button type="button" onClick={handleSave}>Save</button>
-//                             <button type="button" onClick={handleCancel}>Cancel</button>
-//                         </div>
-//                     </div>
-//                 ) : (
-//                     item.type
-//                 )}
-//             </td>
-
-//             {/* Thickness x Width x Grade */}
-//             <td style={{ display: 'flex', gap: '5px' }}>
-//                 {/* Thickness */}
-//                 <div>
-//                     {select === 'thickness'
-//                         ? renderDropdownField('thickness', thicknesses)
-//                         : <span>{item.thickness}</span>}
-//                 </div>
-//                 X
-//                 {/* Width */}
-//                 <div onClick={() => clickHandler('width')}>
-//                     {select === 'width'
-//                         ? renderDropdownField('width', widths)
-//                         : <span>{item.width}</span>}
-//                 </div>
-//                 X
-//                 {/* Grade */}
-//                 <div onClick={() => clickHandler('grade')}>
-//                     {select === 'grade'
-//                         ? renderDropdownField('grade', grades)
-//                         : <span>{item.grade}</span>}
-//                 </div>
-//             </td>
-
-//             {/* Quantity */}
-//             <td onClick={() => clickHandler('quantity')}>
-//                 {select === 'quantity'
-//                     ? renderEditableField('quantity', 'number')
-//                     : item.quantity}
-//             </td>
-
-//             {/* Ship To */}
-//             <td onClick={() => clickHandler('shipTo')}>
-//                 {select === 'shipTo' ? (
-//                     <div onClick={() => clickHandler('shipTo')}>
-//                         {select === 'shipTo'
-//                             ? renderDropdownField('shipTo', cutters)
-//                             : <span>{item.width}</span>}
-//                     </div>
-//                 ) : (
-//                     item.shipTo
-//                 )}
-//             </td>
-
-//             {/* Vehicle */}
-//             <td onClick={() => clickHandler('vehicleNumber')}>
-//                 {select === 'vehicleNumber'
-//                     ? renderEditableField('vehicleNumber')
-//                     : item.vehicleNumber || '-'}
-//             </td>
-
-//             {/* Ship To */}
-//             <td onClick={() => clickHandler('loader')}>
-//                 {select === 'loader'
-//                     ? renderEditableField('loader')
-//                     : item.loader || '-'}
-//             </td>
-
-//             {/* Ship To */}
-//             <td onClick={() => clickHandler('transporterName')}>
-//                 {select === 'transporterName'
-//                     ? renderEditableField('transporterName')
-//                     : item.transport || '-'}
-//             </td>
-//         </tr>
-//     );
-// };
-
 const Filters = ({ setFilters }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
@@ -411,9 +226,23 @@ const Filters = ({ setFilters }) => {
         getAllItem({ filters }, dispatch);
     };
 
-    const handleReset = () => {
+    const handleReset = (filters) => {
         getAllItem({}, dispatch);
         reset();
+        setFilters({
+            type: "",
+            grade: "",
+            formType: "",
+            width: "",
+            thickness: "",
+            wagonNumber: "",
+            challanNumber: "",
+            challanDate: "",
+            quantity: "",
+            shipTo: "",
+            fromDate: "",
+            toDate: "",
+        })
     };
 
     return (

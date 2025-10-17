@@ -8,8 +8,7 @@ import AddItemForm from 'components/common/Overlay/AddItemForm';
 import Upcoming from 'components/core/Inventory/Upcoming';
 import AddForm from 'components/core/Inventory/AddForm';
 import Items from 'components/core/Inventory/Items';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 
 const Inventory = () => {
     const [showForm, setShowForm] = useState(false);
@@ -18,31 +17,11 @@ const Inventory = () => {
     const { showOverlay } = useOverlay();
     const { userData } = useSelector(state => state.auth);
 
-    // const [items, setItems] = useState([]);
-    // const [limit, setLimit] = useState(50);
-    // const [statusFilter, setStatusFilter] = useState("");
-    // const [sortBy, setSortBy] = useState("createdAt");
-    // const [booking, setOrder] = useState("desc");
-    // const [page, setPage] = useState(1);
-    // const [pages, setPages] = useState(1);
-
     useEffect(() => {
         if (showForm) {
             showOverlay(AddItemForm, { showForm, setShowForm })
         }
     }, [showForm, showOverlay])
-
-    // useEffect(() => {
-    //     const scrollToTop = () => {
-    //         document.querySelector(`.${style.Inventory}`).scrollTo({
-    //             top: 0,
-    //             behavior: 'smooth',
-    //         });
-    //     };
-    //     if (showForm) {
-    //         scrollToTop();
-    //     }
-    // }, [showForm])
 
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -50,31 +29,9 @@ const Inventory = () => {
     const inputRef = useRef();
 
     const handleFileChange = async (e) => {
-        setFile(e.target.files[0]);
-
         if (e.target.files[0]) {
-            const formData = new FormData();
-            formData.append("file", e.target.files[0]);
-
-            try {
-                setUploading(true);
-                toast.loading("Uploading file...");
-
-                await axios.post("http://localhost:4000/api/v1/item/uploadCSV", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-
-                toast.dismiss();
-                toast.success("File uploaded successfully!");
-
-                setFile(null);
-            } catch (err) {
-                toast.dismiss();
-                toast.error(err.response?.data?.message || "Upload failed");
-            } finally {
-                setUploading(false);
-                inputRef.current.value = null;
-            }
+            uploadCSV(e.target.files[0], setUploading, inputRef);
+            setFile(null);
         }
     };
     const handleUpload = async () => {
@@ -107,27 +64,9 @@ const Inventory = () => {
                 <button onClick={handleUpload} >
                     {uploading ? "Uploading..." : "Import"}
                 </button>
-
+                <button onClick={downloadTemplate}>Download Template</button>
             </div>}
             <Upcoming />
-            {/* <div className={style.allItems}>
-                <h3>All Items</h3>
-                <div className={style.search}>
-                    <input type='text' placeholder='Search Item' value={search} onChange={(e) => setSearch(e.target.value)} />
-                    <button onClick={onSearch}>Search</button>
-                    <button onClick={onReset}>Reset</button>
-                    <select>
-                        <option value='' disabled>Sort By</option>
-                        <option value='weight'>Weight</option>
-                        <option value='challanDate'>Challan Date</option>
-                        <option value='quantity'>Quantity</option>
-                        <option value='createdAt'>Time</option>
-                    </select>
-                </div>
-                <Filter filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
-                <ViewAll list={currentList} />
-            </div> */}
-            {/* <Items /> */}
             <Items />
         </div >
     )

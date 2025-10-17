@@ -203,11 +203,10 @@ const getAllItem = async (req, res) => {
             order = "desc",
             page = 1,
             limit = 50,
-            filters = null
+            filters = null,
         } = req.body;
 
         let query = {};
-
         query.wagonNumber = { $ne: null };
 
         // 🔍 Search
@@ -216,70 +215,85 @@ const getAllItem = async (req, res) => {
                 { type: { $regex: search, $options: "i" } },
                 { wagonNumber: { $regex: search, $options: "i" } },
                 { formType: { $regex: search, $options: "i" } },
+                { "challan.challanNumber": { $regex: search, $options: "i" } },
             ];
         }
 
         // 🎯 Filters
         if (filters) {
-            Object.keys(filters).forEach((key) => {
-                const value = filters[key];
-                if (!value) return;
-
-                if (key === 'remaining') {
-                    if (value === 'remaining') {
-                        query.quantity = { $gt: 0 };
-                    } else if (value === 'finished') {
-                        query.quantity = 0;
-                    }
-                    return; // ✅ prevent overwriting below
+            // handle remaining first (special case)
+            if (filters.remaining) {
+                if (filters.remaining === "remaining") {
+                    query.quantity = { $gt: 0 };
+                } else if (filters.remaining === "finished") {
+                    query.quantity = 0;
                 }
-
-                // Default case
-                query[key] = value;
-            });
-            if (filters.fromDate && filters.toDate) {
-                query["challan.challanDate"] = {
-                    $gte: new Date(filters.fromDate),
-                    $lte: new Date(filters.toDate),
-                };
             }
-        }
 
+            // handle date range (apply to challan.challanDate — change to createdAt if you want)
+            const { fromDate, toDate } = filters;
+            if (fromDate || toDate) {
+                const range = {};
+                if (fromDate) {
+                    const from = new Date(fromDate);
+                    from.setHours(0, 0, 0, 0); // start of day
+                    range.$gte = from;
+                }
+                if (toDate) {
+                    const to = new Date(toDate);
+                    to.setHours(23, 59, 59, 999); // end of day
+                    range.$lte = to;
+                }
+                // apply to challan date; if you prefer createdAt, use "createdAt" key
+                query["challan.challanDate"] = range;
+            }
+
+            // default key -> value filters (skip handled ones)
+            const skipKeys = new Set(["remaining", "fromDate", "toDate"]);
+            Object.keys(filters).forEach((key) => {
+                if (skipKeys.has(key)) return;
+                const value = filters[key];
+                if (!value) return; // skip empty
+
+                // if filter is one of the string-match fields, use regex for partial
+                // otherwise set exact match (IDs etc.)
+                if (["type", "wagonNumber", "challanNumber", "shipTo"].includes(key)) {
+                    query[key] = { $regex: String(value), $options: "i" };
+                } else {
+                    query[key] = value;
+                }
+            });
+        }
 
         const skip = (page - 1) * limit;
 
-        // 📦 Fetch items
+        // Fetch items (apply sort, pagination if needed)
         const items = await Item.find(query)
-            .populate("grade width thickness shipTo challan transport")
-            .sort({ createdAt: - 1 })
+            .populate("grade width thickness shipTo transport") // removed challan populate (it's embedded)
+            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+            .skip(skip)
+            .limit(Number(limit));
 
         const total = await Item.countDocuments(query);
 
-        // 🧩 Group by wagonNumber
-
-        const listView = [];
-
-        items.forEach((item) => {
-            const formattedItems = {
-                _id: item._id,
-                wagonNumber: item.wagonNumber,
-                challanNumber: item?.challan?.challanNumber,
-                challanDate: item?.challan?.challanDate,
-                type: item.type,
-                grade: item.grade?.name,
-                width: item.width?.name,
-                quantity: item.originalQuanity,
-                thickness: item.thickness?.name,
-                shipTo: item?.shipTo?.name,
-                createdAt: item.createdAt,
-                transporterName: item.transport?.transporterName,
-                loader: item.transport?.loader,
-                vehicleNumber: item.transport?.vehicleNumber,
-                remaining: item.quantity,
-            };
-
-            listView.push(formattedItems);
-        });
+        // Build listView
+        const listView = items.map((item) => ({
+            _id: item._id,
+            wagonNumber: item.wagonNumber,
+            challanNumber: item?.challan?.challanNumber,
+            challanDate: item?.challan?.challanDate,
+            type: item.type,
+            grade: item.grade?.name,
+            width: item.width?.name,
+            quantity: item.originalQuanity,
+            thickness: item.thickness?.name,
+            shipTo: item?.shipTo?.name,
+            createdAt: item.createdAt,
+            transporterName: item.transport?.transporterName,
+            loader: item.transport?.loader,
+            vehicleNumber: item.transport?.vehicleNumber,
+            remaining: item.quantity,
+        }));
 
         res.status(200).json({
             success: true,
@@ -287,12 +301,13 @@ const getAllItem = async (req, res) => {
             total,
             page: Number(page),
             pages: Math.ceil(total / limit),
-            listView: listView
+            listView,
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const getItemByWagons = async (req, res) => {
     try {
@@ -653,6 +668,17 @@ const uploadCSV = async (req, res) => {
             //     continue;
             // }
 
+            // Parse transport detail
+            const vehicleNumber = row["VEHICLE"]
+                ? row["VEHICLE"]
+                : null;
+            const loader = row["LOADER"]
+                ? row["LOADER"]
+                : null;
+            const transporterName = row["TRANSPORT"]
+                ? row["TRANSPORT"]
+                : null;
+
             itemsToInsert.push({
                 type: detectMaterialType(row["MATERIAL-DESCRIPTION"]),
                 grade: grade._id,
@@ -667,7 +693,7 @@ const uploadCSV = async (req, res) => {
                 quantity: Number(row["QUANTITY"] || 0),
                 shipTo: shipTo ? shipTo._id : null,
                 transport: {
-                    vehicleNumber: row["VEHICLE "] || null,
+                    vehicleNumber: row["VEHICLE"] || null,
                     loader: row["LOADER"] || null,
                     transporterName: row["TRANSPORT"] || null,
                 },
@@ -677,7 +703,7 @@ const uploadCSV = async (req, res) => {
         if (!itemsToInsert.length) {
             return errorResponse(res, "No valid items found in file");
         }
-
+        console.log(itemsToInsert)
         await Item.insertMany(itemsToInsert);
 
         res.status(200).json({
@@ -820,20 +846,20 @@ const getExcelItem = async (req, res) => {
         items.forEach((item) => {
             const formattedItems = {
                 _id: item._id,
-                wagonNumber: item.wagonNumber,
+                wagonNumber: item.wagonNumber || 'NA',
                 challanNumber: item?.challan?.challanNumber,
                 challanDate: item?.challan?.challanDate,
-                type: item.type,
-                grade: item.grade.name,
-                width: item.width.name,
-                quantity: item.originalQuanity,
-                thickness: item.thickness.name,
-                shipTo: item?.shipTo?.name,
-                createdAt: item.createdAt,
-                transporterName: item.transport?.transporterName,
-                loader: item.transport?.loader,
-                vehicleNumber: item.transport?.vehicleNumber,
-                remaining: item.quantity,
+                type: item.type || 'NA',
+                grade: item.grade?.name || 'NA',
+                width: item.width?.name || 'NA',
+                quantity: item.originalQuanity || 'NA',
+                thickness: item.thickness?.name || 'NA',
+                shipTo: item?.shipTo?.name || 'NA',
+                createdAt: item.createdAt || 'NA',
+                transporterName: item.transport?.transporterName || 'NA',
+                loader: item.transport?.loader || 'NA',
+                vehicleNumber: item.transport?.vehicleNumber || 'NA',
+                remaining: item.quantity || 'NA',
             };
 
             listView.push(formattedItems);

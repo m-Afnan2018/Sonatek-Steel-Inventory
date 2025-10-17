@@ -9,6 +9,7 @@ import {
     setOptions,
     updateBookingStatus
 } from "slices/bookingSlice";
+import { setPagination } from "slices/itemSlice";
 import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
 
 export async function searchOptions(params, dispatch) {
@@ -56,6 +57,7 @@ export async function getAllBookings(dispatch) {
 
         if (response.success) {
             dispatch(setBookings(response.bookings));
+            dispatch(setPagination(response.pagination))
         }
 
         dispatch(showSuccess({ id: "getAllBookings", message: response.message }));
@@ -103,7 +105,7 @@ export async function shipBooking(params, dispatch) {
         const response = (await apiConnector('PATCH', bookingEndpoints.SHIPPED_BOOKING, params)).data;
 
         if (response.success) {
-            dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped'}));
+            dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
         }
 
         dispatch(showSuccess({ id: "shipBooking", message: response.message }));
