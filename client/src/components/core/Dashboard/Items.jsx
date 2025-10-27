@@ -101,7 +101,7 @@ const Items = () => {
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items</h3>
-            <form onSubmit={onSearch} className={style.searchForm}>
+            <form onSubmit={onSearch} className={style.searchForm} style={{marginBottom: '1rem'}}>
                 <input
                     type="text"
                     placeholder="Search bookings..."
@@ -184,13 +184,13 @@ const SingleItem = ({ item, view, setView }) => {
             <td>{item.type || "-"}</td>
 
             <td style={{ display: "flex", gap: "5px" }}>
-                <span>{item.thickness || "-"}</span> X
-                <span>{item.width || "-"}</span> X
-                <span>{item.grade || "-"}</span>
+                <span>{item.thickness?.name || "-"}</span> X
+                <span>{item.width?.name || "-"}</span> X
+                <span>{item.grade?.name || "-"}</span>
             </td>
 
             <td>{item.quantity ?? "-"}</td>
-            <td>{item.shipTo || "-"}</td>
+            <td>{item.shipTo?.name ?? "-"}</td>
             <td>{item.vehicleNumber || "-"}</td>
             <td>{item.loader || "-"}</td>
             <td>{item.transport || "-"}</td>

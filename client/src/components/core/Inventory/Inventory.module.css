@@ -116,6 +116,13 @@
     font-weight: 700;
 }
 
+.inlineButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
 /* FILTER */
 .filter {
     overflow: hidden;
@@ -311,6 +318,17 @@ h4 {
     font-size: 0.875rem;
 }
 
+.Upcoming td svg {
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.Upcoming td>div{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
 .table th {
     background-color: #f5f6fa;
     font-weight: 600;
@@ -405,10 +423,16 @@ h4 {
 
 .card {
     background: #fff;
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 0 0 1rem 1rem;
+    padding: 4px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     height: 500px;
+    overflow: hidden;
+}
+
+.test {
+    background: #f0fbff;
+    padding: 0rem;
 }
 
 .loading,
@@ -428,23 +452,25 @@ h4 {
 .tableWrapper {
     overflow: scroll;
     height: 100%;
-    border-radius: 1rem;
+    /* border-radius: 1rem; */
     /* overflow-x: auto; */
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
 }
 
 .table th,
 .table td {
-    padding: 8px 12px;
+    /* padding: 8px 12px; */
+    padding: 8px 0;
     border-bottom: 1px solid #eee;
     text-align: center;
 }
 
+.table td {
+    text-align: center;
+    justify-content: center;
+}
+
 .table th {
+    width: 2rem;
     background-color: #f5f6fa;
     font-weight: 600;
 }
@@ -504,10 +530,9 @@ h4 {
     gap: 1rem;
     background: #f9fafb;
     padding: 1rem;
-    border-radius: 1rem;
+    border-radius: 1rem 1rem 0 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     font-family: "Inter", sans-serif;
-    margin-bottom: 1rem;
 }
 
 .formBlock label {
@@ -597,9 +622,33 @@ h4 {
 }
 
 .AddForm {
-    margin: 2rem;
-    /* background: #001f2b;
-    color: white; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    overflow: hidden;
     padding: 1rem;
-    border-radius: 1rem;
+    background: white;
+    border-radius: 1rem 1rem 0 0;
+    overflow: visible;
+}
+
+.AddForm>div {
+    width: calc(100% / 6);
+}
+
+.AddForm button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background-color: rgb(0 31 43);
+    border: none;
+    color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AddForm button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    color: #05516f;
+    background-color: #f0fbff;
 }

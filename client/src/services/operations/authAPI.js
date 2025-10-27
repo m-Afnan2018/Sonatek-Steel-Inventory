@@ -2,7 +2,7 @@
 import { setIsLogin, setLoader, setToken, setUserData } from "../../slices/authSlice";
 import { apiConnector } from "../apiConnector";
 import { authEndpoints } from "../apis";
-import { addLoader, showError } from "slices/loaderSlice";
+import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
 export async function login(email, password, dispatch) {
     try {
@@ -16,7 +16,7 @@ export async function login(email, password, dispatch) {
         dispatch(setUserData(response.data.user));
         dispatch(setToken(response.data.token));
 
-        // dispatch(showSuccess({ id: 'login', message: response.data.message }));
+        dispatch(showSuccess({ id: 'login', message: response.data.message }));
         return true;
     } catch (err) {
         dispatch(showError({ id: 'login', message: err?.response?.data?.message || 'Login failed' }));
@@ -35,7 +35,7 @@ export async function signup(firstName, lastName, email, password, dispatch) {
             firstName, lastName, email, password
         })).data;
 
-        // dispatch(showSuccess({ id: 'signup', message: response.message }));
+        dispatch(showSuccess({ id: 'signup', message: response.message }));
         return true;
     } catch (err) {
         dispatch(showError({ id: 'signup', message: err?.response?.data?.message || 'Signup failed' }));
@@ -53,7 +53,7 @@ export async function sendLink(email, dispatch) {
 
         const response = (await apiConnector('POST', authEndpoints.FORGET_PASSWORD, { email })).data;
 
-        // dispatch(showSuccess({ id: 'sendLink', message: response.message }));
+        dispatch(showSuccess({ id: 'sendLink', message: response.message }));
         return true;
     } catch (err) {
         dispatch(showError({ id: 'sendLink', message: err?.response?.data?.message || 'Failed to send link' }));
@@ -73,7 +73,7 @@ export async function getUser(dispatch) {
         if (response.data.success) {
             dispatch(setUserData(response.data.user));
             dispatch(setToken(response.data.token));
-            // dispatch(showSuccess({ id: 'getUser', message: response.data.message }));
+            dispatch(showSuccess({ id: 'getUser', message: response.data.message }));
         } else {
             dispatch(showError({ id: 'getUser', message: 'Failed to fetch user' }));
         }
@@ -97,7 +97,7 @@ export async function logoutUser(dispatch) {
         dispatch(setIsLogin(false));
         localStorage.removeItem('isLogin');
 
-        // dispatch(showSuccess({ id: 'logoutUser', message: response.message }));
+        dispatch(showSuccess({ id: 'logoutUser', message: response.message }));
     } catch (err) {
         dispatch(showError({ id: 'logoutUser', message: err?.response?.data?.message || 'Logout failed' }));
     } finally {
@@ -113,7 +113,7 @@ export async function resetPassword(params, setPath, dispatch) {
         // eslint-disable-next-line no-unused-vars
         const response = (await apiConnector('POST', authEndpoints.RESET_PASSWORD, params)).data;
 
-        // dispatch(showSuccess({ id: 'resetPassword', message: response.message }));
+        dispatch(showSuccess({ id: 'resetPassword', message: response.message }));
         setPath('login');
     } catch (err) {
         dispatch(showError({ id: 'resetPassword', message: err?.response?.data?.message || 'Password reset failed' }));

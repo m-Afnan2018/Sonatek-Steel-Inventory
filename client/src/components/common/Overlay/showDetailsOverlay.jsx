@@ -46,7 +46,7 @@ const ShowDetailsOverlay = ({ data, close }) => {
                                 </div>
                                 <div className={style.ItemMeta}>
                                     <p><strong>Available Qty:</strong> {it.item?.quantity}</p>
-                                    <p><strong>Booked Qty:</strong> {it.quantity}</p>
+                                    <p><strong>Booked Qty:</strong> {it.quantity.toFixed(3)}</p>
                                     <p><strong>Wagon:</strong> {it.item?.wagonNumber || 'N/A'}</p>
                                     <p><strong>Challan#:</strong> {it.item?.challan?.challanNumber || 'N/A'}</p>
                                     <p><strong>Challan Date:</strong> {it.item?.challan?.challanDate ? new Date(it.item.challan.challanDate).toLocaleDateString() : 'N/A'}</p>

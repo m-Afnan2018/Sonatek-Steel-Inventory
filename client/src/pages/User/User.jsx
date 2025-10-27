@@ -162,7 +162,7 @@ const User = () => {
             </div>
 
             <div className={style.pendingRequest}>
-                <h3>Suspended Users</h3>
+                <h3>Inactive Users</h3>
                 <div className={style.usersList}>
                     {suspendedUsers && suspendedUsers.length > 0 && suspendedUsers.map((user) => {
                         {/* return <div className={style.singleUser}>
@@ -268,18 +268,18 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
                 {role !== user.role && <button onClick={() => changeUserDesignation(user._id, role, dispatch)}>Update Designation</button>}
                 {user.status === 'active' && <button onClick={() => {
                     showOverlay(ConfirmationOverlay, {
-                        message: "Are you sure you want to suspend this user ?",
+                        message: "Are you sure you want to deactivate this user ?",
                         onAccept: () => removeUser(user._id, dispatch)
                     }
                     )
-                }}>Suspend User</button>}
+                }}>Deactivate User</button>}
                 {user.status === 'inactive' && <button onClick={() => {
                     showOverlay(ConfirmationOverlay, {
-                        message: "Are you sure this user is rejoining the company ?",
+                        message: "Are you sure this user is activate the company ?",
                         onAccept: () => activeUser(user._id, dispatch),
 
                     })
-                }}>Rejoin User</button>}
+                }}>Reactivate User</button>}
             </div>}
         </div>
     </div>

@@ -2,8 +2,12 @@ const { default: mongoose } = require("mongoose");
 
 const gradeSchema = new mongoose.Schema({
     name: {
-        type: String, 
+        type: String,
         required: true,
+    },
+    type: {
+        type: String,
+        enum: ['Hot Rolled', 'Cold Rolled'],
     },
     createdAt: {
         type: Date,

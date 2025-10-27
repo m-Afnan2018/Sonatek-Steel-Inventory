@@ -1,6 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { cutterEndpoints } from "services/apis";
-import { addLoader, showError } from "slices/loaderSlice";
+import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 import { setCutters } from "slices/varientSlice";
 
 
@@ -12,11 +12,11 @@ export async function addCutter(params, dispatch, list) {
         const response = (await apiConnector("POST", cutterEndpoints.ADD_CUTTERS, params)).data;
 
         if (response.success) {
-            const newList = [...list, response.value];
+            const newList = [...list, response.cutter];
 
             dispatch(setCutters(newList));
 
-            // dispatch(showSuccess({ id: "addCutter", message: response.message }));
+            dispatch(showSuccess({ id: "addCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -26,19 +26,48 @@ export async function addCutter(params, dispatch, list) {
     }
 }
 
+export async function updateCutter(params, dispatch, list, setCutters) {
+    try {
+        dispatch(addLoader("updateCutter"));
+
+        const response = (await apiConnector("POST", cutterEndpoints.UPDATE_CUTTER, params)).data;
+
+        if (response.success) {
+            setCutters(list.map((c) => {
+                if (c._id === params.cutterId) {
+                    c.name = params.name || c.name;
+                    c.address = params.address || c.address;
+                    c.phoneNumber = params.phoneNumber || c.phoneNumber;
+                }
+                return c;
+            }))
+
+            dispatch(showSuccess({ id: "updateCutter", message: response.message }));
+        }
+    } catch (err) {
+        dispatch(showError({
+            id: "updateCutter",
+            message: err?.response?.data?.message || "Failed to update cutter"
+        }));
+    }
+}
+
 // ➕ Add Varient
-export async function showCutter(params, dispatch, list) {
+export async function showCutter(params, dispatch, list, setCutters) {
     try {
         dispatch(addLoader("showCutter"));
 
         const response = (await apiConnector("POST", cutterEndpoints.SHOW_CUTTERS, params)).data;
 
         if (response.success) {
-            const newList = [...list, response.value];
+            setCutters(list.map((prev) => {
+                if (prev._id === params.cutterId) {
+                    prev.visible = true;
+                }
+                return prev;
+            }))
 
-            dispatch(setCutters(newList));
-
-            // dispatch(showSuccess({ id: "showCutter", message: response.message }));
+            dispatch(showSuccess({ id: "showCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -49,18 +78,21 @@ export async function showCutter(params, dispatch, list) {
 }
 
 // ➕ Add Varient
-export async function hideCutter(params, dispatch, list) {
+export async function hideCutter(params, dispatch, list, setCutters) {
     try {
         dispatch(addLoader("hideCutter"));
 
-        const response = (await apiConnector("POST", cutterEndpoints.HIDE_CUTTERS_CUTTERS, params)).data;
+        const response = (await apiConnector("POST", cutterEndpoints.HIDE_CUTTERS, params)).data;
 
         if (response.success) {
-            const newList = [...list, response.value];
+            setCutters(list.map((prev) => {
+                if (prev._id === params.cutterId) {
+                    prev.visible = false;
+                }
+                return prev;
+            }))
 
-            dispatch(setCutters(newList));
-
-            // dispatch(showSuccess({ id: "hideCutter", message: response.message }));
+            dispatch(showSuccess({ id: "hideCutter", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -70,11 +102,26 @@ export async function hideCutter(params, dispatch, list) {
     }
 }
 
-export async function getDataByCutters() {
+export async function getAllCutterDetails(setCutters) {
     try {
-        const response = (await apiConnector("GET", cutterEndpoints.GET_CUTTERS)).data;
-        return response;
+        const response = (await apiConnector('GET', cutterEndpoints.GET_ALL_CUTTER_DETAILS)).data;
+
+        if (response.success) {
+            setCutters(response.data.list);
+        }
     } catch (err) {
         return null;
+    }
+}
+
+export async function getDataByCutters(id, setItemsList) {
+    try {
+        const response = (await apiConnector('POST', cutterEndpoints.GET_DATA_BY_CUTTERS, { cutter: id })).data;
+
+        if (response.success) {
+            setItemsList(response.data.items);
+        }
+    } catch (err) {
+        console.log(err);
     }
 }

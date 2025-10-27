@@ -1,8 +1,9 @@
 const { errorResponse, customError } = require("../utils/errorHandler");
 const Cutter = require("../models/cutterModel");
 const Item = require("../models/itemModel");
+const mongoose = require('mongoose');
 
-const addCutter = (req, res) => {
+const addCutter = async (req, res) => {
     try {
         const { name, address, phoneNumber } = req.body;
 
@@ -11,7 +12,37 @@ const addCutter = (req, res) => {
         }
 
         const newCutter = new Cutter({ name, address, phoneNumber });
-        newCutter.save();
+        await newCutter.save();
+
+        return res.status(201).json({
+            success: true,
+            message: "Cutter added successfully",
+            cutter: newCutter
+        });
+    } catch (err) {
+        return errorResponse(res, err)
+    }
+}
+
+const updateCutter = async (req, res) => {
+    try {
+        const { cutterId, name, address, phoneNumber } = req.body;
+
+        if (!name && !address && !phoneNumber) {
+            throw customError("Atleast one field is required", 400);
+        }
+
+        const cutter = await Cutter.findById(cutterId);
+
+        if (!cutter) {
+            throw customError("Unable to find the cutter");
+        }
+
+        const newCutter = await Cutter.findByIdAndUpdate(cutterId, {
+            name: name || cutter.name,
+            address: address || cutter.address,
+            phoneNumber: phoneNumber || cutter.phoneNumber
+        }, { new: true })
 
         return res.status(201).json({
             success: true,
@@ -37,7 +68,7 @@ const getAllCutters = async (req, res) => {
 
 const showCutter = async (req, res) => {
     try {
-        const { cutterId } = req.params;
+        const { cutterId } = req.body;
         if (!cutterId) {
             throw customError("Cutter ID is required", 400);
         }
@@ -49,6 +80,7 @@ const showCutter = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            message: 'Visibility Changed Successfully',
             cutter
         });
     } catch (err) {
@@ -58,7 +90,7 @@ const showCutter = async (req, res) => {
 
 const hideCutter = async (req, res) => {
     try {
-        const { cutterId } = req.params;
+        const { cutterId } = req.body;
         if (!cutterId) {
             throw customError("Cutter ID is required", 400);
         }
@@ -70,6 +102,7 @@ const hideCutter = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            message: 'Visibility Changed Successfully',
             cutter
         });
     } catch (err) {
@@ -79,30 +112,125 @@ const hideCutter = async (req, res) => {
 
 const getDataByCutters = async (req, res) => {
     try {
-        const cutters = await Cutter.find();
+        const { cutter } = req.body;
 
-        const items = await Item.find({ shipTo: { $in: cutters.map(c => c._id) } })
-            .populate('grade')
-            .populate('width')
-            .populate('thickness')
-            .populate('shipTo');
+        if (!cutter) {
+            return res.status(400).json({
+                success: false,
+                message: "Cutter ID is required",
+            });
+        }
 
-        const order = await Booking.find({ 'items.item': { $in: items.map(i => i._id) } })
-            .populate('bookedBy', 'name email phone role')
-            .populate('items.item');
+        // Get cutter + basic item aggregation
+        const cutterData = await Cutter.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(cutter) },
+            },
+            {
+                $lookup: {
+                    from: "items",
+                    localField: "_id",
+                    foreignField: "shipTo",
+                    as: "items",
+                },
+            },
+            {
+                $addFields: {
+                    totalItems: { $size: "$items" },
+                    totalQuantity: {
+                        $sum: "$items.quantity"
+                    }
+                }
+            }
+        ]);
 
-        return res.status(200).json({
+        if (!cutterData || cutterData.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Cutter not found",
+            });
+        }
+
+        // Populate item fields (grade, width, thickness)
+        const populatedItems = await Item.find({ shipTo: cutter })
+            .populate("grade", "name")
+            .populate("width", "name")
+            .populate("thickness", "name");
+
+        // Final result
+        const result = {
+            ...cutterData[0],
+            items: populatedItems,
+        };
+
+        res.status(200).json({
             success: true,
-            items
+            message: "Fetched cutter details successfully",
+            data: result,
+        });
+
+    } catch (err) {
+        console.error("Error fetching cutter details:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch cutter details",
+            error: err.message,
+        });
+    }
+};
+
+const getAllCutterDetails = async (req, res) => {
+    try {
+        const cutters = await Cutter.aggregate([
+            {
+                $lookup: {
+                    from: "items",
+                    localField: "_id",
+                    foreignField: "shipTo",
+                    as: "items",
+                },
+            },
+            {
+                $addFields: {
+                    totalItems: { $size: "$items" },
+                    totalQuantity: {
+                        $sum: "$items.quantity"
+                    }
+                }
+            },
+            {
+                $project: {
+                    items: 0 // ❌ remove items from output
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            message: "Fetched all cutter details successfully",
+            data: {
+                total: cutters.length,
+                list: cutters,
+            },
         });
     } catch (err) {
-        return errorResponse(res, err)
+        console.error("Error fetching cutter details:", err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch cutter details",
+            error: err.message,
+        });
     }
-}
+};
+
+
 
 module.exports = {
     addCutter,
+    updateCutter,
     getAllCutters,
     showCutter,
-    hideCutter
+    hideCutter,
+    getAllCutterDetails,
+    getDataByCutters
 };  

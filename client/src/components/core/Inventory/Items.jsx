@@ -9,6 +9,8 @@ const Items = () => {
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
     const [search, setSearch] = useState("");
+    const [order, setOrder] = useState('desc');
+    const [sortType, setSortType] = useState(null)
     const [page, setPage] = useState(1);
     // eslint-disable-next-line no-unused-vars
     const [pagination, setPagination] = useState(null);
@@ -45,7 +47,7 @@ const Items = () => {
                     'Authorization': `Bearer ${token}`,
                     'Access-Control-Allow-Origin': 'http://localhost:3000'
                 },
-                body: JSON.stringify({ search, filters })
+                body: JSON.stringify({ search, filters, sortBy: sortType, order })
             });
             const blob = await response.blob();
 
@@ -70,6 +72,12 @@ const Items = () => {
             setLoading(false);
         }
     }, [listViewList]);
+
+    const sortBy = (val) => {
+        setOrder(order === 'asc' ? 'desc' : 'asc');
+        setSortType(val);
+        getAllItem({ search, filters, sortBy: val, order: order }, dispatch);
+    }
 
     return (
         <div className={style.staffContainer}>
@@ -96,16 +104,16 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th>Wagon No.</th>
-                                    <th>Challan date</th>
-                                    <th>Challan No.</th>
-                                    <th>Type</th>
-                                    <th>Material Description</th>
-                                    <th>Quantity</th>
-                                    <th>Ship To</th>
-                                    <th>Vehicle Number</th>
-                                    <th>Loader</th>
-                                    <th>Transport</th>
+                                    <th onClick={() => sortBy('wagonNumber')}>Wagon No.</th>
+                                    <th onClick={() => sortBy('challan.challanDate')}>Challan date</th>
+                                    <th onClick={() => sortBy('challan.challanNumber')}>Challan No.</th>
+                                    <th onClick={() => sortBy('type')}>Type</th>
+                                    <th onClick={() => sortBy('materialDescription')}>Material Description</th>
+                                    <th onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th onClick={() => sortBy('shipTo')}>Ship To</th>
+                                    <th onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
+                                    <th onClick={() => sortBy('transport.loader')}>Loader</th>
+                                    <th onClick={() => sortBy('transport.transporterName')}>Transport</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -161,10 +169,11 @@ const SingleItem = ({ item, setView, view }) => {
     };
 
     const handleSave = (e) => {
-        e.stopPropagation(); const grade = grades.find(g => g.name === item.grade)._id;
-        const thickness = thicknesses.find(t => t.name === item.thickness)._id;
-        const width = widths.find(w => w.name === item.width)._id;
-        const cutter = cutters.find(c => c.name === item.shipTo)?._id;
+        e.stopPropagation(); 
+        const grade = item.grade._id;
+        const thickness = item.thickness._id;
+        const width =item.width._id;
+        const cutter = item.shipTo?._id;
         let Item = { ...item, grade, thickness, width, shipTo: cutter };
         let updatedItem = { ...Item, [select]: value };
         updateItem(updatedItem, dispatch);
@@ -178,8 +187,9 @@ const SingleItem = ({ item, setView, view }) => {
     };
 
     const renderEditableField = (type, inputType = 'text') => (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
             <input
+                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
                 type={inputType}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
@@ -193,8 +203,9 @@ const SingleItem = ({ item, setView, view }) => {
     );
 
     const renderDropdownField = (type, options) => (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
             <select
+                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
                 value={value?._id}
                 onChange={(e) => setValue(e.target.value)}
                 autoFocus
@@ -242,7 +253,7 @@ const SingleItem = ({ item, setView, view }) => {
             {/* Type */}
             <td onClick={() => clickHandler('type')}>
                 {select === 'type' ? (
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
                         <select
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
@@ -268,29 +279,29 @@ const SingleItem = ({ item, setView, view }) => {
                 <div onClick={() => clickHandler('thickness')}>
                     {select === 'thickness'
                         ? renderDropdownField('thickness', thicknesses)
-                        : <span>{item.thickness}</span>}
+                        : <span>{item.thickness?.name || '-'}</span>}
                 </div>
                 X
                 {/* Width */}
                 <div onClick={() => clickHandler('width')}>
                     {select === 'width'
                         ? renderDropdownField('width', widths)
-                        : <span>{item.width}</span>}
+                        : <span>{item.width?.name || '-'}</span>}
                 </div>
                 X
                 {/* Grade */}
                 <div onClick={() => clickHandler('grade')}>
                     {select === 'grade'
                         ? renderDropdownField('grade', grades)
-                        : <span>{item.grade}</span>}
+                        : <span>{item.grade?.name || '-'}</span>}
                 </div>
             </td>
 
             {/* Quantity */}
-            <td onClick={() => clickHandler('quantity')}>
-                {select === 'quantity'
-                    ? renderEditableField('quantity', 'number')
-                    : item.quantity}
+            <td onClick={() => clickHandler('originalQuantity')}>
+                {select === 'originalQuantity'
+                    ? renderEditableField('originalQuantity', 'number')
+                    : item.originalQuantity}
             </td>
 
             {/* Ship To */}
@@ -299,10 +310,10 @@ const SingleItem = ({ item, setView, view }) => {
                     <div onClick={() => clickHandler('shipTo')}>
                         {select === 'shipTo'
                             ? renderDropdownField('shipTo', cutters)
-                            : <span>{item.width}</span>}
+                            : <span>{item.shipTo?.name || '-'}</span>}
                     </div>
                 ) : (
-                    item.shipTo
+                    item.shipTo?.name 
                 )}
             </td>
 
@@ -350,6 +361,7 @@ const Filters = ({ setFilters }) => {
     })
 
     const onSubmit = (filters) => {
+        setFilters(filters)
         getAllItem({ filters }, dispatch);
     }
 

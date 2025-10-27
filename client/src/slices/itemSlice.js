@@ -61,8 +61,31 @@ const itemSlice = createSlice({
             state.listViewList = action.payload;
         },
         updateListViewList(state, action) {
-            state.listViewList = [action.payload, ...(state.listViewList.filter((item) => item._id !== action.payload._id))];
-            state.upcomingItem = state.upcomingItem.filter((item) => item._id !== action.payload._id);
+            const item = action.payload;
+
+            if (item.wagonNumber) {
+                const originalItem = state.listViewList.find((i) => i._id === item._id);
+                if (originalItem) {
+                    console.log(`GOT ORIGINAL ITEM: ${originalItem}`)
+                    state.listViewList = state.listViewList.map((i) => {
+                        if (i._id === item._id) {
+                            return item;
+                        }
+                        return i;
+                    })
+                } else {
+                    state.listViewList = [item, ...(state.listViewList)];
+                }
+                state.upcomingItem = state.upcomingItem.filter((i) => i._id !== item._id);
+            } else {
+                state.upcomingItem = state.upcomingItem.map((i) => {
+                    if (i._id === item._id) {
+                        return item;
+                    }
+                    return i;
+                })
+            }
+
         },
         setLoader(state, action) {
             state.loader = action.payload;
@@ -75,6 +98,9 @@ const itemSlice = createSlice({
         },
         addUpcomingItem(state, action) {
             state.upcomingItem = [action.payload, ...state.upcomingItem];
+        },
+        deleteFromUpcomingItem(state, action) {
+            state.upcomingItem = state.upcomingItem.filter(i => i._id !== action.payload);
         },
         setPagination(state, action) {
             state.pagination = action.payload;
@@ -93,7 +119,8 @@ export const {
     setUpcomingItem,
     setPagination,
     updateListViewList,
-    addUpcomingItem
+    addUpcomingItem,
+    deleteFromUpcomingItem
 } = itemSlice.actions;
 
 export default itemSlice.reducer;

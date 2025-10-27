@@ -1,22 +1,15 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
 const { inventoryAccess, directorAccess } = require('../middlewares/authorization');
-const { addItem, getItem, deleteItem, addVarient, getVarients, updateVarient, deleteVarient, getAllItem, getAllVarients, updateItem, getAllDetailVarient } = require('../controllers/itemController');
+const { addCutter, hideCutter, showCutter, getDataByCutters, getAllCutterDetails, updateCutter } = require('../controllers/cutterController');
 const router = express.Router();
 
 //  Item Routes
-router.post('/addItem', authentication, inventoryAccess, addItem);
-router.patch('/updateItem', authentication, inventoryAccess, updateItem);
-router.post('/getItem', authentication, getItem);
-router.post('/getAllItems', authentication, getAllItem);
-router.delete('/deleteItem', authentication, directorAccess, deleteItem);
-
-//  Varient Routes
-router.post('/addVarient', authentication, directorAccess, addVarient)
-router.get('/getVarient', getVarients);
-router.get('/getAllVarients', getAllVarients);
-router.patch('/updateVarient', authentication, directorAccess, updateVarient);
-router.delete('/deleteVarient', authentication, directorAccess, deleteVarient);
-router.get('/getAllDetailVarient', authentication, getAllDetailVarient);
+router.post('/addCutter', authentication, directorAccess, addCutter);
+router.post('/hideCutter', authentication, directorAccess, hideCutter);
+router.post('/showCutter', authentication, directorAccess, showCutter);
+router.post('/updateCutter', authentication, directorAccess, updateCutter);
+router.post('/getDataByCutters', authentication, directorAccess, getDataByCutters);
+router.get('/getAllCutterDetails', authentication, directorAccess, getAllCutterDetails);
 
 module.exports = router;

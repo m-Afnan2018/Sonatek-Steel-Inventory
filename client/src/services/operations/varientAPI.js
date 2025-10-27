@@ -1,7 +1,7 @@
 import { apiConnector } from "services/apiConnector";
 import { varientEndpoints } from "services/apis";
 import { setCutters, setGrades, setThicknesses, setWidths } from "slices/varientSlice";
-import { addLoader, showError } from "slices/loaderSlice";
+import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
 // 🧩 Get All Varients
 export async function getAllVarients(dispatch) {
@@ -28,7 +28,7 @@ export async function getAllVarients(dispatch) {
             dispatch(setThicknesses(sortByName(response.thickness)));
             dispatch(setWidths(sortByName(response.widths)));
 
-            // dispatch(showSuccess({ id: "getAllVarients", message: response.message }));
+            dispatch(showSuccess({ id: "getAllVarients", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -53,7 +53,7 @@ export async function addVarient(type, value, dispatch, list) {
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 
-            // dispatch(showSuccess({ id: "addVarient", message: response.message }));
+            dispatch(showSuccess({ id: "addVarient", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -80,7 +80,7 @@ export async function updateVarient(id, type, value, dispatch, list) {
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 
-            // dispatch(showSuccess({ id: "updateVarient", message: response.message }));
+            dispatch(showSuccess({ id: "updateVarient", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -105,7 +105,7 @@ export async function deleteVarient(id, type, dispatch, list) {
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 
-            // dispatch(showSuccess({ id: "deleteVarient", message: response.message }));
+            dispatch(showSuccess({ id: "deleteVarient", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({
@@ -125,7 +125,7 @@ export async function getAllVarientsDetail(setData, setLoading, dispatch) {
         if (response.success) {
             setData(response.data);
             setLoading(false);
-            // dispatch(showSuccess({ id: "getAllVarientsDetail", message: response.message }));
+            dispatch(showSuccess({ id: "getAllVarientsDetail", message: response.message }));
         }
     } catch (err) {
         dispatch(showError({

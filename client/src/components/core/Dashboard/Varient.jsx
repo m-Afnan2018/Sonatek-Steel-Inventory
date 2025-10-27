@@ -23,8 +23,8 @@ const Varient = () => {
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Total Coils</th>
-                        <th>Total Quantity</th>
+                        <th>Coils</th>
+                        <th>Quantity</th>
                     </tr>
                 </thead>
                 <tbody>

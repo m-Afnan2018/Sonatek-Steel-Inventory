@@ -4,9 +4,8 @@ import { getAllItem, getUpcomingItem } from 'services/operations/itemAPI';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOverlay } from 'hooks/useOverlay';
 import AddItemForm from 'components/common/Overlay/AddItemForm';
-// import Items from 'components/core/Inventory/Items';
 import Upcoming from 'components/core/Inventory/Upcoming';
-import AddForm from 'components/core/Inventory/AddForm';
+// import AddForm from 'components/core/Inventory/AddForm';
 import Items from 'components/core/Inventory/Items';
 import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 
@@ -49,7 +48,6 @@ const Inventory = () => {
     return (
         <div className={style.Inventory}>
             <h2>Manage Inventory</h2>
-            <AddForm />
             {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
                 <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button>
                 <input

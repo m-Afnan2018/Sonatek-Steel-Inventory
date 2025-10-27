@@ -134,7 +134,7 @@ const Bookings = () => {
                                                 {it.item?.type} | {it.item?.grade?.name} | {" "}
                                                 {it.item?.width?.name}mm | {it.item?.thickness?.name}mm
                                             </p>
-                                            <small>Qty: {it.quantity}ton</small>
+                                            <small>Qty: {it.quantity.toFixed(3)}ton</small>
                                         </div>
                                     ))}
                                 </td>

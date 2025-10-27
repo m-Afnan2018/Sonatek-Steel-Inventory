@@ -316,6 +316,7 @@ const searchOptions = async (req, res) => {
         const findAll = await Item.find(query)
             .select('-__v') // Exclude version key
             .sort({ quantity: -1 }) // Sort by remaining quantity (highest first)
+            .populate('shipTo')
             .lean(); // Return plain JavaScript objects for better performance
 
         // Return appropriate message based on results

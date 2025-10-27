@@ -44,8 +44,17 @@ const Choices = () => {
         if (items.length <= 0) {
             return;
         }
+        let mini = 0;
+        let maxi = 0;
+        items.forEach(element => {
+            maxi += element.quantity;
+            mini = Math.max(mini, element.quantity);
+        });
+        mini = maxi - mini;
+        console.log(items, mini, maxi)
         showOverlay(SingleField, {
             message: "Enter requirement and form type",
+            range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
             onAccept: (data) => {
                 bookingItems({ items: [...items], ...data }, dispatch)
             }
@@ -72,68 +81,6 @@ const Choices = () => {
                     <h4>{(widths.filter(width => width._id === options?.width))[0]?.name}</h4>
                 </div>
             </div>}
-            {/* Best Suggestion */}
-            {/* <div>
-                <h2>Best Suggestion</h2>
-                <div className={style.groupItem}>
-                    <div className={style.singleItem}>
-                        <h4>Wagon Number</h4>
-                        <h4>Quantity</h4>
-                    </div>
-                    <div className={style.singleItem}>
-                        <h4>Wagon Number</h4>
-                        <h4>Quantity</h4>
-                    </div>
-                    <div className={style.singleItem}>
-                        <h4>Wagon Number</h4>
-                        <h4>Quantity</h4>
-                    </div>
-                    <div className={style.confirmationButton}>
-                        <button>Booking this one</button>
-                    </div>
-                </div>
-            </div> */}
-
-            {/* All Suggestions */}
-            {/* <div>
-                <h2>All Suggestions</h2>
-                <div>
-                    <div className={style.groupItem}>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.confirmationButton}>
-                            <button>Booking this one</button>
-                        </div>
-                    </div>
-                    <div className={style.groupItem}>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.singleItem}>
-                            <h4>Wagon Number</h4>
-                            <h4>Quantity</h4>
-                        </div>
-                        <div className={style.confirmationButton}>
-                            <button>Booking this one</button>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
 
             {/* All Choices */}
             <div className={style.allChoices}>
@@ -144,8 +91,9 @@ const Choices = () => {
                 {allChoices?.length !== 0 && <div className={style.groupItem}>
                     {
                         allChoices?.map((items) => {
-                            return <div onClick={() => selecting(items._id)} style={{ backgroundColor: selectChoices.includes(items._id) ? '#065675' : '#001f2b' }} className={style.singleItem}>
-                                <h4>{items.wagonNumber}</h4>
+                            return <div onClick={() => selecting(items)} style={{ backgroundColor: selectChoices.includes(items) ? '#065675' : '#001f2b' }} className={style.singleItem}>
+                                <h4>{items.shipTo.name || 'Not Reached'}</h4> X
+                                <h4>{items.wagonNumber || 'Not Reached'}</h4> X
                                 <h4>{items.quantity}</h4>
                             </div>
                         })

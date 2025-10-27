@@ -61,7 +61,7 @@ const itemSchema = new mongoose.Schema({
         enum: ['In Stock', 'Sold', 'Reserved', 'Cancelled'],
         default: 'In Stock',
     },
-    originalQuanity: {
+    originalQuantity: {
         type: Number,
         required: true
     },

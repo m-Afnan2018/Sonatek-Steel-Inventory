@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import style from './Overlay.module.css'
 
-const SingleField = ({ message, onAccept, close }) => {
+const SingleField = ({ message, onAccept, range, close }) => {
     const [selectedType, setSelectedType] = useState('Sheet');
     const [quantity, setQuantity] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -14,6 +14,11 @@ const SingleField = ({ message, onAccept, close }) => {
         const qty = Number(quantity);
         if (!qty || qty <= 0) {
             setError('Please enter a valid quantity greater than 0');
+            return;
+        }
+
+        if (!(range.min < qty && qty <= range.max)) {
+            setError(`Please choose between ${range.min} and  ${range.max}`);
             return;
         }
 
@@ -72,19 +77,19 @@ const SingleField = ({ message, onAccept, close }) => {
                     </label>
                 </div>
             </div>
-            <div>
+            <div style={{ position: 'relative' }}>
                 <label>Enter the quantity</label>
                 <input
                     type='number'
-                    min='1'
+                    min='0'
                     step={'any'}
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className={style.inputField}
                 />
+                {error && <div className={style.error}>{error}</div>}
             </div>
 
-            {error && <div className={style.error}>{error}</div>}
 
             <div>
                 <button type='submit' disabled={submitting}>{submitting ? 'Submitting...' : 'Ok'}</button>

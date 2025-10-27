@@ -44,7 +44,7 @@ const addItem = async (req, res) => {
             thickness,
             shipTo: shipTo && shipTo.trim() === "" ? null : shipTo,
             quantity,
-            originalQuanity: quantity,
+            originalQuantity: quantity,
             wagonNumber: wagonNumber || null,
         });
 
@@ -85,12 +85,12 @@ const addItem = async (req, res) => {
             type: item.type,
             grade: gradeChecker,
             width: widthChecker,
-            quantity: item.quantity,
+            originalQuantity: item.originalQuantity,
             wagonNumber: item.wagonNumber,
             challanNumber: item.challan?.challanNumber,
             challanDate: item.challan?.challanDate,
             thickness: thicknessChecker,
-            shipTo: shipTo,
+            shipTo: cutterChecker === true ? null : cutterChecker,
             createdAt: item.createdAt,
         };
 
@@ -145,20 +145,22 @@ const updateItem = async (req, res) => {
             .populate("grade width thickness shipTo");
         if (!updatedItem) throw customError('Item not found', 404);
 
+        console.log(updateData, updatedItem);
+
         const formattedItems = {
             _id: updatedItem._id,
             name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
             type: updatedItem.type,
-            grade: updatedItem.grade.name,
-            width: updatedItem.width.name,
+            grade: updatedItem.grade,
+            width: updatedItem.width,
             remaining: updatedItem.remaining,
-            thickness: updatedItem.thickness.name,
+            thickness: updatedItem.thickness,
             createdAt: updatedItem.createdAt,
             wagonNumber: updatedItem.wagonNumber,
             challanNumber: updatedItem?.challan?.challanNumber,
             challanDate: updatedItem?.challan?.challanDate,
-            shipTo: updatedItem?.shipTo?.name,
-            quantity: updatedItem.originalQuantity,
+            shipTo: updatedItem?.shipTo,
+            originalQuantity: updatedItem.originalQuantity,
             vehicleNumber: updatedItem?.transport?.vehicleNumber,
             loader: updatedItem?.transport?.loader,
             transporterName: updatedItem?.transport?.transporterName,
@@ -221,7 +223,7 @@ const getAllItem = async (req, res) => {
 
         // 🎯 Filters
         if (filters) {
-            // handle remaining first (special case)
+            // handle remaining first
             if (filters.remaining) {
                 if (filters.remaining === "remaining") {
                     query.quantity = { $gt: 0 };
@@ -230,36 +232,51 @@ const getAllItem = async (req, res) => {
                 }
             }
 
-            // handle date range (apply to challan.challanDate — change to createdAt if you want)
+            // handle date range
             const { fromDate, toDate } = filters;
             if (fromDate || toDate) {
                 const range = {};
                 if (fromDate) {
                     const from = new Date(fromDate);
-                    from.setHours(0, 0, 0, 0); // start of day
+                    from.setHours(0, 0, 0, 0);
                     range.$gte = from;
                 }
                 if (toDate) {
                     const to = new Date(toDate);
-                    to.setHours(23, 59, 59, 999); // end of day
+                    to.setHours(23, 59, 59, 999);
                     range.$lte = to;
                 }
-                // apply to challan date; if you prefer createdAt, use "createdAt" key
                 query["challan.challanDate"] = range;
             }
 
-            // default key -> value filters (skip handled ones)
             const skipKeys = new Set(["remaining", "fromDate", "toDate"]);
             Object.keys(filters).forEach((key) => {
                 if (skipKeys.has(key)) return;
                 const value = filters[key];
-                if (!value) return; // skip empty
+                if (!value) return;
 
-                // if filter is one of the string-match fields, use regex for partial
-                // otherwise set exact match (IDs etc.)
-                if (["type", "wagonNumber", "challanNumber", "shipTo"].includes(key)) {
-                    query[key] = { $regex: String(value), $options: "i" };
-                } else {
+                // apply regex search only for pure string filters
+                if (["type", "formType"].includes(key)) {
+                    query[key] = { $regex: value, $options: "i" };
+                }
+                else if (key === "wagonNumber") {
+                    // in case wagonNumber is number-like (not string)
+                    if (isNaN(value)) {
+                        query[key] = { $regex: value, $options: "i" };
+                    } else {
+                        query[key] = Number(value);
+                    }
+                }
+                else if (key === "shipTo") {
+                    // shipTo is likely ObjectId
+                    query[key] = value;
+                }
+                else if (key === "challanNumber") {
+                    // nested string field
+                    query["challan.challanNumber"] = { $regex: value, $options: "i" };
+                }
+                else {
+                    // default exact match
                     query[key] = value;
                 }
             });
@@ -267,27 +284,46 @@ const getAllItem = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        // Fetch items (apply sort, pagination if needed)
-        const items = await Item.find(query)
-            .populate("grade width thickness shipTo transport") // removed challan populate (it's embedded)
-            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+        // Fetch items
+        let items = await Item.find(query)
+            .populate("grade width thickness shipTo transport")
+            .sort(sortBy === "materialDescription" ? {} : { [sortBy]: order === "asc" ? 1 : -1 })
             .skip(skip)
             .limit(Number(limit));
 
         const total = await Item.countDocuments(query);
 
-        // Build listView
+        // 📦 Sort manually when sorting by "materialDescription"
+        if (sortBy === "materialDescription") {
+            items = items.sort((a, b) => {
+                const dir = order === "asc" ? 1 : -1;
+                const gradeA = a.grade?.name?.toLowerCase() || "";
+                const gradeB = b.grade?.name?.toLowerCase() || "";
+                const thickA = a.thickness?.name?.toString() || "";
+                const thickB = b.thickness?.name?.toString() || "";
+                const widthA = a.width?.name?.toString() || "";
+                const widthB = b.width?.name?.toString() || "";
+
+                // Compare in order: grade → thickness → width
+                if (gradeA !== gradeB) return gradeA > gradeB ? dir : -dir;
+                if (thickA !== thickB) return thickA > thickB ? dir : -dir;
+                if (widthA !== widthB) return widthA > widthB ? dir : -dir;
+                return 0;
+            });
+        }
+
+        // 🧩 Build listView
         const listView = items.map((item) => ({
             _id: item._id,
             wagonNumber: item.wagonNumber,
             challanNumber: item?.challan?.challanNumber,
             challanDate: item?.challan?.challanDate,
             type: item.type,
-            grade: item.grade?.name,
-            width: item.width?.name,
-            quantity: item.originalQuanity,
-            thickness: item.thickness?.name,
-            shipTo: item?.shipTo?.name,
+            grade: item.grade,
+            width: item.width,
+            originalQuantity: item.originalQuantity,
+            thickness: item.thickness,
+            shipTo: item?.shipTo,
             createdAt: item.createdAt,
             transporterName: item.transport?.transporterName,
             loader: item.transport?.loader,
@@ -307,7 +343,6 @@ const getAllItem = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 const getItemByWagons = async (req, res) => {
     try {
@@ -353,7 +388,8 @@ const addVarient = async (req, res) => {
             returnValue = await newThickness.save();
         } else if (type === 'grade') {
             const newGrade = new Grade({
-                name: value
+                name: value.name,
+                type: value.type
             })
             returnValue = await newGrade.save();
         } else if (type === 'width') {
@@ -597,9 +633,10 @@ const getUpcomingItem = async (req, res) => {
                 type: item.type,
                 grade: item.grade,
                 width: item.width,
-                quantity: item.quantity,
+                originalQuantity: item.originalQuantity,
                 thickness: item.thickness,
                 createdAt: item.createdAt,
+                shipTo: item.shipTo
             };
 
             listView.push(formattedItems);
@@ -698,7 +735,7 @@ const uploadCSV = async (req, res) => {
                     challanDate,
                     challanNumber: row["CHALLAN-NO."],
                 },
-                originalQuanity: Number(row["QUANTITY"] || 0),
+                originalQuantity: Number(row["QUANTITY"] || 0),
                 quantity: Number(row["QUANTITY"] || 0),
                 shipTo: shipTo ? shipTo._id : null,
                 transport: {
@@ -799,6 +836,9 @@ const getExcelItem = async (req, res) => {
             filters = null
         } = req.body;
 
+        console.log(filters)
+
+
         let query = {};
 
         query.wagonNumber = { $ne: null };
@@ -827,8 +867,37 @@ const getExcelItem = async (req, res) => {
                     return; // ✅ prevent overwriting below
                 }
 
-                // Default case
-                query[key] = value;
+                const skipKeys = new Set(["remaining", "fromDate", "toDate"]);
+                Object.keys(filters).forEach((key) => {
+                    if (skipKeys.has(key)) return;
+                    const value = filters[key];
+                    if (!value) return;
+
+                    // apply regex search only for pure string filters
+                    if (["type", "formType"].includes(key)) {
+                        query[key] = { $regex: value, $options: "i" };
+                    }
+                    else if (key === "wagonNumber") {
+                        // in case wagonNumber is number-like (not string)
+                        if (isNaN(value)) {
+                            query[key] = { $regex: value, $options: "i" };
+                        } else {
+                            query[key] = Number(value);
+                        }
+                    }
+                    else if (key === "shipTo") {
+                        // shipTo is likely ObjectId
+                        query[key] = value;
+                    }
+                    else if (key === "challanNumber") {
+                        // nested string field
+                        query["challan.challanNumber"] = { $regex: value, $options: "i" };
+                    }
+                    else {
+                        // default exact match
+                        query[key] = value;
+                    }
+                });
             });
             if (filters.fromDate && filters.toDate) {
                 query["challan.challanDate"] = {
@@ -842,9 +911,13 @@ const getExcelItem = async (req, res) => {
         const skip = (page - 1) * limit;
 
         // 📦 Fetch items
+        // const items = await Item.find(query)
+        //     .populate("grade width thickness shipTo challan transport")
+        //     .sort({ createdAt: - 1 })
+
         const items = await Item.find(query)
-            .populate("grade width thickness shipTo challan transport")
-            .sort({ createdAt: - 1 })
+            .populate("grade width thickness shipTo challan transport") // removed challan populate (it's embedded)
+            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
 
         const total = await Item.countDocuments(query);
 
@@ -861,7 +934,7 @@ const getExcelItem = async (req, res) => {
                 type: item.type || 'NA',
                 grade: item.grade?.name || 'NA',
                 width: item.width?.name || 'NA',
-                quantity: item.originalQuanity || 'NA',
+                quantity: item.originalQuantity || 'NA',
                 thickness: item.thickness?.name || 'NA',
                 shipTo: item?.shipTo?.name || 'NA',
                 createdAt: item.createdAt || 'NA',
@@ -875,17 +948,17 @@ const getExcelItem = async (req, res) => {
         });
 
         const payload = listView.map((item) => ({
-            Date: item.createdAt?.toISOString().split("T")[0],
-            ChallanDate: item.challanDate
-                ? item.challanDate.toISOString().split("T")[0]
-                : "N/A",
-            ChallanNumber: item?.challanNumber || "N/A",
-            Weight: item.quantity,
-            Remaining: item.remaining,
-            Description: `${item.type || ""} X ${item.thickness || "N/A"} X ${item.width || "N/A"} ${item.grade || "N/A"}`,
-            Cutters: item.shipTo || "N/A",
             WagonNumber: item.wagonNumber || "N/A",
-
+            ChallanDate: item.challanDate,
+            ChallanNumber: item?.challanNumber || "N/A",
+            Type: item.type,
+            Description: `${item.thickness || "N/A"} X ${item.width || "N/A"} ${item.grade || "N/A"}`,
+            Weight: item.quantity,
+            Cutters: item.shipTo || "N/A",
+            vehicle: item.vehicleNumber,
+            loader: item.loader,
+            transport: item.transporterName,
+            Remaining: item.remaining,
         }));
 
         const workbook = xlsx.utils.book_new();

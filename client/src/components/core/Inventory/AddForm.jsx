@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import style from "./Inventory.module.css";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { addItem } from "services/operations/itemAPI";
-import { FaPlus } from "react-icons/fa6";
 
 const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
@@ -20,23 +19,18 @@ const AddForm = () => {
         },
     });
 
-    // prepare option arrays once so we can reference them in handlers
-    const typeOptions = [
-        { label: "Hot Rolled", value: "Hot Rolled" },
-        { label: "Cold Rolled", value: "Cold Rolled" },
-    ];
-
     const onSubmit = (data) => {
         const formattedData = {
-            type: data.type?.value,
+            type: grades.find(g => g._id === data.grade.value).type || 'Cold Rolled',
             grade: data.grade?.value,
             width: data.width?.value,
             thickness: data.thickness?.value,
             quantity: data.quantity,
+            shipTo: data.cutter?.value || null,
         };
 
         addItem(formattedData, dispatch);
-        setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label }]);
+        // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, shipTo: data.cutter?.label || null }]);
         setFocus("type");
     };
 
@@ -46,171 +40,206 @@ const AddForm = () => {
             value: i[valueField] || i.label,
         })) || [];
 
-    const handleKeyDown = (e, nextField) => {
+    const handleKeyDown = (e, prevField, nextField) => {
         if (e.key === "Enter") {
             e.preventDefault();
             if (nextField) setFocus(nextField);
         }
+        if (e.key === 'ArrowLeft' && prevField) {
+            setFocus(prevField)
+        }
+        if (e.key === 'ArrowRight' && nextField) {
+            setFocus(nextField)
+        }
     };
 
-    // const handleSelectEnter = (e, nextField) => {
-    //     if (e.key === "Enter" && nextField) {
-    //         e.preventDefault();
-    //         setTimeout(() => setFocus(nextField), 100); // allow select to close first
-    //     }
-    // }
-
-    const handleSelectEnter = (e, field, options = [], nextField = null) => {
+    const handleSelectEnter = (e, field, options = [], prevField = null, nextField = null) => {
         if (e.key === "Enter") {
             if (nextField) {
                 // slight delay to allow select internal state to settle
                 setTimeout(() => setFocus(nextField), 80);
             }
         }
+        if (e.key === 'ArrowLeft' && prevField) {
+            e.preventDefault();
+            setFocus(prevField)
+        }
+        if (e.key === 'ArrowRight' && nextField) {
+            e.preventDefault();
+            setFocus(nextField)
+        }
     };
 
-    const [currentData, setCurrentData] = useState([]);
+    const customStyles = {
+        control: (provided) => ({
+            ...provided,
+            minHeight: "18px",        // remove large default height
+            height: "auto",           // set exact height
+            cursor: "pointer",
+        }),
+        valueContainer: (provided) => ({
+            ...provided,
+            fontWeight: '900',
+            height: "36px",
+            padding: "0 6px",
+        }),
+        indicatorsContainer: (provided) => ({
+            ...provided,
+            height: "36px",
+        }),
+        dropdownIndicator: (provided) => ({
+            ...provided,
+            padding: "2px",           // reduce padding around icon
+            transform: "scale(0.7)",  // shrink arrow icon
+        }),
+        indicatorSeparator: () => ({
+            display: "none",          // optional: remove | separator
+        }),
+        option: (styles, { isFocused, isSelected }) => ({
+            ...styles,
+            zIndex: 1,
+        }),
+        menu: base => ({
+            ...base,
+            zIndex: 1000,
+            position: 'absolute'
+        }),
+        container: (provided) => ({
+            ...provided,
+            position: 'relative'
+        })
+    };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm}>
-            <table className={style.table}>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Thickness</th>
-                        <th>Width</th>
-                        <th>Grade</th>
-                        <th>Quantity</th>
-                        <th>Cutter</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        currentData && currentData.length > 0 && currentData.map((data, index) => (
-                            <tr key={index}>
-                                <td>{data.type}</td>
-                                <td>{data.thickness}</td>
-                                <td>{data.width}</td>
-                                <td>{data.grade}</td>
-                                <td>{data.quantity}</td>
-                                <td>{data.shipTo}</td>
-                            </tr>
-                        ))
-                    }
-                    <tr>
-                        {/* Type */}
-                        <td>
-                            <Controller
-                                name="type"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        options={typeOptions}
-                                        value={field.value}
-                                        onChange={(option) => field.onChange(option)}
-                                        onKeyDown={(e) => handleSelectEnter(e, field, typeOptions, "thickness")}
-                                        placeholder="Select Type"
-                                        isSearchable
-                                    />
-                                )}
-                            />
-                        </td>
+        <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm} onKeyDown={(e) => {
+            if (e.ctrlKey && e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(onSubmit)();
+            }
+        }}>
 
-                        {/* Thickness */}
-                        <td>
-                            <Controller
-                                name="thickness"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        options={toOptions(thicknesses)}
-                                        value={field.value}
-                                        onChange={(option) => field.onChange(option)}
-                                        onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, "width")}
-                                        placeholder="Select Thickness"
-                                        isSearchable
-                                    />
-                                )}
-                            />
-                        </td>
+            {/* Type */}
+            {/* <div>
+                <Controller
+                    name="type"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            options={typeOptions}
+                            value={field.value}
+                            onChange={(option) => field.onChange(option)}
+                            onKeyDown={(e) => handleSelectEnter(e, field, typeOptions, "thickness")}
+                            placeholder="Select Type"
+                            isSearchable
+                            // components={{ DropdownIndicator: SmallDropdownIndicator }}
+                            styles={customStyles}
+                            menuIsOpen={true}
+                        />
+                    )}
+                />
+            </div> */}
 
-                        {/* Width */}
-                        <td>
-                            <Controller
-                                name="width"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        options={toOptions(widths)}
-                                        value={field.value}
-                                        onChange={(option) => field.onChange(option)}
-                                        onKeyDown={(e) => handleSelectEnter(e, field, widths, "grade")}
-                                        placeholder="Select Width"
-                                        isSearchable
-                                    />
-                                )}
-                            />
-                        </td>
+            {/* Thickness */}
+            <div>
+                <Controller
+                    name="thickness"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            classNames={{
+                                control: (state) =>
+                                    state.isFocused ? style.test : style.test,
+                            }}
+                            {...field}
+                            options={toOptions(thicknesses)}
+                            value={field.value}
+                            onChange={(option) => field.onChange(option)}
+                            onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, null, "width")}
+                            placeholder="Thickness"
+                            styles={customStyles}
+                            isSearchable
+                        />
+                    )}
+                />
+            </div>
 
-                        {/* Grade */}
-                        <td>
-                            <Controller
-                                name="grade"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        options={toOptions(grades)}
-                                        value={field.value}
-                                        onChange={(option) => field.onChange(option)}
-                                        onKeyDown={(e) => handleSelectEnter(e, field, grades, "quantity")}
-                                        placeholder="Select Grade"
-                                        isSearchable
-                                    />
-                                )}
-                            />
-                        </td>
+            {/* Width */}
+            <div >
+                <Controller
+                    name="width"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            options={toOptions(widths)}
+                            value={field.value}
+                            onChange={(option) => field.onChange(option)}
+                            onKeyDown={(e) => handleSelectEnter(e, field, widths, "thickness", "grade")}
+                            placeholder="Width"
+                            styles={customStyles}
+                            isSearchable
+                        />
+                    )}
+                />
+            </div>
 
-                        {/* Quantity */}
-                        <td>
-                            <input
-                                type="number"
-                                {...register("quantity")}
-                                onKeyDown={(e) => handleKeyDown(e, 'cutter')}
-                                placeholder="Enter qty"
-                                step={'any'}
-                            />
-                        </td>
+            {/* Grade */}
+            <div>
+                <Controller
+                    name="grade"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            options={toOptions(grades)}
+                            value={field.value}
+                            onChange={(option) => field.onChange(option)}
+                            onKeyDown={(e) => handleSelectEnter(e, field, grades, "width", "quantity")}
+                            placeholder="Grade"
+                            styles={customStyles}
+                            isSearchable
+                        />
+                    )}
+                />
+            </div>
 
-                        {/* Cutters */}
-                        <td>
-                            <Controller
-                                name="cutter"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        {...field}
-                                        options={toOptions(cutters)}
-                                        value={field.value}
-                                        onChange={(option) => field.onChange(option)}
-                                        onKeyDown={(e) => handleSelectEnter(e, field, cutters, null)}
-                                        placeholder="Select Cutter"
-                                        isSearchable
-                                    />
-                                )}
-                            />
-                        </td>
+            {/* Quantity */}
+            <div>
+                <input
+                    style={{ width: '100%' }}
+                    type="number"
+                    {...register("quantity")}
+                    onKeyDown={(e) => handleKeyDown(e, 'grade', "cutter")}
+                    placeholder="Quantity"
+                    step={'any'}
+                />
+            </div>
 
-                        <td>
-                            <button type="submit"><FaPlus /></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            {/* Cutters */}
+            <div>
+                <Controller
+                    name="cutter"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            options={[{ label: 'NULL', value: null }, ...(toOptions(cutters))]}
+                            value={field.value}
+                            onChange={(option) => field.onChange(option)}
+                            onKeyDown={(e) => handleSelectEnter(e, field, cutters, "quantity", null)}
+                            placeholder="Cutter"
+                            styles={customStyles}
+                            isSearchable
+                        />
+                    )}
+                />
+            </div>
+
+            <div>
+                <button type="submit">Add</button>
+            </div>
+
         </form>
     );
 };
