@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
 import style from './Booking.module.css'
-import SearchForm from 'components/core/Booking/SearchForm'
-import Choices from 'components/core/Booking/Choices'
+// import SearchForm from 'components/core/Booking/SearchForm'
+// import Choices from 'components/core/Booking/Choices'
 import { getAllBookings, getMyBookings } from '../../services/operations/bookingAPI'
 import ViewAll from 'components/core/Booking/ViewAll'
 import { useDispatch, useSelector } from 'react-redux'
+import Items from 'components/core/Booking/Items'
 
 const Booking = () => {
     const dispatch = useDispatch();
@@ -23,11 +24,13 @@ const Booking = () => {
         <div className={style.Booking}>
             <h2>Manage Booking</h2>
 
+            <Items />
+
             {/* Create Booking Form */}
-            <SearchForm />
+            {/* <SearchForm /> */}
 
             {/* View my choice */}
-            <Choices />
+            {/* <Choices /> */}
 
             {/* View All Bookings */}
             <ViewAll />

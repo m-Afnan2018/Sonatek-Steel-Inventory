@@ -298,7 +298,7 @@ const getMyBookings = async (req, res) => {
 
 const searchOptions = async (req, res) => {
     try {
-        const { type, grade, formType, thickness, width, quantity } = req.body;
+        const { type, grade, formType, thickness, width, shipTo, quantity } = req.body;
 
         // Build dynamic query object - only include fields that are provided
         const query = {};
@@ -308,15 +308,15 @@ const searchOptions = async (req, res) => {
         if (formType) query.formType = formType;
         if (thickness !== undefined) query.thickness = thickness;
         if (width !== undefined) query.width = width;
+        if (shipTo !== undefined) query.shipTo = shipTo;
 
         // Always filter for items with remaining quantity > 0
         query.quantity = { $gt: 0 };
-        query.wagonNumber = { $ne: null };
 
         const findAll = await Item.find(query)
             .select('-__v') // Exclude version key
             .sort({ quantity: -1 }) // Sort by remaining quantity (highest first)
-            .populate('shipTo')
+            .populate('shipTo thickness width grade')
             .lean(); // Return plain JavaScript objects for better performance
 
         // Return appropriate message based on results
