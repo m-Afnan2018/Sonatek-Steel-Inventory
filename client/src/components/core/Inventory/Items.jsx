@@ -14,7 +14,7 @@ const Items = () => {
     const [page, setPage] = useState(1);
     // eslint-disable-next-line no-unused-vars
     const [pagination, setPagination] = useState(null);
-    const { listViewList } = useSelector(state => state.item);
+    const { listViewList, totalQuantity } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
 
     // eslint-disable-next-line no-unused-vars
@@ -147,6 +147,9 @@ const Items = () => {
                         Next
                     </button>
                 </div>
+                <div>
+                    <button>{totalQuantity}</button>
+                </div>
             </div>
         </div >
     );
@@ -169,10 +172,10 @@ const SingleItem = ({ item, setView, view }) => {
     };
 
     const handleSave = (e) => {
-        e.stopPropagation(); 
+        e.stopPropagation();
         const grade = item.grade._id;
         const thickness = item.thickness._id;
-        const width =item.width._id;
+        const width = item.width._id;
         const cutter = item.shipTo?._id;
         let Item = { ...item, grade, thickness, width, shipTo: cutter };
         let updatedItem = { ...Item, [select]: value };
@@ -313,7 +316,7 @@ const SingleItem = ({ item, setView, view }) => {
                             : <span>{item.shipTo?.name || '-'}</span>}
                     </div>
                 ) : (
-                    item.shipTo?.name 
+                    item.shipTo?.name
                 )}
             </td>
 

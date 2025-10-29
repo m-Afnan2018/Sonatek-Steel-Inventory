@@ -4,17 +4,17 @@ import { useSelector } from 'react-redux';
 import SingleBlock from 'components/core/Varient/SingleBlock';
 
 const Varient = () => {
-    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+    const { grades, thicknesses, widths } = useSelector(state => state.varient);
 
     return (
         <div className={style.Varient}>
             <h2>Manage Varients</h2>
 
             {/* Block for Grades */}
-            <SingleBlock list={grades} name={'Grade'} />
             <SingleBlock list={thicknesses} name={'Thickness'} />
-            <SingleBlock list={cutters} name={'Cutter'} />
             <SingleBlock list={widths} name={'Width'} />
+            <SingleBlock list={grades} name={'Grade'} />
+            {/* <SingleBlock list={cutters} name={'Cutter'} /> */}
         </div >
     )
 }

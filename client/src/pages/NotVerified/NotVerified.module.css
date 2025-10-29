@@ -1,7 +1,7 @@
 .NotVerified {
     height: 100dvh;
     width: 100dvw;
-    background: radial-gradient(50.00% 50.00% at 50% 50%, rgba(8, 81, 109, 1), rgba(0, 31, 43, 1) 100%);
+    background: radial-gradient(50.00% 50.00% at 50% 50%, rgba(8, 81, 109, 1), #11386C 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,7 +17,7 @@
 }
 
 .heading {
-    background: rgba(0, 31, 43, 1);
+    background: #11386C;
     height: 64px;
     display: flex;
     justify-content: center;

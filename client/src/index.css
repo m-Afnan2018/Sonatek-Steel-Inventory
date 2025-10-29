@@ -1,18 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: "Inter", "system-ui";
+    font-family: "Poppins", "system-ui";
     transition: all 200ms;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
-input, select {
-    padding: 0.5rem;
-    font-weight: 700;
+
+input,
+select {
+    padding: 0.25rem;
+    font-weight: 400;
     border-radius: 0.25rem;
     border-style: solid;
+    color: grey;
+    border-radius: 1rem;
+    border: 2px solid grey;
+    /* padding: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    border-style: solid; */
 }
 
 input::placeholder {

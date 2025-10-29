@@ -7,13 +7,14 @@ import { useDispatch } from 'react-redux'
 const SingleBlock = ({ list, name }) => {
     const [showForm, setShowForm] = useState(false)
     const [varient, setVarient] = useState('')
+    const [option, setOption] = useState('Hot Rolled');
 
     const dispatch = useDispatch();
 
     const onSubmit = (e, type) => {
         e.preventDefault();
         if (type === 'Grade') {
-            addVarient('grade', varient, dispatch, list);
+            addVarient('grade', { name: varient, type: option }, dispatch, list);
         }
         if (type === 'Thickness') {
             addVarient('thickness', varient, dispatch, list);
@@ -63,11 +64,21 @@ const SingleBlock = ({ list, name }) => {
     return (
         <div className={style.Varient}>
             <h3>{name}</h3>
-            <button style={{ height: showForm ? '0' : '5rem', padding: '0 3rem', opacity: showForm ? '0' : '1' }} onClick={() => setShowForm(true)}>Add new {name}</button>
-            <form style={{ height: showForm ? '5rem' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
+            <button style={{ height: showForm ? '0' : '2rem', padding: '0 3rem', opacity: showForm ? '0' : '1' }} onClick={() => setShowForm(true)}>Add new {name}</button>
+            <form style={{ height: showForm ? '2rem' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
+                {name === 'Grade' && <div>
+                    <select
+                        id='type'
+                        defaultValue={option}
+                        onChange={(e) => setOption(e.target.value)}
+                    >
+                        <option value='Hot Rolled'>  Hot Rolled </option>
+                        <option value='Cold Rolled'>  Cold Rolled </option>
+                    </select>
+                </div>}
                 <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} />
                 <div>
-                    <button type='submit'>Add new {name}</button>
+                    <button type='submit'>Add</button>
                     <button type='reset' onClick={() => setShowForm(false)}>Cancle</button>
                 </div>
             </form>

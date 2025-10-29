@@ -12,7 +12,7 @@ import {
 import { setPagination } from "slices/itemSlice";
 import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
 
-export async function searchOptions(params, dispatch) {
+export async function searchOptions(params, dispatch, setter) {
     try {
         dispatch(addLoader("searchOptions"));
         dispatch(setAllChoices(null));
@@ -21,7 +21,8 @@ export async function searchOptions(params, dispatch) {
         const response = (await apiConnector('POST', bookingEndpoints.SEARCH_OPTIONS, params)).data;
 
         if (response.success) {
-            dispatch(setAllChoices(response.allItems));
+            // dispatch(setAllChoices(response.allItems));
+            setter(response.allItems);
         }
 
         dispatch(showSuccess({ id: "searchOptions", message: response.message }));
@@ -30,7 +31,7 @@ export async function searchOptions(params, dispatch) {
     }
 }
 
-export async function bookingItems(params, dispatch) {
+export async function bookingItems(params, dispatch, reset) {
     try {
         dispatch(addLoader("bookingItems"));
 
@@ -44,8 +45,10 @@ export async function bookingItems(params, dispatch) {
         }
 
         dispatch(showSuccess({ id: "bookingItems", message: response.message }));
+        reset();
     } catch (err) {
         dispatch(showError({ id: "bookingItems", message: err?.response?.data?.message || "Booking failed" }));
+        reset();
     }
 }
 
@@ -63,6 +66,24 @@ export async function getAllBookings(dispatch) {
         dispatch(showSuccess({ id: "getAllBookings", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getAllBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+    }
+}
+
+export async function getAllBookingsTable(filters, setBookings, setPagination, dispatch) {
+    try {
+        dispatch(addLoader('getAllBookingsTable'));
+
+        const response = (await apiConnector('POST', bookingEndpoints.GET_ALL_BOOKING_DETAILS_TABLEWISE, filters)).data;
+        console.log(response);
+
+        if (response.success) {
+            setBookings(response.listView);
+            setPagination({ page: response.page, totalPages: response.pages });
+        }
+        dispatch(showSuccess({ id: 'getAllBookingsTable', message: response.message }));
+    } catch (err) {
+        console.log(err)
+        dispatch(showError({ id: 'getAllBookingsTable', message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
 }
 

@@ -9,7 +9,7 @@ const Width = require('../models/widthModel')
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, width, thickness, quantity, shipTo, wagonNumber } = req.body;
+        const { type, grade, width, thickness, quantity, shipTo, wagonNumber, date } = req.body;
 
         // Validation
         if (!type || !grade || !width || !thickness || !quantity) {
@@ -46,6 +46,7 @@ const addItem = async (req, res) => {
             quantity,
             originalQuantity: quantity,
             wagonNumber: wagonNumber || null,
+            date: date
         });
 
         const item = await newItem.save({ new: true });
@@ -74,6 +75,7 @@ const addItem = async (req, res) => {
                 challanDate: item.challan?.challanDate,
                 shipTo: item.shipTo?.name,
                 createdAt: item.createdAt,
+                date: item.date
             }
         });
 
@@ -92,6 +94,7 @@ const addItem = async (req, res) => {
             thickness: thicknessChecker,
             shipTo: cutterChecker === true ? null : cutterChecker,
             createdAt: item.createdAt,
+            date: item.date
         };
 
         res.status(201).json({
@@ -145,8 +148,6 @@ const updateItem = async (req, res) => {
             .populate("grade width thickness shipTo");
         if (!updatedItem) throw customError('Item not found', 404);
 
-        console.log(updateData, updatedItem);
-
         const formattedItems = {
             _id: updatedItem._id,
             name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
@@ -164,6 +165,7 @@ const updateItem = async (req, res) => {
             vehicleNumber: updatedItem?.transport?.vehicleNumber,
             loader: updatedItem?.transport?.loader,
             transporterName: updatedItem?.transport?.transporterName,
+            date: updatedItem.date
         };
 
         res.status(200).json({
@@ -329,7 +331,13 @@ const getAllItem = async (req, res) => {
             loader: item.transport?.loader,
             vehicleNumber: item.transport?.vehicleNumber,
             remaining: item.quantity,
+            date: item.date
         }));
+
+        // ✅ NEW: total quantity of all filtered items
+        // ✅ simple fallback: fetch all matching docs (no limit) and sum in JS
+        const qtyDocs = await Item.find(query).select("originalQuantity").lean();
+        const totalQuantity = qtyDocs.reduce((sum, d) => sum + (d.originalQuantity || 0), 0);
 
         res.status(200).json({
             success: true,
@@ -338,6 +346,7 @@ const getAllItem = async (req, res) => {
             page: Number(page),
             pages: Math.ceil(total / limit),
             listView,
+            totalQuantity: totalQuantity.toFixed(3),
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -617,7 +626,6 @@ const deleteVarient = async (req, res) => {
 
 const getUpcomingItem = async (req, res) => {
     try {
-
         const items = await Item.find({ wagonNumber: null })
             .populate("grade width thickness shipTo challan")
             .sort({ createdAt: 1 })
@@ -636,7 +644,8 @@ const getUpcomingItem = async (req, res) => {
                 originalQuantity: item.originalQuantity,
                 thickness: item.thickness,
                 createdAt: item.createdAt,
-                shipTo: item.shipTo
+                shipTo: item.shipTo,
+                date: item.date
             };
 
             listView.push(formattedItems);

@@ -29,10 +29,6 @@ const Items = () => {
         to: ''
     })
 
-    // useEffect(() => {
-    //     getAllItem({ filters, search, page }, dispatch)
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [page])
 
     const onClickNext = () => {
         getAllItem({ filters, search, page: pagination.page + 1 }, dispatch);
@@ -59,20 +55,6 @@ const Items = () => {
 
     const onDownload = async () => {
         try {
-            // const response = await fetch('http://localhost:4000/api/v1/booking/getExcelBooking', {
-            //     method: 'GET',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
-            //     }
-            // });
-            // const response = await fetch('http://localhost:4000/api/v1/item/downloadTemplate', {
-            //     method: 'GET',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${localStorage.getItem(token)}`
-            //     }
-            // });
             const response = await fetch('http://localhost:4000/api/v1/item/getExcelItem', {
                 method: 'POST',
                 headers: {
@@ -101,7 +83,7 @@ const Items = () => {
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items</h3>
-            <form onSubmit={onSearch} className={style.searchForm} style={{marginBottom: '1rem'}}>
+            <form onSubmit={onSearch} className={style.searchForm} style={{ marginBottom: '1rem' }}>
                 <input
                     type="text"
                     placeholder="Search bookings..."
@@ -182,13 +164,7 @@ const SingleItem = ({ item, view, setView }) => {
             <td>{challanDate}</td>
             <td>{item.challanNumber || "-"}</td>
             <td>{item.type || "-"}</td>
-
-            <td style={{ display: "flex", gap: "5px" }}>
-                <span>{item.thickness?.name || "-"}</span> X
-                <span>{item.width?.name || "-"}</span> X
-                <span>{item.grade?.name || "-"}</span>
-            </td>
-
+            <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
             <td>{item.quantity ?? "-"}</td>
             <td>{item.shipTo?.name ?? "-"}</td>
             <td>{item.vehicleNumber || "-"}</td>

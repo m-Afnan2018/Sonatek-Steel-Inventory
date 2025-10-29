@@ -4,10 +4,19 @@ const { default: mongoose } = require("mongoose");
 const itemSnapshotSchema = new mongoose.Schema({
     item_id: { type: mongoose.Schema.Types.ObjectId }, // original item id (if available)
     type: { type: String },
-    grade: { type: String },
+    grade: {
+        _id: { type: mongoose.Schema.Types.ObjectId },
+        name: { type: String },
+    },
     formType: { type: String },
-    width: { type: String },
-    thickness: { type: String },
+    width: {
+        _id: { type: mongoose.Schema.Types.ObjectId },
+        name: { type: String },
+    },
+    thickness: {
+        _id: { type: mongoose.Schema.Types.ObjectId },
+        name: { type: String },
+    },
     wagonNumber: { type: String },
     challan: {
         challanDate: { type: Date },
@@ -16,7 +25,7 @@ const itemSnapshotSchema = new mongoose.Schema({
     currentStatus: { type: String },
     quantity: { type: Number }, // original item quantity at time of snapshot
     shipTo: { // store basic shipTo/cutter info to avoid losing it
-        shipTo_id: { type: mongoose.Schema.Types.ObjectId },
+        _id: { type: mongoose.Schema.Types.ObjectId },
         name: { type: String }
     },
     createdAt: { type: Date },
@@ -40,6 +49,10 @@ const bookingSchema = new mongoose.Schema({
     },
     order_id: {
         type: String,
+    },
+    formType: {
+        type: String,
+        enum: ['Sheet', 'Coil']
     },
     // Keep the original reference for join/lookup convenience, but also store a full snapshot
     items: [{
@@ -101,24 +114,45 @@ const bookingSchema = new mongoose.Schema({
 // Static helpers to create snapshots from documents. Call these when creating/updating bookings.
 bookingSchema.statics.makeItemSnapshot = function (itemDoc) {
     if (!itemDoc) return {};
+
     return {
         item_id: itemDoc._id || null,
         type: itemDoc.type || null,
-        grade: (itemDoc.grade && (typeof itemDoc.grade === 'string' || itemDoc.grade.name)) ? (itemDoc.grade.name || itemDoc.grade) : (itemDoc.grade ? String(itemDoc.grade) : null),
-        formType: itemDoc.formType || null,
-        width: (itemDoc.width && itemDoc.width.name) ? itemDoc.width.name : (itemDoc.width ? String(itemDoc.width) : null),
-        thickness: (itemDoc.thickness && itemDoc.thickness.name) ? itemDoc.thickness.name : (itemDoc.thickness ? String(itemDoc.thickness) : null),
+
+        // ✅ grade now stores full object {_id, name}
+        grade: itemDoc.grade ? {
+            _id: itemDoc.grade._id || null,
+            name: itemDoc.grade.name || null
+        } : { _id: null, name: null },
+
+        // ✅ width now stores {_id, name}
+        width: itemDoc.width ? {
+            _id: itemDoc.width._id || null,
+            name: itemDoc.width.name || null
+        } : { _id: null, name: null },
+
+        // ✅ thickness now stores {_id, name}
+        thickness: itemDoc.thickness ? {
+            _id: itemDoc.thickness._id || null,
+            name: itemDoc.thickness.name || null
+        } : { _id: null, name: null },
+
         wagonNumber: itemDoc.wagonNumber || null,
+
         challan: {
-            challanDate: itemDoc.challan && itemDoc.challan.challanDate ? itemDoc.challan.challanDate : null,
-            challanNumber: itemDoc.challan && itemDoc.challan.challanNumber ? itemDoc.challan.challanNumber : null
+            challanDate: itemDoc.challan?.challanDate || null,
+            challanNumber: itemDoc.challan?.challanNumber || null
         },
+
         currentStatus: itemDoc.currentStatus || null,
-        quantity: itemDoc.quantity != null ? itemDoc.quantity : null,
+        quantity: itemDoc.quantity ?? null,
+
+        // ✅ shipTo now stores {_id, name}
         shipTo: itemDoc.shipTo ? {
-            shipTo_id: itemDoc.shipTo._id || itemDoc.shipTo || null,
+            _id: itemDoc.shipTo._id || null,
             name: itemDoc.shipTo.name || null
-        } : { shipTo_id: null, name: null },
+        } : { _id: null, name: null },
+
         createdAt: itemDoc.createdAt || null,
         updatedAt: itemDoc.updatedAt || null
     };

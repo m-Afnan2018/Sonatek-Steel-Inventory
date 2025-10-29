@@ -5,7 +5,7 @@ import { setCutters } from "slices/varientSlice";
 
 
 // ➕ Add Varient
-export async function addCutter(params, dispatch, list) {
+export async function addCutter(params, dispatch, list, setter) {
     try {
         dispatch(addLoader("addCutter"));
 
@@ -15,6 +15,17 @@ export async function addCutter(params, dispatch, list) {
             const newList = [...list, response.cutter];
 
             dispatch(setCutters(newList));
+
+            const newCutter = {
+                _id: response.cutter._id,
+                name: response.cutter.name,
+                address: response.cutter.address,
+                phoneNumber: response.cutter.phoneNumber,
+                totalItems: 0,
+                totalQuantity: 0,
+                items: [],
+            };
+            setter((s) => [newCutter, ...s]);
 
             dispatch(showSuccess({ id: "addCutter", message: response.message }));
         }
@@ -53,14 +64,14 @@ export async function updateCutter(params, dispatch, list, setCutters) {
 }
 
 // ➕ Add Varient
-export async function showCutter(params, dispatch, list, setCutters) {
+export async function showCutter(params, dispatch, list, setter) {
     try {
         dispatch(addLoader("showCutter"));
 
         const response = (await apiConnector("POST", cutterEndpoints.SHOW_CUTTERS, params)).data;
 
         if (response.success) {
-            setCutters(list.map((prev) => {
+            setter(list.map((prev) => {
                 if (prev._id === params.cutterId) {
                     prev.visible = true;
                 }
@@ -70,6 +81,7 @@ export async function showCutter(params, dispatch, list, setCutters) {
             dispatch(showSuccess({ id: "showCutter", message: response.message }));
         }
     } catch (err) {
+        console.log(err);
         dispatch(showError({
             id: "showCutter",
             message: err?.response?.data?.message || "Failed to show Cutter"
@@ -95,6 +107,8 @@ export async function hideCutter(params, dispatch, list, setCutters) {
             dispatch(showSuccess({ id: "hideCutter", message: response.message }));
         }
     } catch (err) {
+
+        console.log(err);
         dispatch(showError({
             id: "hideCutter",
             message: err?.response?.data?.message || "Failed to show Cutter"

@@ -20,8 +20,8 @@ const Sidebar = ({ sidebar }) => {
     }
     const links = [
         { to: '/', label: 'Dashboard', roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
-        { to: '/manage-varient', label: 'Manage Varients', roles: ['admin'] },
         { to: '/manage-inventory', label: 'Manage Inventory', roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
+        { to: '/manage-varient', label: 'Manage Varients', roles: ['admin'] },
         { to: '/manage-cutters', label: 'Manage Cutters', roles: ['admin'] },
         { to: '/manage-bookings', label: 'Manage Booking', roles: ['admin', 'agent', 'accountant', 'director'] },
         { to: '/manage-users', label: 'Manange Users', roles: ['admin', 'director'] },
@@ -37,7 +37,7 @@ const Sidebar = ({ sidebar }) => {
     }
 
     return (
-        <div className={style.Sidebar} style={{ width: sidebar ? '256px' : '0px' }}>
+        <div className={style.Sidebar} style={{ width: sidebar ? '200px' : '0px' }}>
             <div>
                 {links.map((ln) => (
                     canSee(ln.roles) && (

@@ -41,22 +41,16 @@ const Cutter = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        addCutter({ name, address, phoneNumber }, dispatch, cutters);
-        const newCutter = {
-            _id: Math.random().toString(36).slice(2, 9),
-            name,
-            address,
-            phoneNumber,
-            totalItems: 0,
-            totalQuantity: 0,
-            items: [],
-        };
-        setCutters((s) => [newCutter, ...s]);
+        addCutter({ name, address, phoneNumber }, dispatch, cutters, setCutters);
         setShowForm(false);
         setName("");
         setAddress("");
         setPhoneNumber("");
     };
+
+    useEffect(()=>{
+        console.log(cutters);
+    }, [cutters])
 
     const startEdit = (c) => {
         setEditingId(c._id);

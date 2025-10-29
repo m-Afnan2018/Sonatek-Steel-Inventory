@@ -3,6 +3,7 @@ const { createSlice } = require("@reduxjs/toolkit");
 const initialState = {
     currentList: null,
     listViewList: null,
+    totalQuantity: 0,
     pagination: null,
     selectUpdate: null,
     upcomingItem: null,
@@ -104,6 +105,9 @@ const itemSlice = createSlice({
         },
         setPagination(state, action) {
             state.pagination = action.payload;
+        },
+        setTotalQuantity(state, action) {
+            state.totalQuantity = action.payload;
         }
     },
 });
@@ -120,7 +124,8 @@ export const {
     setPagination,
     updateListViewList,
     addUpcomingItem,
-    deleteFromUpcomingItem
+    deleteFromUpcomingItem,
+    setTotalQuantity
 } = itemSlice.actions;
 
 export default itemSlice.reducer;

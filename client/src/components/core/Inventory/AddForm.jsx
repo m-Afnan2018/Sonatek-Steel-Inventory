@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { addItem } from "services/operations/itemAPI";
+import { FaCirclePlus } from "react-icons/fa6";
 
 const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
@@ -76,10 +77,12 @@ const AddForm = () => {
             minHeight: "18px",        // remove large default height
             height: "auto",           // set exact height
             cursor: "pointer",
+            border: '2px solid grey',
+            borderRadius: '2rem'
         }),
         valueContainer: (provided) => ({
             ...provided,
-            fontWeight: '900',
+            fontWeight: '400',
             height: "36px",
             padding: "0 6px",
         }),
@@ -107,8 +110,14 @@ const AddForm = () => {
         container: (provided) => ({
             ...provided,
             position: 'relative'
+        }),
+        placeholder: (provided) => ({
+            ...provided,
         })
     };
+
+
+
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm} onKeyDown={(e) => {
@@ -117,28 +126,15 @@ const AddForm = () => {
                 handleSubmit(onSubmit)();
             }
         }}>
-
-            {/* Type */}
-            {/* <div>
-                <Controller
-                    name="type"
-                    control={control}
-                    render={({ field }) => (
-                        <Select
-                            {...field}
-                            options={typeOptions}
-                            value={field.value}
-                            onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, typeOptions, "thickness")}
-                            placeholder="Select Type"
-                            isSearchable
-                            // components={{ DropdownIndicator: SmallDropdownIndicator }}
-                            styles={customStyles}
-                            menuIsOpen={true}
-                        />
-                    )}
+            {/* Date */}
+            <div style={{ width: '8rem' }}>
+                <input
+                    style={{ width: '100%', borderRadius: '2rem', height: '40px' }}
+                    type="date"
+                    {...register("date")}
+                    onKeyDown={(e) => handleKeyDown(e, null, 'thickness')}
                 />
-            </div> */}
+            </div>
 
             {/* Thickness */}
             <div>
@@ -150,12 +146,13 @@ const AddForm = () => {
                             classNames={{
                                 control: (state) =>
                                     state.isFocused ? style.test : style.test,
+
                             }}
                             {...field}
                             options={toOptions(thicknesses)}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, null, "width")}
+                            onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, 'date', "width")}
                             placeholder="Thickness"
                             styles={customStyles}
                             isSearchable
@@ -205,9 +202,9 @@ const AddForm = () => {
             </div>
 
             {/* Quantity */}
-            <div>
+            <div style={{ width: '6rem' }}>
                 <input
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', borderRadius: '2rem', height: '40px' }}
                     type="number"
                     {...register("quantity")}
                     onKeyDown={(e) => handleKeyDown(e, 'grade', "cutter")}
@@ -237,7 +234,7 @@ const AddForm = () => {
             </div>
 
             <div>
-                <button type="submit">Add</button>
+                <button type="submit"><FaCirclePlus /></button>
             </div>
 
         </form>

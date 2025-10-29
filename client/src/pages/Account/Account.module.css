@@ -3,7 +3,7 @@
 }
 
 .Account>h2 {
-    color: rgba(0, 31, 43, 1);
+    color: #11386C;
     font-family: Inter;
     font-size: 36px;
     font-weight: 700;
@@ -57,7 +57,7 @@
     color: white;
     font-weight: 600;
     cursor: pointer;
-    background: rgba(0, 31, 43, 1);
+    background: #11386C;
 }
 
 .Account button:hover {

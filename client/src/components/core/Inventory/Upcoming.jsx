@@ -10,6 +10,7 @@ const Upcoming = () => {
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState([]);
     const [view, setView] = useState(null);
+    const [count, setCount] = useState(null);
 
     const { upcomingItem } = useSelector(state => state.item)
 
@@ -17,6 +18,11 @@ const Upcoming = () => {
         if (upcomingItem) {
             setItems(upcomingItem)
             setLoading(false)
+            let sum = 0;
+            upcomingItem.forEach(i => {
+                sum += i.originalQuantity;
+            });
+            setCount(sum)
         }
     }, [upcomingItem])
 
@@ -37,6 +43,7 @@ const Upcoming = () => {
                             <thead>
                                 <tr>
                                     {/* <th>Type</th> */}
+                                    <th style={{ width: "8rem" }}>Date</th>
                                     <th style={{ width: "8rem" }}>Description</th>
                                     <th style={{ width: "4rem" }}>Quantity</th>
                                     <th style={{ width: "rem" }}>Wagon No.</th>
@@ -54,40 +61,8 @@ const Upcoming = () => {
                         </table>
                     </div>
                 )}
-
-
-                {/* Pagination controls */}
             </div>
-            {/* <div className={style.card}>
-                {loading ? (
-                    <div className={style.loading}>Loading items...</div>
-                ) : items.length === 0 ? (
-                    <div className={style.empty}>No items found</div>
-                ) : (
-                    <div className={style.tableWrapper}>
-
-                        <table className={style.table}>
-                            <thead>
-                                <tr>
-                                    <th>Material Description</th>
-                                    <th>Quantity</th>
-                                    <th>Wagon No.</th>
-                                    <th>Challan date</th>
-                                    <th>Challan No.</th>
-                                    <th>Ship To</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {items.map((item) => (
-                                    <SingleItem key={item._id} item={item} />
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-            </div > */}
+            <button className={style.totalCount}>{count?.toFixed(3)}</button>
         </div>
     )
 }
@@ -157,7 +132,7 @@ const SingleItem = ({ item, setView, view }) => {
                             }, 800);
                         }
                     }}
-                    style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                    style={{ padding: '0rem', width: '3rem' }}
                     value={itemDetail[type]?._id || ""}
                     onChange={(e) => valueSetter(e.target.value)}
                 >
@@ -182,7 +157,7 @@ const SingleItem = ({ item, setView, view }) => {
 
         return <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
             <input
-                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                style={{ padding: '0rem', width: '3rem' }}
                 type={inputType}
                 value={itemDetail[type]}
                 onChange={(e) => valueSetter(e.target.value)}
@@ -200,27 +175,34 @@ const SingleItem = ({ item, setView, view }) => {
             className={`${view === item._id ? style.activeRow : ''}`}
             onClick={() => setView(item._id)}
         >
+            {/* Challan Date */}
+            <td onClick={() => clickHandler('date')}>
+                {select === 'date'
+                    ? renderEditableField('date', 'date')
+                    : itemDetail.date?.slice(0, 10) || '-'}
+            </td>
+
             {/* Thickness x Width x Grade */}
-            <td style={{ display: 'flex', gap: '5px' }}>
+            <td style={{ display: 'flex' }}>
                 {/* Thickness */}
                 <div onClick={() => clickHandler('thickness')}>
                     {select === 'thickness'
                         ? renderDropdownField('thickness', thicknesses)
-                        : <span>{itemDetail.thickness.name}</span>}
+                        : <span style={{ width: '3rem' }}>{itemDetail.thickness.name}</span>}
                 </div>
                 X
                 {/* Width */}
                 <div onClick={() => clickHandler('width')}>
                     {select === 'width'
                         ? renderDropdownField('width', widths)
-                        : <span>{itemDetail.width.name}</span>}
+                        : <span style={{ width: '3rem' }}>{itemDetail.width.name}</span>}
                 </div>
                 X
                 {/* Grade */}
                 <div onClick={() => clickHandler('grade')}>
                     {select === 'grade'
                         ? renderDropdownField('grade', grades)
-                        : <span>{itemDetail.grade.name}</span>}
+                        : <span style={{ width: '3rem' }}>{itemDetail.grade.name}</span>}
                 </div>
             </td>
 
@@ -265,7 +247,7 @@ const SingleItem = ({ item, setView, view }) => {
                 )}
             </td>
             <td>
-                {itemDetail === item ? <MdDelete style={{ color: 'red' }} onClick={handleDelete} /> : <div>
+                {select === '' || itemDetail === item ? <MdDelete style={{ color: 'red' }} onClick={handleDelete} /> : <div>
                     <RxCheck style={{ color: 'green' }} onClick={handleSave} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleCancel} />
                 </div>}

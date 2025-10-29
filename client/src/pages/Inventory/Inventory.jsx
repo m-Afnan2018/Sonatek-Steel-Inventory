@@ -47,7 +47,7 @@ const Inventory = () => {
 
     return (
         <div className={style.Inventory}>
-            <h2>Manage Inventory</h2>
+            {/* <h2>Manage Inventory</h2> */}
             {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
                 <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button>
                 <input

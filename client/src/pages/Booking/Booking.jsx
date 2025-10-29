@@ -6,6 +6,7 @@ import { getAllBookings, getMyBookings } from '../../services/operations/booking
 import ViewAll from 'components/core/Booking/ViewAll'
 import { useDispatch, useSelector } from 'react-redux'
 import Items from 'components/core/Booking/Items'
+import ViewTablewise from 'components/core/Booking/ViewTablewise'
 
 const Booking = () => {
     const dispatch = useDispatch();
@@ -34,6 +35,8 @@ const Booking = () => {
 
             {/* View All Bookings */}
             <ViewAll />
+
+            <ViewTablewise />
         </div>
 
     )

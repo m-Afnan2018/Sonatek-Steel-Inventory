@@ -48,7 +48,8 @@ export const bookingEndpoints = {
     SHIPPED_BOOKING: `${BASE_URL}/booking/shippedBooking`,
     CANCEL_BOOKING: `${BASE_URL}/booking/cancelBooking`,
     DELIVER_BOOKING: `${BASE_URL}/booking/deliverBooking`,
-    GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`
+    GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`,
+    GET_ALL_BOOKING_DETAILS_TABLEWISE: `${BASE_URL}/booking/getAllBookingsDetailsTablewise`
 }
 
 export const cutterEndpoints = {

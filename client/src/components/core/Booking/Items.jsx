@@ -9,8 +9,6 @@ import { useOverlay } from 'hooks/useOverlay';
 import SingleField from 'components/common/Overlay/SingleField';
 
 const Items = () => {
-    const { allChoices } = useSelector(state => state.booking);
-
     const [items, setItems] = useState(null);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
@@ -33,12 +31,20 @@ const Items = () => {
         to: ''
     })
 
+    // useEffect(() => {
+    //     if (allChoices) {
+    //         setItems(allChoices);
+    //         setLoading(false);
+    //     }
+    // }, [allChoices])
+
     useEffect(() => {
-        if (allChoices) {
-            setItems(allChoices);
+        if (items === null) {
+            setLoading(true);
+        } else {
             setLoading(false);
         }
-    }, [allChoices])
+    }, [items]);
 
     const dispatch = useDispatch();
 
@@ -53,12 +59,11 @@ const Items = () => {
             mini = Math.max(mini, element.quantity);
         });
         mini = maxi - mini;
-        console.log(selection, mini, maxi)
         showOverlay(SingleField, {
             message: "Enter requirement and form type",
             range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
             onAccept: (data) => {
-                bookingItems({ items: [...selection], ...data }, dispatch)
+                bookingItems({ items: [...selection], ...data }, dispatch, () => { setSelection([]); setItems(null) })
             }
         })
     }
@@ -66,7 +71,7 @@ const Items = () => {
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items</h3>
-            <Filters setFilters={setFilters} />
+            <Filters setFilters={setFilters} setItems={setItems} />
             {items && <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -144,7 +149,7 @@ const SingleItem = ({ setSelection, item, view, setView }) => {
                 <span>{item.grade?.name || "-"}</span>
             </td>
 
-            <td>{item.quantity ?? "-"}</td>
+            <td>{item.quantity.toFixed(3) ?? "-"}</td>
             <td>{item.shipTo?.name ?? "-"}</td>
 
             <td>{select ? <FaCheckSquare /> : <FaSquare />}</td>
@@ -153,7 +158,7 @@ const SingleItem = ({ setSelection, item, view, setView }) => {
 };
 
 
-const Filters = ({ setFilters }) => {
+const Filters = ({ setFilters, setItems }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
@@ -186,8 +191,7 @@ const Filters = ({ setFilters }) => {
         if (data.shipTo !== '') {
             payload.shipTo = data.shipTo
         }
-        console.log(payload)
-        searchOptions(payload, dispatch);
+        searchOptions(payload, dispatch, setItems);
         // 🧠 You can now trigger search or dispatch action here
     };
 

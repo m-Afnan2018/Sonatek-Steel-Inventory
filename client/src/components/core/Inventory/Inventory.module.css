@@ -255,11 +255,9 @@ h4 {
 /* Upcomming */
 /* Staff */
 .Upcoming {
-    font-family: "Poppins", sans-serif;
-    color: #222;
-    margin: 2rem;
-    padding: 1rem;
-    background: #001f2b;
+    margin: 0.5rem;
+    padding: 0.25rem;
+    background: grey;
     border-radius: 1rem;
 }
 
@@ -269,9 +267,14 @@ h4 {
 }
 
 .Upcoming h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem 16px;
-    color: #f0fbff;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    background: grey;
+    font-size: 1rem;
+    margin-bottom: 0;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .heading {
@@ -323,7 +326,7 @@ h4 {
     cursor: pointer;
 }
 
-.Upcoming td>div{
+.Upcoming td>div {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -353,6 +356,20 @@ h4 {
 .notVerified {
     color: red;
     font-weight: 600;
+}
+
+.totalCount {
+    padding: 0rem 3rem;
+    border-radius: 8px;
+    color: rgb(0 31 43);
+    border: none;
+    background-color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    height: 2rem;
+    margin-top: 1rem;
+    overflow: hidden;
 }
 
 @media (max-width: 768px) {
@@ -450,7 +467,7 @@ h4 {
 }
 
 .tableWrapper {
-    overflow: scroll;
+    overflow: auto;
     height: 100%;
     /* border-radius: 1rem; */
     /* overflow-x: auto; */
@@ -459,7 +476,7 @@ h4 {
 .table th,
 .table td {
     /* padding: 8px 12px; */
-    padding: 8px 0;
+    padding: 2px 0;
     border-bottom: 1px solid #eee;
     text-align: center;
 }
@@ -467,12 +484,20 @@ h4 {
 .table td {
     text-align: center;
     justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    border-bottom: 0;
 }
 
 .table th {
-    width: 2rem;
     background-color: #f5f6fa;
-    font-weight: 600;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.table tr {
+    border-bottom: 1px solid #80808038;
 }
 
 .table tr:hover {
@@ -522,6 +547,7 @@ h4 {
 
 .activeRow {
     background-color: #e9f5ff;
+
 }
 
 .formBlock {
@@ -634,13 +660,13 @@ h4 {
 }
 
 .AddForm>div {
-    width: calc(100% / 6);
+    width: calc((100% - 20rem) / 5);
 }
 
 .AddForm button {
     padding: 0.5rem 3rem;
     border-radius: 8px;
-    background-color: rgb(0 31 43);
+    background-color: #11386C;
     border: none;
     color: #f0fbff;
     font-weight: 600;
@@ -651,4 +677,8 @@ h4 {
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
     color: #05516f;
     background-color: #f0fbff;
+}
+
+.AddForm input {
+    height: 2.25rem;
 }

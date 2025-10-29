@@ -4,7 +4,7 @@
     align-items: flex-start;
     flex-direction: column;
     width: 256px;
-    background: rgba(0, 31, 43, 1);
+    background: #11386C;
     overflow: hidden;
 }
 
@@ -14,31 +14,41 @@
     align-items: flex-start;
     flex-direction: column;
     width: 256px;
-    background: rgba(0, 31, 43, 1);
+    background: #11386C;
 }
 
 .navlinks {
     all: unset;
     padding: 1rem;
     color: white;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 300;
     width: calc(100% - 2rem);
     cursor: pointer;
-    background-color: rgba(0, 31, 43, 1);
+    background-color: #11386C;
 }
 
 .navlinks:hover {
     background-color: rgb(2, 17, 24);
+    border-radius: 1rem 0 0 1rem;
 }
 
 .activeLink {
-    font-style: italic;
-    background-color: rgb(2, 17, 24);
+    border-radius: 1rem 0 0 1rem;
+    background: white;
+    color: #001f2b;
+    font-weight: 600;
 
+}
+
+.activeLink:hover {
+    color: #f0fbff;
+    background-color: rgb(2, 17, 24);
 }
 
 .Sidebar>div:nth-child(1) {
     height: 90%;
+    width: 100%;
 }
 
 .Sidebar>div:nth-child(2) {
@@ -52,7 +62,7 @@
     font-weight: 600;
     width: calc(100% - 2rem);
     cursor: pointer;
-    background-color: rgba(0, 31, 43, 1);
+    background-color: #11386C;
     text-align: center;
     height: 10%;
 }

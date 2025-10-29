@@ -14,7 +14,7 @@ const createBooking = async (req, res) => {
         if (!items?.length) throw customError("Please select items", 404);
 
         // Fetch and sort items by createdAt (oldest first)
-        const allItems = await Item.find({ _id: { $in: items } }).sort({ createdAt: 1 });
+        const allItems = await Item.find({ _id: { $in: items } }).sort({ createdAt: 1 }).populate('thickness shipTo grade width');
 
         let remaining = requirement;
         let totalUsed = 0;
@@ -53,7 +53,8 @@ const createBooking = async (req, res) => {
             quantity: totalUsed,
             requirement,
             bookedBy: userId,
-            bookedBySnapshot
+            bookedBySnapshot,
+            formType: formType
         })
 
         const populatedBookings = await Booking.findById(newBooking._id).populate({
@@ -578,6 +579,441 @@ const getAllBookingsDetails = async (req, res) => {
     }
 };
 
+// const getAllBookingDetailsTablewise = async (req, res) => {
+//     try {
+//         console.log("Here")
+//         const {
+//             search,
+//             sortBy = "bookingDate",
+//             order = "desc",
+//             page = 1,
+//             limit = 50,
+//             filters = null,
+//         } = req.body;
+
+//         const skip = (Number(page) - 1) * Number(limit);
+
+//         // base query
+//         const query = {};
+
+//         // -----------------------
+//         // SEARCH: top-level and inside snapshots
+//         // -----------------------
+//         if (search && typeof search === "string" && search.trim() !== "") {
+//             const s = search.trim();
+//             // search across booking fields, bookedBySnapshot.name, and item snapshots
+//             query.$or = [
+//                 { booking_id: { $regex: s, $options: "i" } },
+//                 { order_id: { $regex: s, $options: "i" } },
+//                 { vehicleNumber: { $regex: s, $options: "i" } },
+//                 { status: { $regex: s, $options: "i" } },
+//                 { "bookedBySnapshot.name": { $regex: s, $options: "i" } },
+//                 { "items.itemSnapshot.grade": { $regex: s, $options: "i" } },
+//                 { "items.itemSnapshot.wagonNumber": { $regex: s, $options: "i" } },
+//                 { "items.itemSnapshot.challan.challanNumber": { $regex: s, $options: "i" } },
+//                 { "items.itemSnapshot.type": { $regex: s, $options: "i" } },
+//                 { "items.itemSnapshot.formType": { $regex: s, $options: "i" } },
+//             ];
+//         }
+
+//         // -----------------------
+//         // FILTERS: status, bookingDate range, bookedBy, itemSnapshot properties
+//         // -----------------------
+//         if (filters && typeof filters === "object") {
+//             // status filter (exact match or array)
+//             if (filters.status) {
+//                 if (Array.isArray(filters.status)) {
+//                     query.status = { $in: filters.status };
+//                 } else {
+//                     query.status = filters.status;
+//                 }
+//             }
+
+//             // bookingDate range: fromDate/toDate expected as ISO or yyyy-mm-dd
+//             const { fromDate, toDate } = filters;
+//             if (fromDate || toDate) {
+//                 query.bookingDate = {};
+//                 if (fromDate) {
+//                     const from = new Date(fromDate);
+//                     from.setHours(0, 0, 0, 0);
+//                     query.bookingDate.$gte = from;
+//                 }
+//                 if (toDate) {
+//                     const to = new Date(toDate);
+//                     to.setHours(23, 59, 59, 999);
+//                     query.bookingDate.$lte = to;
+//                 }
+//             }
+
+//             // bookedBy: can be user id or name
+//             if (filters.bookedBy) {
+//                 const bv = filters.bookedBy;
+//                 // if looks like ObjectId -> match bookedBy ref OR snapshot.user_id
+//                 if (mongoose.Types.ObjectId.isValid(String(bv))) {
+//                     query.$or = query.$or || [];
+//                     query.$or.push({ bookedBy: mongoose.Types.ObjectId(String(bv)) });
+//                     query.$or.push({ "bookedBySnapshot.user_id": mongoose.Types.ObjectId(String(bv)) });
+//                 } else {
+//                     query["bookedBySnapshot.name"] = { $regex: bv, $options: "i" };
+//                 }
+//             }
+
+//             // itemSnapshot-level filters (grade, wagonNumber, challanNumber, type, formType)
+//             const itemKeys = ["grade", "wagonNumber", "type", "formType", "width", "thickness"];
+//             itemKeys.forEach((k) => {
+//                 if (filters[k]) {
+//                     // use $elemMatch to filter bookings that have at least one item matching
+//                     query.items = query.items || {};
+//                     query.items.$elemMatch = query.items.$elemMatch || {};
+//                     // nested fields under items.itemSnapshot
+//                     query.items.$elemMatch[`itemSnapshot.${k}`] = { $regex: filters[k], $options: "i" };
+//                 }
+//             });
+
+//             // challanNumber filter (nested)
+//             if (filters.challanNumber) {
+//                 query.items = query.items || {};
+//                 query.items.$elemMatch = query.items.$elemMatch || {};
+//                 query.items.$elemMatch["itemSnapshot.challan.challanNumber"] = {
+//                     $regex: filters.challanNumber,
+//                     $options: "i",
+//                 };
+//             }
+
+//             // remaining custom filters could be added similarly if needed
+//         }
+
+//         // -----------------------
+//         // FETCH bookings
+//         // -----------------------
+//         // Build mongo sort object
+//         const sortObj = {};
+//         sortObj[sortBy] = order === "asc" ? 1 : -1;
+
+//         // If user wants to sort by bookedBy (snapshot name), we'll fetch and do client-side sort after populate.
+//         const needsClientSideBookedBySort = sortBy === "bookedBy";
+
+//         // Query: find -> populate -> skip/limit
+//         let bookingsQuery = Booking.find(query)
+//             .populate("bookedBy") // populate ref for convenience
+//             .skip(skip)
+//             .limit(Number(limit));
+
+//         // Apply DB-side sort only when not doing bookedBy client-side sort
+//         if (!needsClientSideBookedBySort) bookingsQuery = bookingsQuery.sort(sortObj);
+
+//         let bookings = await bookingsQuery.exec();
+
+//         // total count
+//         const total = await Booking.countDocuments(query);
+
+//         // client-side sort by bookedBy snapshot name if requested
+//         if (needsClientSideBookedBySort) {
+//             const dir = order === "asc" ? 1 : -1;
+//             bookings = bookings.sort((a, b) => {
+//                 const A = (a.bookedBySnapshot?.name || a.bookedBy?.name || "").toLowerCase();
+//                 const B = (b.bookedBySnapshot?.name || b.bookedBy?.name || "").toLowerCase();
+//                 if (A < B) return -1 * dir;
+//                 if (A > B) return 1 * dir;
+//                 return 0;
+//             });
+//         }
+
+//         // -----------------------
+//         // Build listView
+//         // -----------------------
+//         const listView = bookings.map((b) => ({
+//             _id: b._id,
+//             booking_id: b.booking_id,
+//             order_id: b.order_id,
+//             status: b.status,
+//             quantity: b.quantity,
+//             requirement: b.requirement,
+//             vehicleNumber: b.vehicleNumber,
+//             bookedBy: {
+//                 _id: b.bookedBySnapshot?.user_id || (b.bookedBy?._id || null),
+//                 name: b.bookedBySnapshot?.name || b.bookedBy?.name || null,
+//                 email: b.bookedBySnapshot?.email || b.bookedBy?.email || null,
+//                 phone: b.bookedBySnapshot?.phone || b.bookedBy?.phone || null,
+//             },
+//             bookingDate: b.bookingDate,
+//             deliveryDate: b.deliveryDate,
+//             description: b.description,
+//             itemsCount: Array.isArray(b.items) ? b.items.length : 0,
+//             items: (b.items || []).map((it) => ({
+//                 itemRef: it.item || null,
+//                 quantity: it.quantity,
+//                 // itemSnapshot fields (snapshot ensures stable data)
+//                 grade: it.itemSnapshot?.grade || null,
+//                 type: it.itemSnapshot?.type || null,
+//                 formType: it.itemSnapshot?.formType || null,
+//                 width: it.itemSnapshot?.width || null,
+//                 thickness: it.itemSnapshot?.thickness || null,
+//                 wagonNumber: it.itemSnapshot?.wagonNumber || null,
+//                 challanNumber: it.itemSnapshot?.challan?.challanNumber || null,
+//                 challanDate: it.itemSnapshot?.challan?.challanDate || null,
+//                 currentStatus: it.itemSnapshot?.currentStatus || null,
+//                 shipTo: it.itemSnapshot?.shipTo || null,
+//             })),
+//             createdAt: b.createdAt || b.bookingDate || null,
+//             updatedAt: b.updatedAt || null,
+//         }));
+
+//         res.status(200).json({
+//             success: true,
+//             message: "Successfully fetched bookings",
+//             total,
+//             page: Number(page),
+//             pages: Math.ceil(total / Number(limit)),
+//             listView,
+//         });
+//     } catch (error) {
+//         console.error("getAllBookings error:", error);
+//         res.status(500).json({ success: false, message: error.message || "Server error" });
+//     }
+// }
+
+const getAllBookingDetailsTablewise = async (req, res) => {
+    try {
+        const {
+            page = 1,
+            limit = 50,
+            search = "",
+            filters = {}
+        } = req.body;
+
+        const query = {};
+
+        // 🔎 Search
+        if (search) {
+            query.$or = [
+                { order_id: { $regex: search, $options: "i" } },
+                { "bookedBySnapshot.name": { $regex: search, $options: "i" } },
+                { vehicleNumber: { $regex: search, $options: "i" } },
+                { status: { $regex: search, $options: "i" } },
+                { "items.itemSnapshot.grade": { $regex: search, $options: "i" } }
+            ];
+        }
+
+        // 🎯 Filters
+        // 🎯 Filters (✅ FIXED)
+        if (filters.grade) {
+            query.items = { $elemMatch: { "itemSnapshot.grade": filters.grade } };
+        }
+
+        if (filters.type) {
+            query.items = { $elemMatch: { "itemSnapshot.type": filters.type } };
+        }
+
+        if (filters.width) {
+            query.items = { $elemMatch: { "itemSnapshot.width": filters.width } };
+        }
+
+        if (filters.thickness) {
+            query.items = { $elemMatch: { "itemSnapshot.thickness": filters.thickness } };
+        }
+
+        if (filters.formType) {
+            query.items = { $elemMatch: { "itemSnapshot.formType": filters.formType } };
+        }
+
+        if (filters.shipTo) {
+            query.items = { $elemMatch: { "itemSnapshot.shipTo.shipTo_id": filters.shipTo } };
+        }
+
+        // ✅ Status
+        if (filters.status) query.status = filters.status;
+
+        // ✅ BookedBy user filter
+        if (filters.bookedBy) query["bookedBySnapshot.user_id"] = filters.bookedBy;
+
+        // if (filters.grade) query["items.itemSnapshot.grade"] = filters.grade;
+        // if (filters.type) query["items.itemSnapshot.type"] = filters.type;
+        // if (filters.width) query["items.itemSnapshot.width"] = filters.width;
+        // if (filters.thickness) query["items.itemSnapshot.thickness"] = filters.thickness;
+        // if (filters.shipTo) query["items.itemSnapshot.shipTo.shipTo_id"] = filters.shipTo;
+        // if (filters.bookedBy) query["bookedBySnapshot.user_id"] = filters.bookedBy;
+        // if (filters.formType) query["items.itemSnapshot.formType"] = filters.formType;
+        // if (filters.status) query.status = filters.status;
+
+        // 📅 Filter by booking date
+        if (filters.fromDate || filters.toDate) {
+            query.bookingDate = {};
+            if (filters.fromDate) query.bookingDate.$gte = new Date(filters.fromDate);
+            if (filters.toDate) {
+                const end = new Date(filters.toDate);
+                end.setHours(23, 59, 59, 999);
+                query.bookingDate.$lte = end;
+            }
+        }
+
+        const bookings = await Booking.find(query)
+            .sort({ bookingDate: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        const total = await Booking.countDocuments(query);
+
+        // ✅ Convert to frontend table format
+        const listView = bookings.map(b => ({
+            _id: b._id,
+            orderId: b.order_id,
+            bookedBy: b.bookedBySnapshot?.name,
+            bookingDate: b.bookingDate,
+            form: b.items?.[0]?.itemSnapshot?.formType || "-",
+            type: b.items?.[0]?.itemSnapshot?.type || "-",
+            thickness: b.items?.[0]?.itemSnapshot?.thickness || "-",
+            width: b.items?.[0]?.itemSnapshot?.width || "-",
+            grade: b.items?.[0]?.itemSnapshot?.grade || "-",
+            quantity: b.items?.[0]?.quantity,
+            requirement: b.requirement,
+            status: b.status,
+            vehicleNumber: b.vehicleNumber,
+            shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-"
+        }));
+
+        res.status(200).json({
+            success: true,
+            message: "Bookings fetched successfully",
+            page,
+            pages: Math.ceil(total / limit),
+            total,
+            listView
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+};
+
+const getExcelTablewiseBooking = async (req, res) => {
+    try {
+        console.log("Here");
+        const {
+            filters = {},
+            search
+        } = req.body;
+
+        const query = {};
+
+        // 🔎 Search
+        if (search) {
+            query.$or = [
+                { order_id: { $regex: search, $options: "i" } },
+                { "bookedBySnapshot.name": { $regex: search, $options: "i" } },
+                { vehicleNumber: { $regex: search, $options: "i" } },
+                { status: { $regex: search, $options: "i" } },
+                { "items.itemSnapshot.grade": { $regex: search, $options: "i" } }
+            ];
+        }
+
+        // 🎯 Filters
+        // 🎯 Filters (✅ FIXED)
+        if (filters.grade) {
+            query.items = { $elemMatch: { "itemSnapshot.grade": filters.grade } };
+        }
+
+        if (filters.type) {
+            query.items = { $elemMatch: { "itemSnapshot.type": filters.type } };
+        }
+
+        if (filters.width) {
+            query.items = { $elemMatch: { "itemSnapshot.width": filters.width } };
+        }
+
+        if (filters.thickness) {
+            query.items = { $elemMatch: { "itemSnapshot.thickness": filters.thickness } };
+        }
+
+        if (filters.formType) {
+            query.items = { $elemMatch: { "itemSnapshot.formType": filters.formType } };
+        }
+
+        if (filters.shipTo) {
+            query.items = { $elemMatch: { "itemSnapshot.shipTo.shipTo_id": filters.shipTo } };
+        }
+
+        // ✅ Status
+        if (filters.status) query.status = filters.status;
+
+        // ✅ BookedBy user filter
+        if (filters.bookedBy) query["bookedBySnapshot.user_id"] = filters.bookedBy;
+
+        // 📅 Filter by booking date
+        if (filters.fromDate || filters.toDate) {
+            query.bookingDate = {};
+            if (filters.fromDate) query.bookingDate.$gte = new Date(filters.fromDate);
+            if (filters.toDate) {
+                const end = new Date(filters.toDate);
+                end.setHours(23, 59, 59, 999);
+                query.bookingDate.$lte = end;
+            }
+        }
+
+        const bookings = await Booking.find(query)
+
+        const total = await Booking.countDocuments(query);
+
+        // ✅ Convert to frontend table format
+        const listView = bookings.map(b => ({
+            orderId: b.order_id,
+            bookedBy: b.bookedBySnapshot?.name,
+            bookingDate: b.bookingDate,
+            form: b.items?.[0]?.itemSnapshot?.formType || "-",
+            type: b.items?.[0]?.itemSnapshot?.type || "-",
+            description: `${b.items?.[0]?.itemSnapshot?.thickness?.name || "-"} X ${b.items?.[0]?.itemSnapshot?.width?.name || "-"} X ${b.items?.[0]?.itemSnapshot?.grade?.name || "-"}`,
+            quantity: b.items?.[0]?.quantity,
+            requirement: b.requirement,
+            status: b.status,
+            vehicleNumber: b.vehicleNumber,
+            location: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-"
+        }));
+
+        // Create workbook and sheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(listView);
+
+        // Optional: set column widths
+        worksheet["!cols"] = [
+            { wch: 12 }, // OrderID
+            { wch: 12 }, // BookedBy
+            { wch: 14 }, // BookedDate
+            { wch: 16 }, // Form
+            { wch: 10 }, // Type
+            { wch: 30 }, // Description
+            { wch: 12 }, // Quantity
+            { wch: 14 }, // Requirement
+            { wch: 12 }, // Status
+            { wch: 12 }, // Vehicle Number
+            { wch: 12 }, // Location
+        ];
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+
+        const excelBuffer = XLSX.write(workbook, {
+            type: "buffer",
+            bookType: "xlsx",
+        });
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=bookings-${Date.now()}.xlsx`
+        );
+        res.setHeader("Content-Length", excelBuffer.length);
+
+        res.send(excelBuffer);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+}
+
 const getExcelBooking = async (req, res) => {
     try {
         // Fetch all bookings (no populate needed; data is inside snapshots)
@@ -663,4 +1099,6 @@ module.exports = {
     deliverBooking,
     getAllBookingsDetails,
     getExcelBooking,
+    getExcelTablewiseBooking,
+    getAllBookingDetailsTablewise
 }
