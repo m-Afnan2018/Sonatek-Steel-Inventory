@@ -111,7 +111,7 @@ const ViewAll = () => {
 
     return (
         <div className={style.viewAll}>
-            <h2>Your all bookings</h2>
+            <h3>Your all bookings</h3>
             <div>
                 <div className={style.viewOptions}>
                     <button className={view === 'all' && style.selected} onClick={() => setView('all')}>All</button>

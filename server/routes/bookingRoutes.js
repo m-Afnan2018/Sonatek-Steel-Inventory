@@ -1,6 +1,6 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
-const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking } = require('../controllers/bookingController')
+const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails } = require('../controllers/bookingController')
 const { inventoryAccess, agentAccess, accountantAccess, directorAccess } = require('../middlewares/authorization');
 const router = express.Router();
 
@@ -16,7 +16,8 @@ router.patch('/shippedBooking', authentication, accountantAccess, shippedBooking
 router.patch('/cancelBooking', authentication, accountantAccess, cancelBooking);
 router.patch('/deliverBooking', authentication, accountantAccess, deliverBooking);
 router.get('/getAllBookingsDetails', authentication, getAllBookingsDetails);
-router.post('/getAllBookingsDetailsTablewise', authentication, getAllBookingDetailsTablewise)
+router.post('/getAllBookingsDetailsTablewise', authentication, getAllBookingDetailsTablewise);
+router.get('/getAllIncompleteBookingsDetails', authentication, getAllIncompleteBookingsDetails);
 router.post('/getExcelTablewiseBooking', getExcelTablewiseBooking)
 router.get('/getExcelBooking', getExcelBooking);
 

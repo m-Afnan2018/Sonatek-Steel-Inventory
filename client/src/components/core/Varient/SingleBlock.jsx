@@ -17,14 +17,14 @@ const SingleBlock = ({ list, name }) => {
             addVarient('grade', { name: varient, type: option }, dispatch, list);
         }
         if (type === 'Thickness') {
-            addVarient('thickness', varient, dispatch, list);
+            addVarient('thickness', { name: varient, type: option }, dispatch, list);
         }
         if (type === 'Cutter') {
-            addVarient('cutter', varient, dispatch, list);
+            addVarient('cutter', { name: varient, type: option }, dispatch, list);
         }
 
         if (type === 'Width') {
-            addVarient('width', varient, dispatch, list);
+            addVarient('width', { name: varient, type: option }, dispatch, list);
         }
         setShowForm(false);
     }
@@ -66,16 +66,17 @@ const SingleBlock = ({ list, name }) => {
             <h3>{name}</h3>
             <button style={{ height: showForm ? '0' : '2rem', padding: '0 3rem', opacity: showForm ? '0' : '1' }} onClick={() => setShowForm(true)}>Add new {name}</button>
             <form style={{ height: showForm ? '2rem' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
-                {name === 'Grade' && <div>
+                <div>
                     <select
                         id='type'
                         defaultValue={option}
                         onChange={(e) => setOption(e.target.value)}
                     >
+                        {name !== 'Grade' && <option value='Both'>Both</option>}
                         <option value='Hot Rolled'>  Hot Rolled </option>
                         <option value='Cold Rolled'>  Cold Rolled </option>
                     </select>
-                </div>}
+                </div>
                 <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} />
                 <div>
                     <button type='submit'>Add</button>

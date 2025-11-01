@@ -1,12 +1,12 @@
 import React from "react";
-import style from "./Inventory.module.css";
+import style from "./Upcoming.module.css";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { addItem } from "services/operations/itemAPI";
 import { FaCirclePlus } from "react-icons/fa6";
 
-const AddForm = ({ setShowUpcoming }) => {
+const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
 
@@ -21,7 +21,6 @@ const AddForm = ({ setShowUpcoming }) => {
     });
 
     const onSubmit = (data) => {
-        setShowUpcoming(true);
         const formattedData = {
             type: grades.find(g => g._id === data.grade.value).type || 'Cold Rolled',
             grade: data.grade?.value,

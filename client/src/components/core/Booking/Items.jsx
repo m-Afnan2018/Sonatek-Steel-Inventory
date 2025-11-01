@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllItem } from 'services/operations/itemAPI';
+// import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { bookingItems, searchOptions } from 'services/operations/bookingAPI';
 import { FaCheckSquare, FaSquare } from "react-icons/fa";
 import { useOverlay } from 'hooks/useOverlay';
-import SingleField from 'components/common/Overlay/SingleField';
+import { generateShipToColors } from 'utils/colorHandler';
+import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
 
 const Items = () => {
     const [items, setItems] = useState(null);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
     const [selection, setSelection] = useState([]);
+    const [colors, setColors] = useState(null)
 
     const { showOverlay } = useOverlay()
 
@@ -42,6 +44,7 @@ const Items = () => {
         if (items === null) {
             setLoading(true);
         } else {
+            setColors(generateShipToColors(items))
             setLoading(false);
         }
     }, [items]);
@@ -59,18 +62,19 @@ const Items = () => {
             mini = Math.max(mini, element.quantity);
         });
         mini = maxi - mini;
-        showOverlay(SingleField, {
+        showOverlay(OrderConfirmationOverlay, {
             message: "Enter requirement and form type",
             range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
+            data: selection,
             onAccept: (data) => {
-                bookingItems({ items: [...selection], ...data }, dispatch, () => { setSelection([]); setItems(null) })
+                bookingItems({ items: data }, dispatch, () => { setSelection([]); setItems(null) })
             }
         })
     }
 
     return (
         <div className={style.staffContainer}>
-            <h3 className={style.heading}>Inventory Items</h3>
+            <h3 className={style.heading}>Create a Booking</h3>
             <Filters setFilters={setFilters} setItems={setItems} />
             {items && <div className={style.card}>
                 {loading ? (
@@ -83,6 +87,7 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
+                                    <th>Select</th>
                                     <th>Wagon No.</th>
                                     <th>Challan date</th>
                                     <th>Challan No.</th>
@@ -90,20 +95,16 @@ const Items = () => {
                                     <th>Material Description</th>
                                     <th>Quantity</th>
                                     <th>Location</th>
-                                    <th>Select</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem key={item._id} item={item} view={view} setSelection={setSelection} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setSelection={setSelection} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 )}
-
-
-                {/* Pagination controls */}
             </div>}
             {items && selection.length > 0 && <div className={style.confirmationButton}>
                 <button onClick={() => onBookinging()}>Confirm Booking</button>
@@ -112,7 +113,7 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ setSelection, item, view, setView }) => {
+const SingleItem = ({ color, setSelection, item, view, setView }) => {
     const challanDate = item.challanDate
         ? new Date(item.challanDate).toLocaleDateString()
         : "-";
@@ -136,8 +137,10 @@ const SingleItem = ({ setSelection, item, view, setView }) => {
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
+            style={{ backgroundColor: select ? '#EFF6FF' : 'white' }}
             onClick={handleSelect}
         >
+            <td>{select ? <FaCheckSquare style={{ color: '#1D54D9', background: 'white', borderRadius: '0.4rem' }} /> : <FaSquare style={{ color: 'white', background: '#1D54D9', borderRadius: '0.25rem' }} />}</td>
             <td>{item.wagonNumber || "-"}</td>
             <td>{challanDate}</td>
             <td>{item.challanNumber || "-"}</td>
@@ -150,19 +153,26 @@ const SingleItem = ({ setSelection, item, view, setView }) => {
             </td>
 
             <td>{item.quantity.toFixed(3) ?? "-"}</td>
-            <td>{item.shipTo?.name ?? "-"}</td>
+            <td style={{ display: "flex" }}>{item.shipTo === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.shipTo.name.toLowerCase()}</p>}</td>
 
-            <td>{select ? <FaCheckSquare /> : <FaSquare />}</td>
         </tr>
     );
 };
-
 
 const Filters = ({ setFilters, setItems }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
     const dispatch = useDispatch();
+
+    const [currentType, setCurrentType] = useState('Both');
+    const handleTypeChange = (e) => {
+        if (e.target.value === '') {
+            setCurrentType('Both')
+        } else {
+            setCurrentType(e.target.value);
+        }
+    }
 
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
@@ -196,7 +206,7 @@ const Filters = ({ setFilters, setItems }) => {
     };
 
     const handleReset = (filters) => {
-        getAllItem({}, dispatch);
+        searchOptions({}, dispatch, setItems);
         reset();
         setFilters({
             grade: "",
@@ -208,11 +218,11 @@ const Filters = ({ setFilters, setItems }) => {
     };
 
     return (
-        <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
+        <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
             <div>
                 <label htmlFor="type">Type:</label>
-                <select id="type" {...register("type")}>
+                <select id="type" {...register("type")} onClick={handleTypeChange}>
                     <option value="">All</option>
                     <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
@@ -224,7 +234,7 @@ const Filters = ({ setFilters, setItems }) => {
                 <label htmlFor="grade">Grade:</label>
                 <select id="grade" {...register("grade")}>
                     <option value="">All</option>
-                    {grades?.map((grade) => (
+                    {grades?.map((grade) => ((currentType === 'Both' || currentType === grade.type) &&
                         <option key={grade._id} value={grade._id}>
                             {grade.name}
                         </option>
@@ -237,7 +247,7 @@ const Filters = ({ setFilters, setItems }) => {
                 <label htmlFor="width">Width:</label>
                 <select id="width" {...register("width")}>
                     <option value="">All</option>
-                    {widths?.map((width) => (
+                    {widths?.map((width) => ((currentType === 'Both' || currentType === width.type) &&
                         <option key={width._id} value={width._id}>
                             {width.value || width.name}
                         </option>
@@ -250,7 +260,7 @@ const Filters = ({ setFilters, setItems }) => {
                 <label htmlFor="thickness">Thickness:</label>
                 <select id="thickness" {...register("thickness")}>
                     <option value="">All</option>
-                    {thicknesses?.map((thickness) => (
+                    {thicknesses?.map((thickness) => ((currentType === 'Both' || currentType === thickness.type) &&
                         <option key={thickness._id} value={thickness._id}>
                             {thickness.value || thickness.name}
                         </option>
@@ -273,9 +283,8 @@ const Filters = ({ setFilters, setItems }) => {
 
             {/* Buttons */}
             <div className={style.buttonGroup}>
-                <button type="submit">Search</button>
                 <button type="button" onClick={handleReset}>
-                    Cancel
+                    Reset
                 </button>
             </div>
         </form>

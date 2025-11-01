@@ -1,21 +1,26 @@
-import React, { useEffect, useState } from 'react'
-import style from './Inventory.module.css'
+import React, { useEffect, useRef, useState } from 'react'
+import style from './Upcoming.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, updateItem } from 'services/operations/itemAPI';
-import AddForm from './AddForm';
+import AddForm from 'components/core/Upcoming/AddForm';
 import { MdDelete } from "react-icons/md";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
+import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 
 const Upcoming = () => {
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState([]);
     const [view, setView] = useState(null);
     const [count, setCount] = useState(null);
-    const [showUpcoming, setShowUpcoming] = useState(false);
     const [colors, setColors] = useState(null);
 
+
+    const [file, setFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+
     const { upcomingItem } = useSelector(state => state.item)
+    const { userData } = useSelector(state => state.auth);
 
     useEffect(() => {
         if (upcomingItem) {
@@ -31,11 +36,42 @@ const Upcoming = () => {
     }, [upcomingItem])
 
 
+    const inputRef = useRef();
+
+    const handleFileChange = async (e) => {
+        if (e.target.files[0]) {
+            uploadCSV(e.target.files[0], setUploading, inputRef);
+            setFile(null);
+        }
+    };
+    const handleUpload = async () => {
+        if (!file) {
+            inputRef.current.click();
+            return;
+        }
+    };
+
     return (
         <div className={style.Upcoming}>
-            <h3 className={style.heading} onClick={() => setShowUpcoming(!showUpcoming)}>Upcoming Items</h3>
-            <AddForm setShowUpcoming={setShowUpcoming} />
-            <div style={{ height: showUpcoming ? '500px' : '0', padding: showUpcoming ? '4px' : '0' }} className={style.card}>
+            {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
+                {/* <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button> */}
+                <input
+                    ref={inputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileChange}
+                    className="block w-full mb-4 border border-gray-300 rounded-lg p-2 cursor-pointer"
+                    disabled={uploading}
+                    hidden
+                />
+                <button onClick={handleUpload} >
+                    {uploading ? "Uploading..." : "Import"}
+                </button>
+                <button onClick={downloadTemplate}>Download Template</button>
+            </div>}
+            <h3 className={style.heading}>Upcoming Items</h3>
+            <AddForm />
+            <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
                 ) : items.length === 0 ? (
@@ -65,8 +101,8 @@ const Upcoming = () => {
                             <tfoot>
                                 <tr>
                                     <td></td>
-                                    <td style={{fontWeight: '600'}}>Total quantity:</td>
-                                    <td style={{fontWeight: '600'}}>{count.toFixed(3)}</td>
+                                    <td style={{ fontWeight: '600' }}>Total quantity:</td>
+                                    <td style={{ fontWeight: '600' }}>{count.toFixed(3)}</td>
                                 </tr>
                             </tfoot>
                         </table>

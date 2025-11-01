@@ -23,7 +23,7 @@ const SingleField = ({ message, onAccept, range, close }) => {
         }
 
         const payload = {
-            formtType: selectedType,
+            formType: selectedType,
             requirement: qty,
         };
 

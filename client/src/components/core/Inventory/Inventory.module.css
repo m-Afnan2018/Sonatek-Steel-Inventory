@@ -121,6 +121,14 @@
     justify-content: center;
     align-items: center;
     position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 0.25rem;
+}
+
+.inlineButtons>button {
+    font-size: 0.9em;
 }
 
 /* FILTER */
@@ -257,8 +265,10 @@ h4 {
 .Upcoming {
     margin: 0.5rem;
     padding: 0.25rem;
-    background: grey;
-    border-radius: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    /* box-shadow: 0px 0px 0px 1px #808080; */
+    border: 1px solid #F1F3F5;
 }
 
 .Upcoming td input {
@@ -267,10 +277,10 @@ h4 {
 }
 
 .Upcoming h3 {
-    color: white;
+    background-color: #f3f3ff;
     font-weight: 500;
     text-align: center;
-    background: grey;
+    color: grey;
     font-size: 1rem;
     margin-bottom: 0;
     width: 100%;
@@ -302,14 +312,9 @@ h4 {
 }
 
 .table {
-    /* width: 100%; */
+    min-width: 100%;
     border-collapse: collapse;
-    width: 100%;
-    min-width: max-content;
-    /* allows columns to expand to fit content */
-    border-collapse: collapse;
-    table-layout: auto;
-    /* don't force fixed layout */
+    table-layout: fixed;
 }
 
 .table th,
@@ -319,6 +324,10 @@ h4 {
     padding: 2px;
     font-weight: 600;
     font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* ✅ Prevents breaking layout */
+    white-space: nowrap;
 }
 
 .Upcoming td svg {
@@ -339,14 +348,14 @@ h4 {
     font-size: 0.9rem;
 }
 
-.table tr:hover {
+/* .table tr:hover {
     background-color: #f9fafc;
     cursor: pointer;
-}
+} */
 
-.activeRow {
+/* .activeRow {
     background-color: #e9f5ff;
-}
+} */
 
 .verified {
     color: green;
@@ -387,18 +396,22 @@ h4 {
 
 /* Items */
 .staffContainer {
-    font-family: "Poppins", sans-serif;
-    color: #222;
-    margin: 2rem;
-    padding: 1rem;
-    background: #001f2b;
-    border-radius: 1rem;
+    margin: 0.5rem;
+    padding: 0.25rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0px 0px 0px 1px #808080;
 }
 
 .staffContainer h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem 16px;
-    color: #f0fbff;
+    background-color: #f3f3ff;
+    font-weight: 500;
+    text-align: center;
+    color: grey;
+    font-size: 1rem;
+    margin-bottom: 0;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .heading {
@@ -417,10 +430,10 @@ h4 {
 .searchForm button {
     padding: 0.5rem 3rem;
     border-radius: 8px;
-    color: rgb(0 31 43);
+    background-color: rgb(0 122 138);
+    color: #f0fbff;
     border: none;
-    background-color: #f0fbff;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
 }
 
@@ -431,10 +444,10 @@ h4 {
 }
 
 .searchForm input {
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     padding: 0.5rem 0.5rem;
     font-weight: 600;
-    border: none;
+    border: 1px solid black;
     width: 100%;
 }
 
@@ -442,8 +455,7 @@ h4 {
     background: #fff;
     border-radius: 0 0 1rem 1rem;
     padding: 4px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    height: 500px;
+    box-shadow: none;
     overflow: hidden;
 }
 
@@ -488,10 +500,16 @@ h4 {
     font-weight: 400;
     height: 2rem;
     border-bottom: 0;
+    font-size: 0.75rem;
+    height: 3rem;
+}
+
+.table td span {
+    text-align: center;
 }
 
 .table th {
-    background-color: #f5f6fa;
+    background-color: white;
     font-weight: 500;
     font-size: 0.75rem;
 }
@@ -500,9 +518,9 @@ h4 {
     border-bottom: 1px solid #80808038;
 }
 
-.table tr:hover {
+/* .table tr:hover {
     background-color: #f9fafc;
-}
+} */
 
 .controlsRow {
     display: flex;
@@ -516,18 +534,18 @@ h4 {
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 900;
+    color: black;
+    font-size: 0.75rem;
+    font-weight: 400;
 }
 
 .controlsRow button {
-    padding: 0.5rem 3rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 8px;
-    color: rgb(0 31 43);
+    background-color: #007a8a;
     border: none;
-    background-color: #f0fbff;
-    font-weight: 600;
+    color: #f0fbff;
+    font-weight: 400;
     cursor: pointer;
 }
 
@@ -542,42 +560,59 @@ h4 {
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin: 0.25rem 0 0 0;
+    padding: 0.25rem;
+    background: #f9fafb;
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 
+/* 
 .activeRow {
     background-color: #e9f5ff;
-
-}
+} */
 
 .formBlock {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 1rem;
     background: #f9fafb;
-    padding: 1rem;
-    border-radius: 1rem 1rem 0 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     font-family: "Inter", sans-serif;
+    padding: 1rem;
 }
 
 .formBlock label {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     color: #374151;
     font-weight: 500;
-    margin-bottom: 0.3rem;
 }
 
 .formBlock input,
 .formBlock select {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
+    width: 4rem;
+    padding: 0.25rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     background: #fff;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     transition: border-color 0.2s ease;
+    font-weight: 400;
+}
+
+.formBlock input[type=date] {
+    width: 2rem;
+}
+
+.formBlock>div {
+    gap: 1rem;
+}
+
+.formBlock option {
+    border-radius: 1rem;
+    padding: 0.5rem 0.5rem;
+    font-weight: 400;
+    border: none;
 }
 
 .formBlock input:focus,
@@ -607,8 +642,6 @@ h4 {
     gap: 1rem;
     align-items: center;
     justify-content: flex-end;
-    grid-column: 1 / -1;
-    margin-top: 0.5rem;
 }
 
 .buttonGroup button {
@@ -622,13 +655,15 @@ h4 {
 }
 
 .buttonGroup button {
-    padding: 0.5rem 3rem;
-    border-radius: 8px;
-    background-color: rgb(0 31 43);
-    color: #f0fbff;
+    padding: 0.25rem 0.5rem;
     border: none;
     font-weight: 600;
     cursor: pointer;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #f9fafb;
+    font-size: 0.75rem 12px;
+    color: #535353;
 }
 
 .buttonGroup button:hover {
@@ -679,6 +714,27 @@ h4 {
     background-color: #f0fbff;
 }
 
+.AddForm input[type='text'] {
+    height: 1rem !important;
+}
+
 .AddForm input {
     height: 2.25rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.AddForm input::placeholder {
+    font-size: 0.75rem;
+    color: hsl(0, 0%, 50%)
+}
+
+.coloredShipTo {
+    border-radius: 0.25rem;
+    width: fit-content;
+    padding: 0.15rem 0.25rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.15;
+    padding-top: 0.3rem;
 }

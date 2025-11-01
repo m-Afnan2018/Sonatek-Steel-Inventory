@@ -3,10 +3,11 @@ import style from './Booking.module.css'
 // import SearchForm from 'components/core/Booking/SearchForm'
 // import Choices from 'components/core/Booking/Choices'
 import { getAllBookings, getMyBookings } from '../../services/operations/bookingAPI'
-import ViewAll from 'components/core/Booking/ViewAll'
+// import ViewAll from 'components/core/Booking/ViewAll'
 import { useDispatch, useSelector } from 'react-redux'
 import Items from 'components/core/Booking/Items'
 import ViewTablewise from 'components/core/Booking/ViewTablewise'
+import ViewIncompleteBooking from 'components/core/Booking/ViewIncompleteBooking'
 
 const Booking = () => {
     const dispatch = useDispatch();
@@ -23,8 +24,6 @@ const Booking = () => {
 
     return (
         <div className={style.Booking}>
-            <h2>Manage Booking</h2>
-
             <Items />
 
             {/* Create Booking Form */}
@@ -34,7 +33,8 @@ const Booking = () => {
             {/* <Choices /> */}
 
             {/* View All Bookings */}
-            <ViewAll />
+            {/* <ViewAll /> */}
+            <ViewIncompleteBooking />
 
             <ViewTablewise />
         </div>

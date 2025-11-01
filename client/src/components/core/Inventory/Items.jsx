@@ -3,6 +3,7 @@ import style from './Inventory.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
+import { generateShipToColors } from 'utils/colorHandler';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -16,6 +17,7 @@ const Items = () => {
     const [pagination, setPagination] = useState(null);
     const { listViewList, totalQuantity } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
+    const [colors, setColors] = useState(null)
 
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
@@ -69,6 +71,7 @@ const Items = () => {
     useEffect(() => {
         if (listViewList) {
             setItems(listViewList);
+            setColors(generateShipToColors(listViewList))
             setLoading(false);
         }
     }, [listViewList]);
@@ -104,21 +107,21 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th onClick={() => sortBy('wagonNumber')}>Wagon No.</th>
-                                    <th onClick={() => sortBy('challan.challanDate')}>Challan date</th>
-                                    <th onClick={() => sortBy('challan.challanNumber')}>Challan No.</th>
-                                    <th onClick={() => sortBy('type')}>Type</th>
-                                    <th onClick={() => sortBy('materialDescription')}>Material Description</th>
-                                    <th onClick={() => sortBy('quantity')}>Quantity</th>
-                                    <th onClick={() => sortBy('shipTo')}>Ship To</th>
-                                    <th onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
-                                    <th onClick={() => sortBy('transport.loader')}>Loader</th>
-                                    <th onClick={() => sortBy('transport.transporterName')}>Transport</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('wagonNumber')}>Wagon No.</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('challan.challanDate')}>Challan date</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('challan.challanNumber')}>Challan No.</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('type')}>Type</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('materialDescription')}>Material Description</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('shipTo')}>Ship To</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.loader')}>Loader</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.transporterName')}>Transport</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -138,7 +141,7 @@ const Items = () => {
                         Prev
                     </button>
                     <div className={style.paginationInfo}>
-                        Page {page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
                     <button
                         onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
@@ -148,14 +151,14 @@ const Items = () => {
                     </button>
                 </div>
                 <div>
-                    <button>{totalQuantity}</button>
+                    <button>Total Quantity: {totalQuantity}</button>
                 </div>
             </div>
         </div >
     );
 };
 
-const SingleItem = ({ item, setView, view }) => {
+const SingleItem = ({ color, item, setView, view }) => {
     const challanDate = item.challanDate
         ? new Date(item.challanDate).toLocaleDateString()
         : '-';
@@ -208,7 +211,7 @@ const SingleItem = ({ item, setView, view }) => {
     const renderDropdownField = (type, options) => (
         <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
             <select
-                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                style={{ padding: '0rem', width: '3rem' }}
                 value={value?._id}
                 onChange={(e) => setValue(e.target.value)}
                 autoFocus
@@ -261,6 +264,7 @@ const SingleItem = ({ item, setView, view }) => {
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
                             autoFocus
+                            style={{ padding: '0rem', width: '3rem' }}
                         >
                             <option value="">Select</option>
                             <option value="Hot Rolled">Hot Rolled</option>
@@ -308,7 +312,7 @@ const SingleItem = ({ item, setView, view }) => {
             </td>
 
             {/* Ship To */}
-            <td onClick={() => clickHandler('shipTo')}>
+            <td onClick={() => clickHandler('shipTo')} style={{ display: 'flex' }}>
                 {select === 'shipTo' ? (
                     <div onClick={() => clickHandler('shipTo')}>
                         {select === 'shipTo'
@@ -316,7 +320,7 @@ const SingleItem = ({ item, setView, view }) => {
                             : <span>{item.shipTo?.name || '-'}</span>}
                     </div>
                 ) : (
-                    item.shipTo?.name
+                    item.shipTo === null ? "-" : <p className={style.coloredShipTo} style={{ background: color.backgroundColor, color: color.foregroundColor, border: `1px solid ${color.foregroundColor}` }}>{item.shipTo.name.toLowerCase()}</p>
                 )}
             </td>
 
@@ -347,8 +351,9 @@ const SingleItem = ({ item, setView, view }) => {
 const Filters = ({ setFilters }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(state => state.varient)
     const dispatch = useDispatch();
+    const [currentType, setCurrentType] = useState('Both');
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             type: '',
             grade: '',
@@ -365,16 +370,23 @@ const Filters = ({ setFilters }) => {
 
     const onSubmit = (filters) => {
         setFilters(filters)
+        const curr = filters.type;
+        if (curr === '') {
+            setCurrentType('Both')
+        } else {
+            setCurrentType(curr);
+        }
         getAllItem({ filters }, dispatch);
     }
 
     const handleReset = () => {
+        reset()
         getAllItem({}, dispatch);
     }
 
-    return <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
+    return <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
         <div>
-            <label htmlFor='remaining'>Quantity:</label>
+            <label htmlFor='remaining'>Availibility:</label>
             <select
                 id='remaining'
                 {...register('remaining')}
@@ -408,7 +420,7 @@ const Filters = ({ setFilters }) => {
                 {...register('grade')}
             >
                 <option value=''>All</option>
-                {grades && grades.map((grade) => (
+                {grades && grades.map((grade) => ((currentType === 'Both' || currentType === grade.type) &&
                     <option key={grade._id} value={grade._id}>
                         {grade.name}
                     </option>
@@ -424,7 +436,7 @@ const Filters = ({ setFilters }) => {
                 {...register('width')}
             >
                 <option value=''>All</option>
-                {widths && widths.map((width) => (
+                {widths && widths.map((width) => ((currentType === 'Both' || currentType === width.type) &&
                     <option key={width._id} value={width._id}>
                         {width.value || width.name}
                     </option>
@@ -440,7 +452,7 @@ const Filters = ({ setFilters }) => {
                 {...register('thickness')}
             >
                 <option value=''>All</option>
-                {thicknesses && thicknesses.map((thickness) => (
+                {thicknesses && thicknesses.map((thickness) => ((currentType === 'Both' || currentType === thickness.type) &&
                     <option key={thickness._id} value={thickness._id}>
                         {thickness.value || thickness.name}
                     </option>
@@ -449,7 +461,7 @@ const Filters = ({ setFilters }) => {
             {errors.thickness && <span className={style.error}>{errors.thickness.message}</span>}
         </div>
 
-        <div>
+        {/* <div>
             <label htmlFor='wagonNumber'>Wagon Number:</label>
             <input
                 id='wagonNumber'
@@ -469,7 +481,7 @@ const Filters = ({ setFilters }) => {
                 {...register('challanNumber')}
             />
             {errors.challanNumber && <span className={style.error}>{errors.challanNumber.message}</span>}
-        </div>
+        </div> */}
         <div>
             <label htmlFor='challanDate'>Challan Date</label>
             <input
@@ -520,7 +532,6 @@ const Filters = ({ setFilters }) => {
         </div>
 
         <div className={style.buttonGroup}>
-            <button type='submit'>Filter</button>
             <button type='button' onClick={handleReset}>Reset</button>
         </div>
     </form>

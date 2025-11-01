@@ -5,39 +5,51 @@ const Item = require("../models/itemModel");
 const User = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
 const XLSX = require('xlsx');
+const { default: mongoose } = require("mongoose");
 
 const createBooking = async (req, res) => {
     try {
         const { userId } = req.user;
-        const { items, requirement, formType } = req.body;
+        const { items } = req.body;
 
-        if (!items?.length) throw customError("Please select items", 404);
+        if (!items?.length) throw customError("Please select items", 400);
 
-        // Fetch and sort items by createdAt (oldest first)
-        const allItems = await Item.find({ _id: { $in: items } }).sort({ createdAt: 1 }).populate('thickness shipTo grade width');
-
-        let remaining = requirement;
-        let totalUsed = 0;
+        const allItemsId = items.map(i => i.id);
+        const allItems = await Item.find({ _id: { $in: allItemsId } })
+            .populate('thickness shipTo grade width');
 
         const takenItems = [];
 
-        for (const item of allItems) {
-            if (remaining <= 0) break; // stop once requirement is fulfilled
+        for (const i of items) {
+            const item = allItems.find(x => x._id.toString() === i.id);
+            if (!item) continue;
 
-            const used = Math.min(item.quantity, remaining);
-            if (used > 0) {
-                item.quantity -= used;
-                remaining -= used;
-                totalUsed += used;
-                // include an item snapshot so booking keeps item data even if Item is later removed
-                takenItems.push({ item: item._id, quantity: used, itemSnapshot: Booking.makeItemSnapshot(item) })
-                await item.save(); // update only affected items
-            }
+            const qty = Number(i.quantity);
+            if (isNaN(qty) || qty <= 0) continue;
+
+            if (qty > item.quantity)
+                throw customError(`Not enough stock in item ${item._id}`, 400);
+
+            // reduce stock
+            item.quantity -= qty;
+            await item.save();
+
+            const formType = i.formType;
+
+            console.log(formType)
+
+            takenItems.push({
+                item: item._id,
+                quantity: qty,
+                formType: formType,
+                itemSnapshot: Booking.makeItemSnapshot(item)
+            });
         }
 
-        // if (remaining > 0) throw customError("Not enough stock to fulfill requirement", 400);
+        if (!takenItems.length)
+            throw customError("No valid items found for booking", 400);
 
-        // Build bookedBy snapshot from current user data
+        // user snapshot
         const userDoc = await User.findById(userId).select('firstName lastName email phone role name fullName');
         const bookedBySnapshot = Booking.makeBookedBySnapshot(userDoc ? {
             _id: userDoc._id,
@@ -47,63 +59,163 @@ const createBooking = async (req, res) => {
             role: userDoc.role
         } : null);
 
+        const totalQty = takenItems.reduce((sum, it) => sum + it.quantity, 0);
+
         const newBooking = await Booking.create({
             booking_id: uuidv4(),
             items: takenItems,
-            quantity: totalUsed,
-            requirement,
+            quantity: totalQty,
             bookedBy: userId,
             bookedBySnapshot,
-            formType: formType
-        })
+            status: "Pending",
+        });
 
-        const populatedBookings = await Booking.findById(newBooking._id).populate({
-            path: 'items.item',
-            populate: [
-                { path: 'grade', select: 'name' },
-                { path: 'thickness', select: 'name' },
-            ],
-        }).populate({
-            path: 'bookedBy'
-        });;
+        const populatedBooking = await Booking.findById(newBooking._id)
+            .populate({
+                path: 'items.item',
+                populate: [
+                    { path: 'grade', select: 'name' },
+                    { path: 'thickness', select: 'name' },
+                ],
+            })
+            .populate('bookedBy');
 
-        const wagonInfo = populatedBookings.items
-            .map(i => {
-                const src = i.item || i.itemSnapshot || {};
-                return ({
-                    wagonNumber: src.wagonNumber || "N/A",
-                    challanNumber: src.challan?.challanNumber || src.challanNumber || "N/A",
-                    challanDate: src.challan?.challanDate || src.challanDate || "N/A",
-                    quantityTaken: i.quantity,
-                })
-            });
+        const wagonInfo = populatedBooking.items.map(i => {
+            const src = i.item || i.itemSnapshot || {};
+            return {
+                wagonNumber: src.wagonNumber || "N/A",
+                challanNumber: src.challan?.challanNumber || src.challanNumber || "N/A",
+                challanDate: src.challan?.challanDate || src.challanDate || "N/A",
+                quantityTaken: i.quantity,
+                formType: i.formType,
+            };
+        });
 
         const payload = {
-            _id: populatedBookings._id,
-            quantity: populatedBookings.quantity,
-            requirement: populatedBookings.requirement,
-            status: populatedBookings.status,
-            bookingDate: populatedBookings.bookingDate,
-            bookedBy: (populatedBookings.bookedBy && `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`) || populatedBookings.bookedBySnapshot?.name || "N/A",
-            type: (populatedBookings.items[0]?.item?.type) || (populatedBookings.items[0]?.itemSnapshot?.type) || "N/A",
-            grade: (populatedBookings.items[0]?.item?.grade?.name) || (populatedBookings.items[0]?.itemSnapshot?.grade) || "N/A",
-            formType: formType,
-            thickness: (populatedBookings.items[0]?.item?.thickness?.name) || (populatedBookings.items[0]?.itemSnapshot?.thickness) || "N/A",
-            vehicleNumber: populatedBookings.vehicleNumber || "N/A",
+            _id: populatedBooking._id,
+            quantity: populatedBooking.quantity,
+            status: populatedBooking.status,
+            bookingDate: populatedBooking.bookingDate,
+            bookedBy:
+                (populatedBooking.bookedBy && `${populatedBooking.bookedBy.firstName} ${populatedBooking.bookedBy.lastName}`) ||
+                populatedBooking.bookedBySnapshot?.name ||
+                "N/A",
             wagons: wagonInfo,
-        }
+        };
 
         res.status(201).json({
             success: true,
             message: "Booking created successfully",
-            booking: newBooking,
-            item: payload
+            booking: populatedBooking,
+            item: payload,
         });
-
     } catch (err) {
         errorResponse(res, err);
     }
 };
+
+
+// const createBooking = async (req, res) => {
+//     try {
+//         const { userId } = req.user;
+//         const { items, requirement, formType } = req.body;
+
+//         if (!items?.length) throw customError("Please select items", 404);
+
+//         const allItemsId = items.map(i => i.id);
+
+//         // Fetch and sort items by createdAt (oldest first)
+//         const allItems = await Item.find({ _id: { $in: allItemsId } }).populate('thickness shipTo grade width');
+
+//         let remaining = requirement;
+//         let totalUsed = 0;
+
+//         const takenItems = [];
+
+//         for (const item of allItems) {
+//             if (remaining <= 0) break; // stop once requirement is fulfilled
+
+//             const used = Math.min(item.quantity, remaining);
+//             if (used > 0) {
+//                 item.quantity -= used;
+//                 remaining -= used;
+//                 totalUsed += used;
+//                 // include an item snapshot so booking keeps item data even if Item is later removed
+//                 takenItems.push({ item: item._id, quantity: used, itemSnapshot: Booking.makeItemSnapshot(item) })
+//                 await item.save(); // update only affected items
+//             }
+//         }
+
+//         // if (remaining > 0) throw customError("Not enough stock to fulfill requirement", 400);
+
+//         // Build bookedBy snapshot from current user data
+//         const userDoc = await User.findById(userId).select('firstName lastName email phone role name fullName');
+//         const bookedBySnapshot = Booking.makeBookedBySnapshot(userDoc ? {
+//             _id: userDoc._id,
+//             name: userDoc.name || `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim(),
+//             email: userDoc.email,
+//             phone: userDoc.phone,
+//             role: userDoc.role
+//         } : null);
+
+//         const newBooking = await Booking.create({
+//             booking_id: uuidv4(),
+//             items: takenItems,
+//             type: type,
+//             quantity: totalUsed,
+//             requirement,
+//             bookedBy: userId,
+//             bookedBySnapshot,
+//             formType: formType
+//         })
+
+//         const populatedBookings = await Booking.findById(newBooking._id).populate({
+//             path: 'items.item',
+//             populate: [
+//                 { path: 'grade', select: 'name' },
+//                 { path: 'thickness', select: 'name' },
+//             ],
+//         }).populate({
+//             path: 'bookedBy'
+//         });;
+
+//         const wagonInfo = populatedBookings.items
+//             .map(i => {
+//                 const src = i.item || i.itemSnapshot || {};
+//                 return ({
+//                     wagonNumber: src.wagonNumber || "N/A",
+//                     challanNumber: src.challan?.challanNumber || src.challanNumber || "N/A",
+//                     challanDate: src.challan?.challanDate || src.challanDate || "N/A",
+//                     quantityTaken: i.quantity,
+//                 })
+//             });
+
+//         const payload = {
+//             _id: populatedBookings._id,
+//             quantity: populatedBookings.quantity,
+//             requirement: populatedBookings.requirement,
+//             status: populatedBookings.status,
+//             bookingDate: populatedBookings.bookingDate,
+//             bookedBy: (populatedBookings.bookedBy && `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`) || populatedBookings.bookedBySnapshot?.name || "N/A",
+//             type: (populatedBookings.items[0]?.item?.type) || (populatedBookings.items[0]?.itemSnapshot?.type) || "N/A",
+//             grade: (populatedBookings.items[0]?.item?.grade?.name) || (populatedBookings.items[0]?.itemSnapshot?.grade) || "N/A",
+//             formType: formType,
+//             thickness: (populatedBookings.items[0]?.item?.thickness?.name) || (populatedBookings.items[0]?.itemSnapshot?.thickness) || "N/A",
+//             vehicleNumber: populatedBookings.vehicleNumber || "N/A",
+//             wagons: wagonInfo,
+//         }
+
+//         res.status(201).json({
+//             success: true,
+//             message: "Booking created successfully",
+//             booking: newBooking,
+//             item: payload
+//         });
+
+//     } catch (err) {
+//         errorResponse(res, err);
+//     }
+// };
 
 const updateBooking = async (req, res) => {
     try {
@@ -296,7 +408,6 @@ const getMyBookings = async (req, res) => {
     }
 };
 
-
 const searchOptions = async (req, res) => {
     try {
         const { type, grade, formType, thickness, width, shipTo, quantity } = req.body;
@@ -451,7 +562,7 @@ const confirmBooking = async (req, res) => {
 
 const cancelBooking = async (req, res) => {
     try {
-        const { bookingId } = req.body;
+        const { bookingId, reason } = req.body;
         if (!bookingId) throw customError("Please select an booking");
 
         // Get booking with item details
@@ -468,7 +579,7 @@ const cancelBooking = async (req, res) => {
             if (!item?._id) continue;
 
             await Item.findByIdAndUpdate(item._id, {
-                $inc: { quantity: quantity }  // add back deducted quantity
+                $inc: { quantity: quantity, description: reason }  // add back deducted quantity
             });
         }
 
@@ -520,6 +631,77 @@ const getAllBookingsDetails = async (req, res) => {
         let query = {};
         if (role === 'agent') {
             query = { bookedBy: role.userId }
+        }
+
+        // Fetch all bookings with related details populated
+        let bookings = await Booking.find(query)
+            .populate("bookedBy", "firstName lastName email role")
+            .populate({
+                path: "items.item",
+                select: "type formType grade thickness width wagonNumber challan quantity currentStatus",
+                populate: [
+                    { path: "grade", select: "name" },
+                    { path: "thickness", select: "name" },
+                    { path: "width", select: "name" },
+                ],
+            })
+            .sort({ bookingDate: -1 }); // latest first
+
+        if (!bookings || bookings.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No bookings found",
+                data: { total: 0, bookings: [] },
+            });
+        }
+
+        // Summary counts by status
+        const summary = {
+            total: bookings.length,
+            pending: bookings.filter(b => b.status === "Pending").length,
+            processing: bookings.filter(b => b.status === "Processing").length,
+            delivered: bookings.filter(b => b.status === "Delivered").length,
+            cancelled: bookings.filter(b => b.status === "Cancelled").length,
+        };
+
+        // Optional: group by bookedBy (for reports)
+        const agentsSummary = {};
+        bookings.forEach(b => {
+            const agent = b.bookedBy?.firstName || "Unknown";
+            if (!agentsSummary[agent]) {
+                agentsSummary[agent] = { totalBookings: 0, totalQuantity: 0 };
+            }
+            agentsSummary[agent].totalBookings += 1;
+            agentsSummary[agent].totalQuantity += b.quantity;
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Fetched all bookings successfully",
+            data: {
+                summary,
+                agents: agentsSummary,
+                bookings,
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching bookings:", err);
+        errorResponse(res, err);
+    }
+};
+
+const getAllIncompleteBookingsDetails = async (req, res) => {
+    try {
+        const { role } = req.user;
+
+        // Base query for incomplete statuses
+        let query = {
+            status: { $in: ["Pending", "Processing", "Shipped"] },
+        };
+
+        // Restrict to agent's bookings if applicable
+        if (role === "agent") {
+            query.bookedBy = role.userId;
         }
 
         // Fetch all bookings with related details populated
@@ -779,7 +961,9 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             page = 1,
             limit = 50,
             search = "",
-            filters = {}
+            filters = {},
+            sortBy = "orderDate",
+            order = "desc",
         } = req.body;
 
         const query = {};
@@ -848,7 +1032,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
         }
 
         const bookings = await Booking.find(query)
-            .sort({ bookingDate: -1 })
+            .sort(sortBy === "materialDescription" ? {} : { [sortBy]: order === "asc" ? 1 : -1 })
             .skip((page - 1) * limit)
             .limit(limit);
 
@@ -1100,5 +1284,6 @@ module.exports = {
     getAllBookingsDetails,
     getExcelBooking,
     getExcelTablewiseBooking,
-    getAllBookingDetailsTablewise
+    getAllBookingDetailsTablewise,
+    getAllIncompleteBookingsDetails
 }

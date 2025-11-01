@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import style from './Booking.module.css';
+import style from './SalesReport.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { getAllBookingsTable } from 'services/operations/bookingAPI';
 
-const Items = () => {
+const SalesReport = () => {
     const [view, setView] = useState(null);
 
     const [allBookings, setAllBookings] = useState(null);
     const [pagination, setPagination] = useState(null);
     const [setPage, page] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [order, setOrder] = useState('desc')
+    const [sortType, setSortType] = useState(null)
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
+        getAllBookingsTable({ filters: { status: 'Shipped' } }, setAllBookings, setPagination, dispatch);
     }, [dispatch])
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const Items = () => {
         thickness: "",
         shipTo: "",
         formType: "",
-        status: "",
+        status: "Shipped",
         bookedBy: "",
         fromDate: "",
         toDate: "",
@@ -65,9 +67,16 @@ const Items = () => {
         }
     };
 
+    const sortBy = (val) => {
+        setOrder(order === 'asc' ? 'desc' : 'asc');
+        setSortType(val);
+        getAllBookingsTable({ sortBy: val, order: order, filters }, setAllBookings, setPagination, dispatch);
+        // getAllItem({ filters, sortBy: val, order: order }, dispatch);
+    }
+
     return (
         <div className={style.staffContainer}>
-            <h3 className={style.heading}>Order Report</h3>
+            <h3 className={style.heading}>Sales Report</h3>
             <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
@@ -80,17 +89,14 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '8rem' }}>Order ID</th>
-                                    <th style={{ width: '8rem' }}>Booked By</th>
-                                    <th style={{ width: '8rem' }}>Booking Date</th>
-                                    <th style={{ width: '8rem' }}>Form</th>
-                                    <th style={{ width: '8rem' }}>Type</th>
-                                    <th style={{ width: '8rem' }}>Description</th>
-                                    <th style={{ width: '8rem' }}>Quantity</th>
-                                    <th style={{ width: '8rem' }}>Requirement</th>
-                                    <th style={{ width: '8rem' }}>Status</th>
-                                    <th style={{ width: '8rem' }}>Vehicle Number</th>
-                                    <th style={{ width: '8rem' }}>Location</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('bookedBy')}>Booked By</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('bookingDate')}>Booking Date</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('formType')}>Form</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('type')}>Type</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('description')}>Description</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('vehicleNumber')}>Vehicle Number</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('shipTo')}>Location</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -110,18 +116,18 @@ const Items = () => {
                 <button onClick={onDownload}>Download</button>
 
                 <div className={style.paginationControls}>
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    {pagination?.page > 1 && <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                         Prev
-                    </button>
+                    </button>}
                     <div className={style.paginationInfo}>
-                        Page {page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
-                    <button
+                    {pagination?.page < pagination?.totalPages && <button
                         onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
                         disabled={page >= (pagination?.totalPages || 1)}
                     >
                         Next
-                    </button>
+                    </button>}
                 </div>
             </div>
         </div >
@@ -133,43 +139,31 @@ const SingleItem = ({ item, view, setView }) => {
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
 
-    const status = {
-        'Pending': {
-            background: '#FFF4E5', // soft orange
-            foreground: '#D97706'  // amber/dark orange
-        },
-        'Processing': {
-            background: '#E0E7FF', // light indigo
-            foreground: '#4338CA'  // deep indigo
-        },
-        'Shipped': {
+    const colorType = {
+        'Cold Rolled': {
             background: '#E0F2FE', // light blue
             foreground: '#0369A1'  // sky blue
         },
-        'Delivered': {
-            background: '#DCFCE7', // light green
-            foreground: '#15803D'  // deep green
-        },
-        'Cancelled': {
-            background: '#FEE2E2', // light red
-            foreground: '#B91C1C'  // dark red
+        'Hot Rolled': {
+            background: '#FFF4E5', // soft orange
+            foreground: '#D97706'  // amber/dark orange
         }
     }
+
+    console.log(colorType[item.type])
 
 
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
         >
-            <td>{item.orderId || "-"}</td>
             <td>{item.bookedBy || "-"}</td>
             <td>{bookingDate}</td>
             <td>{item.form || "-"}</td>
-            <td>{item.type}</td>
+            <td><p className={style.coloredShipTo} style={{ background: colorType[item.type].background, color: colorType[item.type].foreground, border: `1px solid ${colorType[item.type].foregroundColor}` }}>{item.type.toLowerCase()}</p></td>
+            {/* <td>{item.type}</td> */}
             <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
             <td>{item.quantity ?? "-"}</td>
-            <td>{item.requirement ?? "-"}</td>
-            <td><p className={style.coloredShipTo} style={{ background: status[item.status].background, color: status[item.status].foreground, border: `1px solid ${status[item.status].foreground}` }}>{item.status ?? "-"}</p></td>
             <td>{item.vehicleNumber ?? "-"}</td>
             <td>{item.shipTo?.name ?? "-"}</td>
         </tr>
@@ -181,6 +175,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
+    const dispatch = useDispatch();
 
     const [currentType, setCurrentType] = useState('Both');
     const handleTypeChange = (e) => {
@@ -190,8 +185,6 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
             setCurrentType(e.target.value);
         }
     }
-
-    const dispatch = useDispatch();
 
     const { allUsers } = useSelector(state => state.user);
 
@@ -203,7 +196,6 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
             thickness: "",
             shipTo: "",
             formType: "",
-            status: "",
             bookedBy: "",
             fromDate: "",
             toDate: "",
@@ -219,7 +211,6 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
         if (data.thickness) filterPayload.thickness = data.thickness;
         if (data.shipTo) filterPayload.shipTo = data.shipTo;
         if (data.formType) filterPayload.formType = data.formType;
-        if (data.status) filterPayload.status = data.status;
         if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
         if (data.fromDate) filterPayload.fromDate = data.fromDate;
         if (data.toDate) filterPayload.toDate = data.toDate;
@@ -316,22 +307,9 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
                 </select>
             </div>
 
-            {/* Status  */}
-            <div>
-                <label htmlFor="status">Status:</label>
-                <select id="status" {...register("status")}>
-                    <option value="">All</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
-
             {/* FormType  */}
             <div>
-                <label htmlFor="formType">Status:</label>
+                <label htmlFor="formType">Form:</label>
                 <select id="formType" {...register("formType")}>
                     <option value="">All</option>
                     <option value="Sheet">Sheet</option>a
@@ -362,4 +340,4 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 };
 
 
-export default Items;
+export default SalesReport;

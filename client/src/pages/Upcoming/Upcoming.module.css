@@ -1,0 +1,207 @@
+/* Upcoming component classes */
+.Upcoming {
+    padding: 0.25rem;
+    background: white !important;
+}
+
+.Upcoming td input {
+    padding: 0.15rem;
+    border: 1px solid;
+}
+
+.Upcoming td svg {
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.Upcoming td>div {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.heading {
+    /* Style used for the clickable "Upcoming Items" header */
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f3f3ff;
+    font-weight: 500;
+    text-align: center;
+    color: grey;
+    font-size: 1rem;
+    margin-bottom: 0;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.card {
+    /* Style wrapper for the table/content */
+    background: #fff;
+    border-radius: 0 0 1rem 1rem;
+    padding: 4px;
+    box-shadow: none;
+    height: 500px;
+    /* Used in style prop, but style is also used here */
+    overflow: hidden;
+}
+
+.loading,
+.empty {
+    /* Styles for conditional rendering */
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-size: 1rem;
+}
+
+.tableWrapper {
+    /* Wrapper for table scrolling */
+    overflow: auto;
+    height: 100%;
+    /* border-radius: 1rem; */
+    /* overflow-x: auto; */
+}
+
+.table {
+    /* Styles for the table in Upcoming */
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table th,
+.table td {
+    /* Shared styles for table cells/headers */
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 2px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* ✅ Prevents breaking layout */
+    white-space: nowrap;
+    /* Overridden later for td: */
+    /* padding: 8px 12px; */
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.table td {
+    /* Overrides for table data cells */
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    border-bottom: 0;
+    font-size: 0.75rem;
+    height: 3rem;
+}
+
+.table td span {
+    text-align: center;
+}
+
+.table th {
+    /* Overrides for table headers */
+    background-color: white;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.table tr {
+    /* Styles for table rows */
+    border-bottom: 1px solid #80808038;
+}
+
+.coloredShipTo {
+    /* Used for the Ship To cell in SingleItem */
+    border-radius: 0.25rem;
+    width: fit-content;
+    padding: 0.15rem 0.25rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.15;
+    padding-top: 0.3rem;
+}
+
+/* AddForm component classes (as it's used inside Upcoming) */
+.AddForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 1rem;
+    background: white;
+    border-radius: 1rem 1rem 0 0;
+    overflow: visible;
+}
+
+.AddForm>div {
+    width: calc((100% - 20rem) / 5);
+}
+
+.AddForm button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background-color: #11386C;
+    border: none;
+    color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AddForm button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    color: #05516f;
+    background-color: #f0fbff;
+}
+
+.AddForm input[type='text'] {
+    height: 1rem !important;
+}
+
+.AddForm input {
+    height: 2.25rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.AddForm input::placeholder {
+    font-size: 0.75rem;
+    color: hsl(0, 0%, 50%)
+}
+
+.addNew {
+    margin: 0.5rem;
+    border-radius: 1rem;
+    background: #f0fbff;
+    display: flex;
+    gap: 1rem;
+}
+
+.addNew>button {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    background-color: #f3f3ff;
+    font-weight: 500;
+    text-align: center;
+    color: grey;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+.addNew>button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background-color: #05516f;
+    color: #f0fbff;
+}

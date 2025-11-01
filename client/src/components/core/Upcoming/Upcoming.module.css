@@ -1,0 +1,51 @@
+.AddForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 1rem;
+    background: white;
+    border-radius: 1rem 1rem 0 0;
+    overflow: visible;
+}
+
+.AddForm>div {
+    width: calc((100% - 20rem) / 5);
+}
+
+.AddForm button {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background-color: #11386C;
+    border: none;
+    color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AddForm button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    color: #05516f;
+    background-color: #f0fbff;
+}
+
+.AddForm input[type='text'] {
+    height: 1rem !important;
+}
+
+.AddForm input {
+    height: 2.25rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.AddForm input::placeholder {
+    font-size: 0.75rem;
+    color: hsl(0, 0%, 50%)
+}
+
+.test {
+    background: #f0fbff;
+    padding: 0rem;
+}

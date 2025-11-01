@@ -24,6 +24,7 @@ const itemSnapshotSchema = new mongoose.Schema({
     },
     currentStatus: { type: String },
     quantity: { type: Number }, // original item quantity at time of snapshot
+    takenQuantity: { type: Number },
     shipTo: { // store basic shipTo/cutter info to avoid losing it
         _id: { type: mongoose.Schema.Types.ObjectId },
         name: { type: String }
@@ -42,74 +43,31 @@ const bookedBySnapshotSchema = new mongoose.Schema({
 }, { _id: false });
 
 const bookingSchema = new mongoose.Schema({
-    booking_id: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    order_id: {
-        type: String,
-    },
-    formType: {
-        type: String,
-        enum: ['Sheet', 'Coil']
-    },
-    // Keep the original reference for join/lookup convenience, but also store a full snapshot
+    booking_id: { type: String, required: true, unique: true },
+    order_id: { type: String },
+    type: { type: String, enum: ['Hot Rolled', 'Cold Rolled'] },
+
     items: [{
-        item: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Item'
-        },
-        itemSnapshot: {
-            type: itemSnapshotSchema,
-            required: true
-        },
-        quantity: {
-            type: Number,
-            required: true,
-        }
+        item: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
+        itemSnapshot: { type: itemSnapshotSchema, required: true },
+        formType: { type: String, enum: ['Sheet', 'Coil'], required: true },
+        quantity: { type: Number, required: true }
     }],
-    quantity: {
-        type: Number,
-        required: true,
-    },
-    requirement: {
-        type: Number,
-        required: true,
-    },
-    vehicleNumber: {
-        type: String,
-    },
-    // Keep the original ref so existing code still works, and add a snapshot
-    bookedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    bookedBySnapshot: {
-        type: bookedBySnapshotSchema,
-        required: true
-    },
+
+    quantity: { type: Number, required: true },
+    requirement: { type: Number }, // optional now
+    vehicleNumber: { type: String },
+    bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    bookedBySnapshot: { type: bookedBySnapshotSchema, required: true },
     status: {
         type: String,
         enum: ['Pending', 'Processing', 'Delivered', 'Shipped', 'Cancelled'],
         default: 'Pending'
     },
-    bookingDate: {
-        type: Date,
-        default: Date.now
-    },
-    description: {
-        type: String,
-        default: '',
-    },
-    deliveryDate: {
-        type: Date,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    description: { type: String, default: '' },
+    deliveryDate: { type: Date },
+}, { timestamps: { createdAt: 'bookingDate', updatedAt: 'updatedAt' } });
+
 
 // Static helpers to create snapshots from documents. Call these when creating/updating bookings.
 bookingSchema.statics.makeItemSnapshot = function (itemDoc) {

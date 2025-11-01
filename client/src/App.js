@@ -20,6 +20,8 @@ import toast from 'react-hot-toast';
 import { removeError, removeSuccess } from 'slices/loaderSlice';
 import { OverlayProvider } from 'hooks/useOverlay';
 import Cutter from 'pages/Cutter/Cutter';
+import SalesReport from 'pages/SalesReport/SalesReport';
+import Upcoming from 'pages/Upcoming/Upcoming';
 
 function App() {
     //  If User Logged in
@@ -39,7 +41,7 @@ function App() {
 
     useEffect(() => {
         success.forEach((s) => {
-            toast.success(s.message, { position: "bottom-right" });
+            // toast.success(s.message, { position: "bottom-right" });
             dispatch(removeSuccess(s.id))
         })
     }, [dispatch, success])
@@ -83,8 +85,10 @@ function App() {
                         <Route path='/' element={<Dashboard />} />
                         <Route path='/manage-varient' element={<Varient />} />
                         <Route path='/manage-inventory' element={<Inventory />} />
+                        <Route path='/manage-upcoming' element={<Upcoming />} />
                         <Route path='/manage-cutters' element={<Cutter />} />
                         <Route path='/manage-bookings' element={<Booking />} />
+                        <Route path='/sales-report' element={<SalesReport />} />
                         <Route path='/manage-users' element={<User />} />
                         <Route path='/manage-account' element={<Account />} />
                         <Route path='*' element={<Error />} />

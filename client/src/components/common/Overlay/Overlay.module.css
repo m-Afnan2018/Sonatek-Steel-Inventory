@@ -2,8 +2,8 @@
     position: relative;
     padding: 1rem;
     background-color: #f0fbff;
-    width: 50%;
-    height: 50%;
+    width: 90%;
+    height: 90%;
     top: 50%;
     transform: translate(-50%, -50%);
     left: 50%;
@@ -143,13 +143,16 @@
 }
 
 .Card {
-    background: #f7fcfd;
+    background: #F1F3F5;
     padding: 0.8rem;
     border-radius: 8px
 }
 
 .FullWidth {
-    grid-column: 1 / -1
+    grid-column: 1 / -1;
+    padding: 0.8rem;
+    background: #F1F3F5;
+    border-radius: 0.5rem;
 }
 
 .ItemRow {
@@ -601,4 +604,134 @@
     .chip {
         min-width: 84px;
     }
+}
+
+.ViewIncompleteBookingDetail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.ViewIncompleteBookingDetail h4 {
+    text-align: start;
+    color: #07162b;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.FullWidth>table {
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.FullWidth>table th,
+.FullWidth>table td {
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 2px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* ✅ Prevents breaking layout */
+    white-space: nowrap;
+}
+
+.FullWidth>table td {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    border-bottom: 0;
+    font-size: 0.75rem;
+    height: 3rem;
+}
+
+.FullWidth>table td svg {
+    font-size: 1rem;
+}
+
+.FullWidth>table th {
+    background-color: white;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.FullWidth button {
+    background: #05516f;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.buttons {
+    border-bottom: 0px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.FullWidth .inputField {
+    position: relative
+}
+
+.FullWidth .inputField input {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.FullWidth .inputField span {
+    position: absolute;
+    bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: #f3adad;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+/* OrderConfirmationOverlay */
+.OrderConfirmationOverlay {
+    position: relative;
+    background-color: #f0fbff;
+    width: 90%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: 1rem;
+    box-shadow: 1px 1px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
+}
+
+.OrderConfirmationOverlay select {
+    padding: 0.25rem;
+    font-weight: 400;
+    border-radius: 0.25rem;
+    border-style: solid;
+    color: darkslategrey;
+    border-radius: 0.5rem;
+    border: 1px solid grey;
+}
+
+.OrderConfirmationOverlay td div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }

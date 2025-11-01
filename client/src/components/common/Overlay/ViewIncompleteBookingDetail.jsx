@@ -1,0 +1,117 @@
+import React from 'react'
+import style from './Overlay.module.css'
+
+const ViewIncompleteBookingDetail = ({ data,
+    cancel,
+    confirm,
+    ship,
+    deliver,
+    userData, close }) => {
+    if (!data) return null;
+
+    const bookedBy = data.bookedBy || {};
+
+    const submitting = (e) => {
+        e.preventDefault();
+        const button = e.nativeEvent.submitter;
+        if (button.innerText === 'Cancel Booking') {
+            cancel(e.target[0].value, data._id);
+        } else if (button.innerText === 'Confirm Booking') {
+            confirm(e.target[0].value, data._id)
+        } else if (button.innerText === 'Shipped') {
+            ship(e.target[0].value, data._id)
+        } else if (button.innerText === 'Delivered') {
+            deliver(e.target[0].value, data._id)
+        }
+    }
+
+    const status = {
+        'Pending': {
+            button: 'Confirm Booking',
+            placeholder: 'Enter the Order ID to confirm order or reason to cancel'
+        },
+        'Processing': {
+            button: 'Shipped',
+            placeholder: 'Enter the Vechicle number to confirm deliver it or reason to cancel'
+        },
+        'Shipped': {
+            button: 'Delivered',
+            placeholder: 'Enter the description to confirm delivery or reason to cancel or reason to cancel'
+        }
+    }
+
+    return (
+        <div className={style.ViewIncompleteBookingDetail} onClick={close}>
+            <div className={style.DetailsContent} onClick={(e) => e.stopPropagation()}>
+                <div className={style.DetailsHeader}>
+                    <h2>Booking Details</h2>
+                </div>
+
+                <div className={style.DetailsGrid}>
+                    <div className={style.Card}>
+                        <h4>Booking</h4>
+                        <p><strong>ID:</strong> {data.booking_id}</p>
+                        <p><strong>Status:</strong> <span className={style[data.status?.toLowerCase()] || ''}>{data.status}</span></p>
+                        <p><strong>Quantity:</strong> {data.quantity}</p>
+                        <p><strong>Booked At:</strong> {new Date(data.bookingDate).toLocaleString()}</p>
+                    </div>
+
+                    <div className={style.Card}>
+                        <h4>Agent</h4>
+                        <p><strong>Name:</strong> {bookedBy.firstName} {bookedBy.lastName}</p>
+                        <p><strong>Email:</strong> {bookedBy.email}</p>
+                        <p><strong>Role:</strong> {bookedBy.role}</p>
+                    </div>
+
+                    <div className={style.FullWidth}>
+                        <h4>Items</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Form</th>
+                                    <th>Available</th>
+                                    <th>Booked</th>
+                                    <th>Wagon</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    data.items.map((it) => (
+                                        <tr>
+                                            <td>{it.item?.type}</td>
+                                            <td>{`${it.item?.thickness?.name} X ${it.item?.width?.name} X ${it.item?.grade?.name}`}</td>
+                                            <td>{it?.formType}</td>
+                                            <td>{it.item?.quantity?.toFixed(3)}</td>
+                                            <td>{it.quantity?.toFixed(3)}</td>
+                                            <td>{it.item?.wagonNumber || 'N/A'}</td>
+                                        </tr>
+
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <form onSubmit={submitting} on className={style.FullWidth}>
+                        <h4>Action</h4>
+                        {['admin', 'director', 'accountant'].includes(userData.role) && (data.status === 'Pending' || data.status === 'Processing' || data.status === 'Shipped') && <div className={style.inputField}>
+                            <input type='text' placeholder={status[data.status].placeholder} />
+                        </div>}
+                        {['admin', 'director', 'accountant'].includes(userData.role) && data.status !== 'Cancelled' && <div className={style.buttons}>
+                            <button type='submit'>Cancel Booking</button>
+                            <button type='submit'>{status[data.status].button}</button>
+                        </div>}
+                    </form>
+                </div>
+
+                <div className={style.DetailsFooter}>
+                    <button className={style.PrimaryButton} onClick={close}>Close</button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default ViewIncompleteBookingDetail

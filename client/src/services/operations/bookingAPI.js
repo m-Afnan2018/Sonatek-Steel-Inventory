@@ -103,7 +103,7 @@ export async function getMyBookings(dispatch) {
     }
 }
 
-export async function cancelBooking(params, dispatch) {
+export async function cancelBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("cancelBooking"));
 
@@ -113,13 +113,15 @@ export async function cancelBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Cancelled' }));
         }
 
+        setter((prev) => prev.filter(i => i._id === params.bookingId));
+
         dispatch(showSuccess({ id: "cancelBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "cancelBooking", message: err?.response?.data?.message || "Cancel booking failed" }));
     }
 }
 
-export async function shipBooking(params, dispatch) {
+export async function shipBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("shipBooking"));
 
@@ -129,13 +131,20 @@ export async function shipBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
         }
 
+        setter((prev) => prev.map(i => {
+            if (i._id === params.bookingId) {
+                return { ...i, status: 'Shipped' }
+            }
+            return i;
+        }));
+
         dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "shipBooking", message: err?.response?.data?.message || "Ship booking failed" }));
     }
 }
 
-export async function confirmBooking(params, dispatch) {
+export async function confirmBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("confirmBooking"));
 
@@ -145,13 +154,20 @@ export async function confirmBooking(params, dispatch) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Processing' }));
         }
 
+        setter((prev) => prev.map(i => {
+            if (i._id === params.bookingId) {
+                return { ...i, status: 'Processing' }
+            }
+            return i;
+        }));
+
         dispatch(showSuccess({ id: "confirmBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "confirmBooking", message: err?.response?.data?.message || "Confirm booking failed" }));
     }
 }
 
-export async function deliverBooking(params, dispatch) {
+export async function deliverBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("deliverBooking"));
 
@@ -160,6 +176,8 @@ export async function deliverBooking(params, dispatch) {
         if (response.success) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Delivered' }));
         }
+
+        setter((prev) => prev.filter(i => i._id === params.bookingId));
 
         dispatch(showSuccess({ id: "deliverBooking", message: response.message }));
     } catch (err) {
@@ -206,5 +224,23 @@ export async function fetchBookings(params = {}, setBookings, setLoading, dispat
         dispatch(removeLoader("fetchBookings"));
         dispatch(showError({ id: "fetchBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
         setLoading(false);
+    }
+}
+
+// Fetch bookings with server-side pagination, search and sorting support
+export async function getAllIncompleteBookingsDetails(setter, dispatch) {
+    try {
+        dispatch(addLoader("fetchAllIncompleteBookings"));
+
+        // params may contain: page, limit, search, sortBy (e.g., status), userId
+        const response = (await apiConnector('GET', bookingEndpoints.GET_ALL_INCOMPLETE_BOOKING_DETAILS)).data;
+
+        if (response.success) {
+            setter(response.data.bookings);
+        }
+
+        dispatch(showSuccess({ id: "fetchAllIncompleteBookings", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "fetchAllIncompleteBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
 }

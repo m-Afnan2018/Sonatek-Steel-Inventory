@@ -323,7 +323,7 @@ const getAllItem = async (req, res) => {
             type: item.type,
             grade: item.grade,
             width: item.width,
-            originalQuantity: item.originalQuantity,
+            originalQuantity: Number(item.originalQuantity),
             thickness: item.thickness,
             shipTo: item?.shipTo,
             createdAt: item.createdAt,
@@ -392,7 +392,8 @@ const addVarient = async (req, res) => {
         let returnValue;
         if (type === 'thickness') {
             const newThickness = new Thickness({
-                name: Number(value)
+                name: value.name,
+                type: value.type
             })
             returnValue = await newThickness.save();
         } else if (type === 'grade') {
@@ -403,7 +404,8 @@ const addVarient = async (req, res) => {
             returnValue = await newGrade.save();
         } else if (type === 'width') {
             const newWidth = new Width({
-                name: value
+                name: value.name,
+                type: value.type
             })
             returnValue = await newWidth.save();
         } else if (type === 'cutter') {
@@ -641,7 +643,7 @@ const getUpcomingItem = async (req, res) => {
                 type: item.type,
                 grade: item.grade,
                 width: item.width,
-                originalQuantity: item.originalQuantity,
+                originalQuantity: String(item.originalQuantity),
                 thickness: item.thickness,
                 createdAt: item.createdAt,
                 shipTo: item.shipTo,
