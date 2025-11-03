@@ -211,7 +211,7 @@ const getAllItem = async (req, res) => {
         } = req.body;
 
         let query = {};
-        query.wagonNumber = { $ne: null };
+        query['challan.challanNumber'] = { $ne: null };
 
         // 🔍 Search
         if (search) {

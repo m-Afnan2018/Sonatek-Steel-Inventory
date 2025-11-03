@@ -92,7 +92,7 @@ const SingleBlock = ({ list, name }) => {
                         defaultValue={option}
                         onChange={(e) => setOption(e.target.value)}
                     >
-                        {name !== 'Grade' && <option value='Both'>Both</option>}
+                        {name !== 'Grade' && <option value='Both'>All</option>}
                         <option value='Hot Rolled'>  Hot Rolled </option>
                         <option value='Cold Rolled'>  Cold Rolled </option>
                     </select>

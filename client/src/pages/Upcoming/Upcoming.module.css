@@ -12,6 +12,7 @@
 .Upcoming td svg {
     font-size: 1.25rem;
     cursor: pointer;
+    padding: 0;
 }
 
 .Upcoming td>div {
