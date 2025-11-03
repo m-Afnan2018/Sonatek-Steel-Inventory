@@ -144,7 +144,6 @@
 .table thead th {
     text-align: left;
     font-weight: 700;
-    padding: 12px 14px;
     color: #004452;
     border-bottom: 1px solid #e6f0f2;
     background: linear-gradient(180deg, rgba(250, 254, 255, 1), #ffffff);

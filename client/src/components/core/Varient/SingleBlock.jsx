@@ -8,6 +8,21 @@ const SingleBlock = ({ list, name }) => {
     const [showForm, setShowForm] = useState(false)
     const [varient, setVarient] = useState('')
     const [option, setOption] = useState('Hot Rolled');
+    const [show, setShow] = useState(list);
+    const [type, setType] = useState('ALL')
+
+    const handleClick = (t) => {
+        if (t === 'HR') {
+            setType('HR')
+            setShow(list.filter(i => i.type === 'Hot Rolled'))
+        } else if (t === 'CR') {
+            setType('CR')
+            setShow(list.filter(i => i.type === 'Cold Rolled'))
+        } else {
+            setType('ALL')
+            setShow(list);
+        }
+    }
 
     const dispatch = useDispatch();
 
@@ -64,8 +79,13 @@ const SingleBlock = ({ list, name }) => {
     return (
         <div className={style.Varient}>
             <h3>{name}</h3>
-            <button style={{ height: showForm ? '0' : '2rem', padding: '0 3rem', opacity: showForm ? '0' : '1' }} onClick={() => setShowForm(true)}>Add new {name}</button>
-            <form style={{ height: showForm ? '2rem' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
+            <div style={{ height: showForm ? '0' : '40px', opacity: showForm ? '0' : '1' }}>
+                <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && '#05516f', color: type === 'ALL' && '#f0fbff' }}>Both</button>
+                <button onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && '#05516f', color: type === 'HR' && '#f0fbff' }}>Hot Rolled</button>
+                <button onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && '#05516f', color: type === 'CR' && '#f0fbff' }}>Cold Rolled</button>
+                <button onClick={() => setShowForm(true)}>Add new {name}</button>
+            </div>
+            <form style={{ height: showForm ? '40px' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
                 <div>
                     <select
                         id='type'
@@ -77,18 +97,25 @@ const SingleBlock = ({ list, name }) => {
                         <option value='Cold Rolled'>  Cold Rolled </option>
                     </select>
                 </div>
-                <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} />
+                <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} style={{ width: '100%' }} />
                 <div>
                     <button type='submit'>Add</button>
                     <button type='reset' onClick={() => setShowForm(false)}>Cancle</button>
                 </div>
             </form>
-            {list && list.length > 0 &&
-                <div className={style.allVarients}>
-                    {list.map((value) => {
-                        return <SingleVarient onUpdate={onUpdate} onDelete={onDelete} value={value} />
-                    })}
-                </div>
+            {show && show.length > 0 &&
+                <table className={style.allVarients}>
+                    <thead>
+                        <th>Value</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        {show.map((value) => {
+                            return <SingleVarient onUpdate={onUpdate} onDelete={onDelete} value={value} />
+                        })}
+                    </tbody>
+                </table>
             }
         </div>
     )

@@ -1,8 +1,7 @@
 .Varient {
-    margin: 2rem;
-    background: #001f2b;
-    color: white;
-    padding: 1rem;
+    margin: 0.25rem;
+    background: white;
+    padding: 0.25rem;
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
@@ -11,24 +10,32 @@
 }
 
 .Varient>h3 {
-    margin: auto;
-    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background-color: #f3f3ff;
+    font-weight: 500;
     text-align: center;
-    font-weight: 600;
+    color: grey;
+    font-size: 1rem;
+    margin-bottom: 0;
     width: 100%;
+    margin: 0 auto;
 }
 
 .Varient>div {
-    padding: 0.5rem;
-    background: #f0fbff;
-    border-radius: 0.5rem;
-    margin-top: 1rem;
-    color: #001f2b;
+    overflow: hidden;
+    gap: 1rem;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 0.25rem;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.Varient>div>button {
     width: 100%;
 }
 
@@ -38,7 +45,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 0.5rem;
+    width: 100%;
 }
 
 .Varient form>div {
@@ -48,19 +55,13 @@
     gap: 1rem;
 }
 
-.Varient input {
-    width: 100%;
-}
 
 .SingleVarient {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #001f2b;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    color: #f0fbff;
-    gap: 1rem;
+    background: white;
+    color: black;
+    border-bottom: 1px solid #80808038;
+    padding: 0;
+    border-radius: 0;
 }
 
 .SingleVarient>div {
@@ -68,4 +69,65 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
+}
+
+table {
+    /* Styles for the table in Upcoming */
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+table th,
+table td {
+    /* Shared styles for table cells/headers */
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 2px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* ✅ Prevents breaking layout */
+    white-space: nowrap;
+    /* Overridden later for td: */
+    /* padding: 8px 12px; */
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+table td {
+    /* Overrides for table data cells */
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    border-bottom: 0;
+    font-size: 0.75rem;
+    height: 3rem;
+}
+
+table td span {
+    text-align: center;
+}
+
+table th {
+    /* Overrides for table headers */
+    background-color: white;
+    font-weight: 500;
+    font-size: 0.75rem;
+    width: 33%;
+}
+
+table tr {
+    /* Styles for table rows */
+    border-bottom: 1px solid #80808038;
+}
+
+table td svg {
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
 }

@@ -61,8 +61,8 @@ const bookingSchema = new mongoose.Schema({
     bookedBySnapshot: { type: bookedBySnapshotSchema, required: true },
     status: {
         type: String,
-        enum: ['Pending', 'Processing', 'Delivered', 'Shipped', 'Cancelled'],
-        default: 'Pending'
+        enum: ['Processing', 'Shipped', 'Cancelled'],
+        default: 'Processing'
     },
     description: { type: String, default: '' },
     deliveryDate: { type: Date },

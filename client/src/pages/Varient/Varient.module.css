@@ -22,13 +22,14 @@
 }
 
 .Varient button {
-    padding: 0.5rem 3rem;
+    padding: 0.5rem 1rem;
     border-radius: 8px;
     color: rgb(0 31 43);
     border: none;
-    background-color: #f0fbff;
+    background-color: #f3f3ff;
     font-weight: 600;
     cursor: pointer;
+    margin: 0.25rem;
     margin-left: auto;
 }
 

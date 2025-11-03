@@ -36,8 +36,6 @@ const createBooking = async (req, res) => {
 
             const formType = i.formType;
 
-            console.log(formType)
-
             takenItems.push({
                 item: item._id,
                 quantity: qty,
@@ -67,7 +65,7 @@ const createBooking = async (req, res) => {
             quantity: totalQty,
             bookedBy: userId,
             bookedBySnapshot,
-            status: "Pending",
+            status: "Processing",
         });
 
         const populatedBooking = await Booking.findById(newBooking._id)
@@ -696,7 +694,7 @@ const getAllIncompleteBookingsDetails = async (req, res) => {
 
         // Base query for incomplete statuses
         let query = {
-            status: { $in: ["Pending", "Processing", "Shipped"] },
+            status: { $in: ["Pending", "Processing"] },
         };
 
         // Restrict to agent's bookings if applicable

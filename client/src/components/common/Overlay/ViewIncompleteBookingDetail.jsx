@@ -14,31 +14,32 @@ const ViewIncompleteBookingDetail = ({ data,
     const submitting = (e) => {
         e.preventDefault();
         const button = e.nativeEvent.submitter;
-        if (button.innerText === 'Cancel Booking') {
+        if (button.innerText === 'Cancel') {
             cancel(e.target[0].value, data._id);
-        } else if (button.innerText === 'Confirm Booking') {
-            confirm(e.target[0].value, data._id)
-        } else if (button.innerText === 'Shipped') {
+        } else {
             ship(e.target[0].value, data._id)
-        } else if (button.innerText === 'Delivered') {
-            deliver(e.target[0].value, data._id)
         }
+        // } else if (button.innerText === 'Shipped') {
+        //     ship(e.target[0].value, data._id)
+        // } else if (button.innerText === 'Delivered') {
+        //     deliver(e.target[0].value, data._id)
+        // }
     }
 
-    const status = {
-        'Pending': {
-            button: 'Confirm Booking',
-            placeholder: 'Enter the Order ID to confirm order or reason to cancel'
-        },
-        'Processing': {
-            button: 'Shipped',
-            placeholder: 'Enter the Vechicle number to confirm deliver it or reason to cancel'
-        },
-        'Shipped': {
-            button: 'Delivered',
-            placeholder: 'Enter the description to confirm delivery or reason to cancel or reason to cancel'
-        }
-    }
+    // const status = {
+    //     'Pending': {
+    //         button: 'Confirm Booking',
+    //         placeholder: 'Enter the Order ID to confirm order or reason to cancel'
+    //     },
+    //     'Processing': {
+    //         button: 'Shipped',
+    //         placeholder: 'Enter the Vechicle number to confirm deliver it or reason to cancel'
+    //     },
+    //     'Shipped': {
+    //         button: 'Delivered',
+    //         placeholder: 'Enter the description to confirm delivery or reason to cancel or reason to cancel'
+    //     }
+    // }
 
     return (
         <div className={style.ViewIncompleteBookingDetail} onClick={close}>
@@ -52,7 +53,7 @@ const ViewIncompleteBookingDetail = ({ data,
                         <h4>Booking</h4>
                         <p><strong>ID:</strong> {data.booking_id}</p>
                         <p><strong>Status:</strong> <span className={style[data.status?.toLowerCase()] || ''}>{data.status}</span></p>
-                        <p><strong>Quantity:</strong> {data.quantity}</p>
+                        <p><strong>Quantity:</strong> {data.quantity?.toFixed(3)}</p>
                         <p><strong>Booked At:</strong> {new Date(data.bookingDate).toLocaleString()}</p>
                     </div>
 
@@ -97,18 +98,18 @@ const ViewIncompleteBookingDetail = ({ data,
                     <form onSubmit={submitting} on className={style.FullWidth}>
                         <h4>Action</h4>
                         {['admin', 'director', 'accountant'].includes(userData.role) && (data.status === 'Pending' || data.status === 'Processing' || data.status === 'Shipped') && <div className={style.inputField}>
-                            <input type='text' placeholder={status[data.status].placeholder} />
+                            <input type='text' placeholder={'Enter the Vechicle number to confirm deliver it or reason to cancel'} />
                         </div>}
                         {['admin', 'director', 'accountant'].includes(userData.role) && data.status !== 'Cancelled' && <div className={style.buttons}>
-                            <button type='submit'>Cancel Booking</button>
-                            <button type='submit'>{status[data.status].button}</button>
+                            <button type='submit'>Cancel</button>
+                            <button type='submit'>Ship</button>
+                            <button className={style.PrimaryButton} onClick={close}>Close</button>
                         </div>}
                     </form>
                 </div>
 
-                <div className={style.DetailsFooter}>
-                    <button className={style.PrimaryButton} onClick={close}>Close</button>
-                </div>
+                {/* <div className={style.DetailsFooter}>
+                </div> */}
             </div>
         </div>
     )

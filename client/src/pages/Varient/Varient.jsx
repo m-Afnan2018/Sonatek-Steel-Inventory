@@ -8,8 +8,6 @@ const Varient = () => {
 
     return (
         <div className={style.Varient}>
-            <h2>Manage Varients</h2>
-
             {/* Block for Grades */}
             <SingleBlock list={thicknesses} name={'Thickness'} />
             <SingleBlock list={widths} name={'Width'} />

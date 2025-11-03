@@ -628,7 +628,7 @@ const deleteVarient = async (req, res) => {
 
 const getUpcomingItem = async (req, res) => {
     try {
-        const items = await Item.find({ wagonNumber: null })
+        const items = await Item.find({ 'challan.challanNumber': null })
             .populate("grade width thickness shipTo challan")
             .sort({ createdAt: 1 })
 
@@ -644,6 +644,7 @@ const getUpcomingItem = async (req, res) => {
                 grade: item.grade,
                 width: item.width,
                 originalQuantity: String(item.originalQuantity),
+                currentQuantity: String(item.quantity),
                 thickness: item.thickness,
                 createdAt: item.createdAt,
                 shipTo: item.shipTo,

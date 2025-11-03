@@ -64,10 +64,9 @@ const itemSlice = createSlice({
         updateListViewList(state, action) {
             const item = action.payload;
 
-            if (item.wagonNumber) {
-                const originalItem = state.listViewList.find((i) => i._id === item._id);
+            if (item.challanNumber && state.listViewList) {
+                const originalItem = state.listViewList?.find((i) => i._id === item._id);
                 if (originalItem) {
-                    console.log(`GOT ORIGINAL ITEM: ${originalItem}`)
                     state.listViewList = state.listViewList.map((i) => {
                         if (i._id === item._id) {
                             return item;
@@ -79,6 +78,9 @@ const itemSlice = createSlice({
                 }
                 state.upcomingItem = state.upcomingItem.filter((i) => i._id !== item._id);
             } else {
+                if (item.challanNumber) {
+                    state.upcomingItem = state.upcomingItem.filter((i) => i._id !== item._id);
+                }
                 state.upcomingItem = state.upcomingItem.map((i) => {
                     if (i._id === item._id) {
                         return item;
@@ -98,7 +100,11 @@ const itemSlice = createSlice({
             state.upcomingItem = action.payload;
         },
         addUpcomingItem(state, action) {
-            state.upcomingItem = [action.payload, ...state.upcomingItem];
+            if (state.upcomingItem === null) {
+                state.upcomingItem = [action.payload];
+            } else {
+                state.upcomingItem = [action.payload, ...state.upcomingItem];
+            }
         },
         deleteFromUpcomingItem(state, action) {
             state.upcomingItem = state.upcomingItem.filter(i => i._id !== action.payload);

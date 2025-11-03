@@ -29,15 +29,19 @@ const ViewIncompleteBooking = () => {
                 setListing(bookings);
                 console.log(bookings)
             } else if (view === 'pending') {
-                setListing(bookings.filter((item) => item.status === 'Pending'));
-            } else if (view === 'cancelled') {
-                setListing(bookings.filter((item) => item.status === 'Cancelled'));
+                const threeDaysAgo = new Date();
+                threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+                setListing(
+                    bookings.filter((item) => ((new Date(item.bookingDate) < threeDaysAgo) && item))
+                );
             } else if (view === 'processing') {
-                setListing(bookings.filter((item) => item.status === 'Processing'));
-            } else if (view === 'shipped') {
-                setListing(bookings.filter((item) => item.status === 'Shipped'));
-            } else if (view === 'delivered') {
-                setListing(bookings.filter((item) => item.status === 'Delivered'));
+                const threeDaysAgo = new Date();
+                threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+                setListing(
+                    bookings.filter((item) => (!(new Date(item.bookingDate) < threeDaysAgo) && item))
+                );
             }
         }
     }, [bookings, view])
@@ -126,7 +130,7 @@ const ViewIncompleteBooking = () => {
                     <button className={view === 'all' && style.selected} onClick={() => setView('all')}>All</button>
                     <button className={view === 'pending' && style.selected} onClick={() => setView('pending')}>Pending</button>
                     <button className={view === 'processing' && style.selected} onClick={() => setView('processing')}>Processing</button>
-                    <button className={view === 'shipped' && style.selected} onClick={() => setView('shipped')}>Shipped</button>
+                    {/* <button className={view === 'shipped' && style.selected} onClick={() => setView('shipped')}>Shipped</button> */}
                 </div>
 
                 <table className={style.table}>

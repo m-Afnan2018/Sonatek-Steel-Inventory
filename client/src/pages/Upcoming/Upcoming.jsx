@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import style from './Upcoming.module.css'
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteItem, updateItem } from 'services/operations/itemAPI';
+import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/itemAPI';
 import AddForm from 'components/core/Upcoming/AddForm';
 import { MdDelete } from "react-icons/md";
 import { RxCheck, RxCross2 } from "react-icons/rx";
@@ -18,6 +18,8 @@ const Upcoming = () => {
 
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
+
+    const dispatch = useDispatch();
 
     const { upcomingItem } = useSelector(state => state.item)
     const { userData } = useSelector(state => state.auth);
@@ -50,6 +52,10 @@ const Upcoming = () => {
             return;
         }
     };
+
+    useEffect(() => {
+        getUpcomingItem({}, dispatch);
+    }, [dispatch])
 
     return (
         <div className={style.Upcoming}>

@@ -151,12 +151,12 @@ const Cutter = () => {
                     <table className={style.table}>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Address</th>
-                                <th>Phone</th>
-                                <th>Total Items</th>
-                                <th>Total Qty</th>
-                                <th>Actions</th>
+                                <th style={{width: '1rem'}}>Name</th>
+                                <th style={{width: '1rem'}}>Address</th>
+                                <th style={{width: '1rem'}}>Phone</th>
+                                <th style={{width: '1rem'}}>Total Items</th>
+                                <th style={{width: '1rem'}}>Total Qty</th>
+                                <th style={{width: '1rem'}}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>

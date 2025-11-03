@@ -44,7 +44,7 @@
     border-radius: 0 0 1rem 1rem;
     padding: 4px;
     box-shadow: none;
-    height: 500px;
+    /* height: 500px; */
     /* Used in style prop, but style is also used here */
     overflow: hidden;
 }
@@ -182,7 +182,6 @@
 .addNew {
     margin: 0.5rem;
     border-radius: 1rem;
-    background: #f0fbff;
     display: flex;
     gap: 1rem;
 }
