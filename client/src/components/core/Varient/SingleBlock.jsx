@@ -80,7 +80,7 @@ const SingleBlock = ({ list, name }) => {
         <div className={style.Varient}>
             <h3>{name}</h3>
             <div style={{ height: showForm ? '0' : '40px', opacity: showForm ? '0' : '1' }}>
-                <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && '#05516f', color: type === 'ALL' && '#f0fbff' }}>Both</button>
+                <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && '#05516f', color: type === 'ALL' && '#f0fbff' }}>All</button>
                 <button onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && '#05516f', color: type === 'HR' && '#f0fbff' }}>Hot Rolled</button>
                 <button onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && '#05516f', color: type === 'CR' && '#f0fbff' }}>Cold Rolled</button>
                 <button onClick={() => setShowForm(true)}>Add new {name}</button>

@@ -126,8 +126,8 @@ table tr {
     border-bottom: 1px solid #80808038;
 }
 
-.SingleVarient table td svg {
-    font-size: 2rem;
+.SingleVarient svg {
+    font-size: 2.25rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
 }
