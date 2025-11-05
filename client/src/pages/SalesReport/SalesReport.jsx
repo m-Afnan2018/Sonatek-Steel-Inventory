@@ -49,7 +49,7 @@ const SalesReport = () => {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': 'http://localhost:3000'
                 },
-                body: JSON.stringify({ filters })
+                body: JSON.stringify({ filters, sortBy: sortType, order: order })
             });
             const blob = await response.blob();
 
@@ -70,7 +70,13 @@ const SalesReport = () => {
     const sortBy = (val) => {
         setOrder(order === 'asc' ? 'desc' : 'asc');
         setSortType(val);
-        getAllBookingsTable({ sortBy: val, order: order, filters }, setAllBookings, setPagination, dispatch);
+        // getAllBookingsTable({ sortBy: val, order: order, filters }, setAllBookings, setPagination, dispatch);
+        getAllBookingsTable(
+            { page: 1, limit: 50, filters, sortBy: val, order: order === 'asc' ? 'desc' : 'asc' },
+            setAllBookings,
+            setPagination,
+            dispatch
+        );
         // getAllItem({ filters, sortBy: val, order: order }, dispatch);
     }
 
@@ -89,6 +95,7 @@ const SalesReport = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('party')}>Party</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookedBy')}>Booked By</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookingDate')}>Booking Date</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('formType')}>Form</th>
@@ -97,6 +104,7 @@ const SalesReport = () => {
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('quantity')}>Quantity</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('vehicleNumber')}>Vehicle Number</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('shipTo')}>Location</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('remark')}>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -150,13 +158,12 @@ const SingleItem = ({ item, view, setView }) => {
         }
     }
 
-    console.log(colorType[item.type])
-
 
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
         >
+            <td>{item.party || "-"}</td>
             <td>{item.bookedBy || "-"}</td>
             <td>{bookingDate}</td>
             <td>{item.form || "-"}</td>
@@ -165,7 +172,8 @@ const SingleItem = ({ item, view, setView }) => {
             <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
             <td>{item.quantity ?? "-"}</td>
             <td>{item.vehicleNumber ?? "-"}</td>
-            <td>{item.shipTo?.name ?? "-"}</td>
+            <td>{item.shipTo ?? "-"}</td>
+            <td>{item.remark ?? "-"}</td>
         </tr>
     );
 };

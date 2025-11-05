@@ -778,3 +778,38 @@
     text-align: start;
     margin-bottom: 0.5rem;
 }
+
+.paginationInfo {
+    padding: 0.5rem 3rem;
+    border-radius: 8px;
+    background-color: rgb(17 56 108);
+    border: none;
+    color: #f0fbff;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.inlineButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 0.25rem;
+}
+
+.inlineButtons button {
+    font-size: 0.9em;
+}
+
+.inlineEdit {
+    position: relative;
+}
+
+.inlineEdit input {
+    width: 6.25rem;
+    padding: 0.15rem 0.25rem;
+    border-radius: 0.25rem;
+}

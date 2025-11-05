@@ -12,10 +12,9 @@ const Items = () => {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState('desc');
     const [sortType, setSortType] = useState(null)
-    const [page, setPage] = useState(1);
     // eslint-disable-next-line no-unused-vars
-    const [pagination, setPagination] = useState(null);
-    const { listViewList, totalQuantity } = useSelector(state => state.item);
+    // const [pagination, setPagination] = useState(null);
+    const { listViewList, totalQuantity, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
     const [colors, setColors] = useState(null)
 
@@ -82,6 +81,14 @@ const Items = () => {
         getAllItem({ search, filters, sortBy: val, order: order }, dispatch);
     }
 
+    const nextPage = () => {
+        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page + 1 }, dispatch);
+    }
+
+    const prevPage = () => {
+        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page - 1 }, dispatch);
+    }
+
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items</h3>
@@ -117,6 +124,7 @@ const Items = () => {
                                     <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
                                     <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.loader')}>Loader</th>
                                     <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('transport.transporterName')}>Transport</th>
+                                    <th style={{ width: '10rem', padding: '0 2rem' }} onClick={() => sortBy('remark')}>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -137,18 +145,17 @@ const Items = () => {
                 <button onClick={onDownload}>Download</button>
 
                 <div className={style.paginationControls}>
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    {pagination?.page > 1 && <button onClick={prevPage}>
                         Prev
-                    </button>
+                    </button>}
                     <div className={style.paginationInfo}>
                         Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
-                    <button
-                        onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
-                        disabled={page >= (pagination?.totalPages || 1)}
+                    {pagination?.page < (pagination?.totalPages || 1) && <button
+                        onClick={nextPage}
                     >
                         Next
-                    </button>
+                    </button>}
                 </div>
                 <div>
                     <button>Total Quantity: {totalQuantity}</button>
@@ -343,6 +350,13 @@ const SingleItem = ({ color, item, setView, view }) => {
                 {select === 'transporterName'
                     ? renderEditableField('transporterName')
                     : item.transporterName || '-'}
+            </td>
+
+            {/* Remark */}
+            <td onClick={() => clickHandler('remark')}>
+                {select === 'remark'
+                    ? renderEditableField('remark')
+                    : item.remark || '-'}
             </td>
         </tr>
     );

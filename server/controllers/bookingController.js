@@ -6,11 +6,26 @@ const User = require('../models/userModel')
 const { v4: uuidv4 } = require('uuid');
 const XLSX = require('xlsx');
 const { default: mongoose } = require("mongoose");
+const Party = require("../models/partyModel");
 
 const createBooking = async (req, res) => {
     try {
         const { userId } = req.user;
         const { items } = req.body;
+        const { party } = req.body;
+
+        let selectedParty;
+        if (party.type === 'id') {
+            selectedParty = await Party.findById(party.val);
+        } else {
+            const tempParty = new Party({ name: party.val });
+            const temp = await tempParty.save();
+            selectedParty = temp;
+        }
+
+        if (!selectedParty) {
+            throw customError("Select the party first");
+        }
 
         if (!items?.length) throw customError("Please select items", 400);
 
@@ -66,6 +81,8 @@ const createBooking = async (req, res) => {
             bookedBy: userId,
             bookedBySnapshot,
             status: "Processing",
+            party: selectedParty._id,
+            partySnapshot: Booking.makePartySnapshot(selectedParty)
         });
 
         const populatedBooking = await Booking.findById(newBooking._id)
@@ -112,109 +129,6 @@ const createBooking = async (req, res) => {
     }
 };
 
-
-// const createBooking = async (req, res) => {
-//     try {
-//         const { userId } = req.user;
-//         const { items, requirement, formType } = req.body;
-
-//         if (!items?.length) throw customError("Please select items", 404);
-
-//         const allItemsId = items.map(i => i.id);
-
-//         // Fetch and sort items by createdAt (oldest first)
-//         const allItems = await Item.find({ _id: { $in: allItemsId } }).populate('thickness shipTo grade width');
-
-//         let remaining = requirement;
-//         let totalUsed = 0;
-
-//         const takenItems = [];
-
-//         for (const item of allItems) {
-//             if (remaining <= 0) break; // stop once requirement is fulfilled
-
-//             const used = Math.min(item.quantity, remaining);
-//             if (used > 0) {
-//                 item.quantity -= used;
-//                 remaining -= used;
-//                 totalUsed += used;
-//                 // include an item snapshot so booking keeps item data even if Item is later removed
-//                 takenItems.push({ item: item._id, quantity: used, itemSnapshot: Booking.makeItemSnapshot(item) })
-//                 await item.save(); // update only affected items
-//             }
-//         }
-
-//         // if (remaining > 0) throw customError("Not enough stock to fulfill requirement", 400);
-
-//         // Build bookedBy snapshot from current user data
-//         const userDoc = await User.findById(userId).select('firstName lastName email phone role name fullName');
-//         const bookedBySnapshot = Booking.makeBookedBySnapshot(userDoc ? {
-//             _id: userDoc._id,
-//             name: userDoc.name || `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim(),
-//             email: userDoc.email,
-//             phone: userDoc.phone,
-//             role: userDoc.role
-//         } : null);
-
-//         const newBooking = await Booking.create({
-//             booking_id: uuidv4(),
-//             items: takenItems,
-//             type: type,
-//             quantity: totalUsed,
-//             requirement,
-//             bookedBy: userId,
-//             bookedBySnapshot,
-//             formType: formType
-//         })
-
-//         const populatedBookings = await Booking.findById(newBooking._id).populate({
-//             path: 'items.item',
-//             populate: [
-//                 { path: 'grade', select: 'name' },
-//                 { path: 'thickness', select: 'name' },
-//             ],
-//         }).populate({
-//             path: 'bookedBy'
-//         });;
-
-//         const wagonInfo = populatedBookings.items
-//             .map(i => {
-//                 const src = i.item || i.itemSnapshot || {};
-//                 return ({
-//                     wagonNumber: src.wagonNumber || "N/A",
-//                     challanNumber: src.challan?.challanNumber || src.challanNumber || "N/A",
-//                     challanDate: src.challan?.challanDate || src.challanDate || "N/A",
-//                     quantityTaken: i.quantity,
-//                 })
-//             });
-
-//         const payload = {
-//             _id: populatedBookings._id,
-//             quantity: populatedBookings.quantity,
-//             requirement: populatedBookings.requirement,
-//             status: populatedBookings.status,
-//             bookingDate: populatedBookings.bookingDate,
-//             bookedBy: (populatedBookings.bookedBy && `${populatedBookings.bookedBy.firstName} ${populatedBookings.bookedBy.lastName}`) || populatedBookings.bookedBySnapshot?.name || "N/A",
-//             type: (populatedBookings.items[0]?.item?.type) || (populatedBookings.items[0]?.itemSnapshot?.type) || "N/A",
-//             grade: (populatedBookings.items[0]?.item?.grade?.name) || (populatedBookings.items[0]?.itemSnapshot?.grade) || "N/A",
-//             formType: formType,
-//             thickness: (populatedBookings.items[0]?.item?.thickness?.name) || (populatedBookings.items[0]?.itemSnapshot?.thickness) || "N/A",
-//             vehicleNumber: populatedBookings.vehicleNumber || "N/A",
-//             wagons: wagonInfo,
-//         }
-
-//         res.status(201).json({
-//             success: true,
-//             message: "Booking created successfully",
-//             booking: newBooking,
-//             item: payload
-//         });
-
-//     } catch (err) {
-//         errorResponse(res, err);
-//     }
-// };
-
 const updateBooking = async (req, res) => {
     try {
         // Fetching Data
@@ -239,6 +153,29 @@ const updateBooking = async (req, res) => {
         errorResponse(res, err);
     }
 };
+
+const updateRemark = async (req, res) => {
+    try {
+        const { bookingId, remark } = req.body;
+
+        if (!bookingId) {
+            throw customError("Please select any one booking");
+        }
+
+        const booking = await Booking.findByIdAndUpdate(bookingId, { description: remark });
+
+        if (!booking) {
+            throw customError("Unable to find the booking");
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully update the booking"
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
 
 const deleteBooking = async (req, res) => {
     try {
@@ -514,13 +451,13 @@ const searchOptions = async (req, res) => {
 
 const shippedBooking = async (req, res) => {
     try {
-        const { bookingId, vehicleNumber } = req.body;
+        const { bookingId, fieldValue } = req.body;
 
         if (!bookingId) {
             throw customError("Please select any one booking");
         }
 
-        const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Shipped', vehicleNumber: vehicleNumber });
+        const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Shipped', vehicleNumber: fieldValue });
 
         if (!booking) {
             throw customError("Unable to find the booking");
@@ -966,6 +903,16 @@ const getAllBookingDetailsTablewise = async (req, res) => {
 
         const query = {};
 
+
+        const toObjectId = (id) => {
+            if (!id) return null;
+            try {
+                return new mongoose.Types.ObjectId(id);
+            } catch (err) {
+                return null;
+            }
+        };
+
         // 🔎 Search
         if (search) {
             query.$or = [
@@ -973,52 +920,31 @@ const getAllBookingDetailsTablewise = async (req, res) => {
                 { "bookedBySnapshot.name": { $regex: search, $options: "i" } },
                 { vehicleNumber: { $regex: search, $options: "i" } },
                 { status: { $regex: search, $options: "i" } },
-                { "items.itemSnapshot.grade": { $regex: search, $options: "i" } }
+                { "items.itemSnapshot.grade": { $regex: search, $options: "i" } },
             ];
         }
 
-        // 🎯 Filters
-        // 🎯 Filters (✅ FIXED)
-        if (filters.grade) {
-            query.items = { $elemMatch: { "itemSnapshot.grade": filters.grade } };
+        // 🎯 Combined Filters
+        const itemMatch = {};
+
+        if (filters.grade) itemMatch["itemSnapshot.grade._id"] = toObjectId(filters.grade);
+        if (filters.type) itemMatch["itemSnapshot.type"] = filters.type;
+        if (filters.width) itemMatch["itemSnapshot.width._id"] = toObjectId(filters.width);
+        if (filters.thickness) itemMatch["itemSnapshot.thickness._id"] = toObjectId(filters.thickness);
+        if (filters.formType) itemMatch["itemSnapshot.formType"] = filters.formType;
+        if (filters.shipTo)
+            itemMatch["itemSnapshot.shipTo._id"] = toObjectId(filters.shipTo);
+
+        if (Object.keys(itemMatch).length > 0) {
+            query.items = { $elemMatch: itemMatch };
         }
 
-        if (filters.type) {
-            query.items = { $elemMatch: { "itemSnapshot.type": filters.type } };
-        }
-
-        if (filters.width) {
-            query.items = { $elemMatch: { "itemSnapshot.width": filters.width } };
-        }
-
-        if (filters.thickness) {
-            query.items = { $elemMatch: { "itemSnapshot.thickness": filters.thickness } };
-        }
-
-        if (filters.formType) {
-            query.items = { $elemMatch: { "itemSnapshot.formType": filters.formType } };
-        }
-
-        if (filters.shipTo) {
-            query.items = { $elemMatch: { "itemSnapshot.shipTo.shipTo_id": filters.shipTo } };
-        }
-
-        // ✅ Status
+        // ✅ Other top-level filters
         if (filters.status) query.status = filters.status;
+        if (filters.bookedBy)
+            query["bookedBySnapshot.user_id"] = toObjectId(filters.bookedBy);
 
-        // ✅ BookedBy user filter
-        if (filters.bookedBy) query["bookedBySnapshot.user_id"] = filters.bookedBy;
-
-        // if (filters.grade) query["items.itemSnapshot.grade"] = filters.grade;
-        // if (filters.type) query["items.itemSnapshot.type"] = filters.type;
-        // if (filters.width) query["items.itemSnapshot.width"] = filters.width;
-        // if (filters.thickness) query["items.itemSnapshot.thickness"] = filters.thickness;
-        // if (filters.shipTo) query["items.itemSnapshot.shipTo.shipTo_id"] = filters.shipTo;
-        // if (filters.bookedBy) query["bookedBySnapshot.user_id"] = filters.bookedBy;
-        // if (filters.formType) query["items.itemSnapshot.formType"] = filters.formType;
-        // if (filters.status) query.status = filters.status;
-
-        // 📅 Filter by booking date
+        // 📅 Date range
         if (filters.fromDate || filters.toDate) {
             query.bookingDate = {};
             if (filters.fromDate) query.bookingDate.$gte = new Date(filters.fromDate);
@@ -1029,6 +955,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             }
         }
 
+        // 🔍 Fetch from DB
         const bookings = await Booking.find(query)
             .sort(sortBy === "materialDescription" ? {} : { [sortBy]: order === "asc" ? 1 : -1 })
             .skip((page - 1) * limit)
@@ -1036,8 +963,8 @@ const getAllBookingDetailsTablewise = async (req, res) => {
 
         const total = await Booking.countDocuments(query);
 
-        // ✅ Convert to frontend table format
-        const listView = bookings.map(b => ({
+        // 🧾 Transform result
+        const listView = bookings.map((b) => ({
             _id: b._id,
             orderId: b.order_id,
             bookedBy: b.bookedBySnapshot?.name,
@@ -1051,7 +978,9 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             requirement: b.requirement,
             status: b.status,
             vehicleNumber: b.vehicleNumber,
-            shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-"
+            shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
+            remark: b.description || "-",
+            party: b.partySnapshot?.name || "-",
         }));
 
         res.status(200).json({
@@ -1060,9 +989,8 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             page,
             pages: Math.ceil(total / limit),
             total,
-            listView
+            listView,
         });
-
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
@@ -1071,10 +999,11 @@ const getAllBookingDetailsTablewise = async (req, res) => {
 
 const getExcelTablewiseBooking = async (req, res) => {
     try {
-        console.log("Here");
         const {
             filters = {},
-            search
+            search,
+            sortBy = "orderDate",
+            order = "desc",
         } = req.body;
 
         const query = {};
@@ -1133,13 +1062,13 @@ const getExcelTablewiseBooking = async (req, res) => {
             }
         }
 
-        const bookings = await Booking.find(query)
+        const bookings = await Booking.find(query).sort(sortBy === "materialDescription" ? {} : { [sortBy]: order === "asc" ? 1 : -1 })
 
         const total = await Booking.countDocuments(query);
 
         // ✅ Convert to frontend table format
         const listView = bookings.map(b => ({
-            orderId: b.order_id,
+            party: b.partySnapshot?.name || "-",
             bookedBy: b.bookedBySnapshot?.name,
             bookingDate: b.bookingDate,
             form: b.items?.[0]?.itemSnapshot?.formType || "-",
@@ -1149,7 +1078,8 @@ const getExcelTablewiseBooking = async (req, res) => {
             requirement: b.requirement,
             status: b.status,
             vehicleNumber: b.vehicleNumber,
-            location: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-"
+            location: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
+            remark: b.description || '-'
         }));
 
         // Create workbook and sheet
@@ -1258,7 +1188,6 @@ const getExcelBooking = async (req, res) => {
 
         res.send(excelBuffer);
     } catch (error) {
-        console.error("Error generating Excel:", error);
         res.status(500).json({
             message: "Error generating Excel file",
             error: error.message,
@@ -1266,10 +1195,40 @@ const getExcelBooking = async (req, res) => {
     }
 };
 
+const getAllParty = async (req, res) => {
+    try {
+        const parties = await Party.find();
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched all parties",
+            parties
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const deleteParty = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        await Party.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully delete the party",
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 
 module.exports = {
     createBooking,
     updateBooking,
+    updateRemark,
     deleteBooking,
     getBooking,
     getAllBookings,
@@ -1283,5 +1242,7 @@ module.exports = {
     getExcelBooking,
     getExcelTablewiseBooking,
     getAllBookingDetailsTablewise,
-    getAllIncompleteBookingsDetails
+    getAllIncompleteBookingsDetails,
+    getAllParty,
+    deleteParty
 }

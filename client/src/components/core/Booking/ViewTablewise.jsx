@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { getAllBookingsTable } from 'services/operations/bookingAPI';
 
@@ -39,6 +38,15 @@ const Items = () => {
         toDate: "",
     })
 
+    // useEffect(() => {
+    //     getAllBookingsTable(
+    //         { page: 1, limit: 50, filters: filters },
+    //         setAllBookings,
+    //         setPagination,
+    //         dispatch
+    //     );
+    // }, [dispatch, filters])
+
     const onDownload = async () => {
         try {
             const response = await fetch('http://localhost:4000/api/v1/booking/getExcelTablewiseBooking', {
@@ -68,7 +76,7 @@ const Items = () => {
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Order Report</h3>
-            <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} />
+            <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -80,7 +88,7 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '8rem' }}>Order ID</th>
+                                    <th style={{ width: '8rem' }}>Party</th>
                                     <th style={{ width: '8rem' }}>Booked By</th>
                                     <th style={{ width: '8rem' }}>Booking Date</th>
                                     <th style={{ width: '8rem' }}>Form</th>
@@ -91,6 +99,7 @@ const Items = () => {
                                     <th style={{ width: '8rem' }}>Status</th>
                                     <th style={{ width: '8rem' }}>Vehicle Number</th>
                                     <th style={{ width: '8rem' }}>Location</th>
+                                    <th style={{ width: '8rem' }}>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -110,18 +119,18 @@ const Items = () => {
                 <button onClick={onDownload}>Download</button>
 
                 <div className={style.paginationControls}>
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    {pagination?.page > 1 && <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                         Prev
-                    </button>
+                    </button>}
                     <div className={style.paginationInfo}>
-                        Page {page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
-                    <button
+                    {pagination?.page < pagination?.totalPages && <button
                         onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
                         disabled={page >= (pagination?.totalPages || 1)}
                     >
                         Next
-                    </button>
+                    </button>}
                 </div>
             </div>
         </div >
@@ -161,7 +170,7 @@ const SingleItem = ({ item, view, setView }) => {
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
         >
-            <td>{item.orderId || "-"}</td>
+            <td>{item.party || "-"}</td>
             <td>{item.bookedBy || "-"}</td>
             <td>{bookingDate}</td>
             <td>{item.form || "-"}</td>
@@ -172,24 +181,18 @@ const SingleItem = ({ item, view, setView }) => {
             <td><p className={style.coloredShipTo} style={{ background: status[item.status].background, color: status[item.status].foreground, border: `1px solid ${status[item.status].foreground}` }}>{item.status ?? "-"}</p></td>
             <td>{item.vehicleNumber ?? "-"}</td>
             <td>{item.shipTo?.name ?? "-"}</td>
+            <td>{item.remark ?? "-"}</td>
         </tr>
     );
 };
 
 
-const Filters = ({ setFilters, setAllBookings, setPagination }) => {
+const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
 
     const [currentType, setCurrentType] = useState('Both');
-    const handleTypeChange = (e) => {
-        if (e.target.value === '') {
-            setCurrentType('Both')
-        } else {
-            setCurrentType(e.target.value);
-        }
-    }
 
     const dispatch = useDispatch();
 
@@ -212,7 +215,33 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
     const onSubmit = (data) => {
         let filterPayload = {};
-
+        if (data.type !== filters.type) {
+            console.log(`Data: ${data.type}, Filter: ${filters.type}`)
+            reset({
+                grade: "",
+                width: "",
+                thickness: "",
+                shipTo: "",
+                formType: "",
+                status: "",
+                bookedBy: "",
+                fromDate: "",
+                toDate: "",
+            });
+            if (data.type === '') {
+                setCurrentType('Both')
+            } else {
+                setCurrentType(data.type);
+            }
+            getAllBookingsTable(
+                { page: 1, limit: 50, filters: { type: data.type } },
+                setAllBookings,
+                setPagination,
+                dispatch
+            );
+            setFilters({ type: data.type })
+            return;
+        }
         if (data.grade) filterPayload.grade = data.grade;
         if (data.type) filterPayload.type = data.type;
         if (data.width) filterPayload.width = data.width;
@@ -223,7 +252,10 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
         if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
         if (data.fromDate) filterPayload.fromDate = data.fromDate;
         if (data.toDate) filterPayload.toDate = data.toDate;
+
         setFilters(filterPayload);
+
+
         getAllBookingsTable(
             { page: 1, limit: 50, filters: filterPayload },
             setAllBookings,
@@ -234,17 +266,22 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
 
     const handleReset = (filters) => {
-        getAllItem({}, dispatch);
+        getAllBookingsTable(
+            { page: 1, limit: 50, filters: {} },
+            setAllBookings,
+            setPagination,
+            dispatch
+        );
         reset();
         setFilters({});
     };
 
     return (
-        <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
+        <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
             <div>
                 <label htmlFor="type">Type:</label>
-                <select id="type" {...register("type")} onChange={handleTypeChange}>
+                <select id="type" {...register("type")}>
                     <option value="">All</option>
                     <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
@@ -352,9 +389,8 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
             {/* Buttons */}
             <div className={style.buttonGroup}>
-                <button type="submit">Filter</button>
                 <button type="button" onClick={handleReset}>
-                    Cancel
+                    Reset
                 </button>
             </div>
         </form>

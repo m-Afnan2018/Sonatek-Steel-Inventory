@@ -165,6 +165,7 @@ const updateItem = async (req, res) => {
             vehicleNumber: updatedItem?.transport?.vehicleNumber,
             loader: updatedItem?.transport?.loader,
             transporterName: updatedItem?.transport?.transporterName,
+            remark: updatedItem?.remark,
             date: updatedItem.date
         };
 
@@ -331,6 +332,7 @@ const getAllItem = async (req, res) => {
             loader: item.transport?.loader,
             vehicleNumber: item.transport?.vehicleNumber,
             remaining: item.quantity,
+            remark: item?.remark,
             date: item.date
         }));
 
@@ -648,7 +650,8 @@ const getUpcomingItem = async (req, res) => {
                 thickness: item.thickness,
                 createdAt: item.createdAt,
                 shipTo: item.shipTo,
-                date: item.date
+                date: item.date,
+                remark: item.remark,
             };
 
             listView.push(formattedItems);
@@ -755,6 +758,7 @@ const uploadCSV = async (req, res) => {
                     loader: row["LOADER"] || null,
                     transporterName: row["TRANSPORT"] || null,
                 },
+                remark: row["REMARK"]
             });
         }
 
@@ -808,7 +812,7 @@ const downloadTemplate = async (req, res) => {
     try {
         // 🧾 Define headers (as the first row)
         const headers = [
-            ["WAGON-NO.", "CHALLAN-DATE", "CHALLAN-NO.", "MATERIAL-DESCRIPTION", "QUANTITY", "SHIP-TO", "VEHICLE", "LOADER", "TRANSPORT"]];
+            ["WAGON-NO.", "CHALLAN-DATE", "CHALLAN-NO.", "MATERIAL-DESCRIPTION", "QUANTITY", "SHIP-TO", "VEHICLE", "LOADER", "TRANSPORT", "REMARK"]];
 
         // 📄 Create worksheet from headers
         const worksheet = xlsx.utils.aoa_to_sheet(headers);
@@ -848,12 +852,10 @@ const getExcelItem = async (req, res) => {
             filters = null
         } = req.body;
 
-        console.log(filters)
-
 
         let query = {};
 
-        query.wagonNumber = { $ne: null };
+        query['challan.challanNumber'] = { $ne: null };
 
         // 🔍 Search
         if (search) {
@@ -954,6 +956,7 @@ const getExcelItem = async (req, res) => {
                 loader: item.transport?.loader || 'NA',
                 vehicleNumber: item.transport?.vehicleNumber || 'NA',
                 remaining: item.quantity || 'NA',
+                remark: item?.remark,
             };
 
             listView.push(formattedItems);
@@ -971,6 +974,7 @@ const getExcelItem = async (req, res) => {
             loader: item.loader,
             transport: item.transporterName,
             Remaining: item.remaining,
+            remark: item?.remark,
         }));
 
         const workbook = xlsx.utils.book_new();

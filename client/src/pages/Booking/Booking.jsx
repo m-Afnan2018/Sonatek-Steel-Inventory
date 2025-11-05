@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import style from './Booking.module.css'
 // import SearchForm from 'components/core/Booking/SearchForm'
 // import Choices from 'components/core/Booking/Choices'
-import { getAllBookings, getMyBookings } from '../../services/operations/bookingAPI'
+import { getAllBookings, getAllParty, getMyBookings } from '../../services/operations/bookingAPI'
 // import ViewAll from 'components/core/Booking/ViewAll'
 import { useDispatch, useSelector } from 'react-redux'
 import Items from 'components/core/Booking/Items'
@@ -14,6 +14,7 @@ const Booking = () => {
     const { userData } = useSelector((state) => state.auth);
 
     useEffect(() => {
+        getAllParty(dispatch)
         if (userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors')) {
             getAllBookings(dispatch);
         } else {

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { addItem } from "services/operations/itemAPI";
 import { FaCirclePlus } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
@@ -21,6 +22,12 @@ const AddForm = () => {
     });
 
     const onSubmit = (data) => {
+        // Basic validation
+        if (!data.thickness?.value) return toast.error("Please select thickness");
+        if (!data.width?.value) return toast.error("Please select a width");
+        if (!data.grade?.value) return toast.error("Please select a grade");
+        if (!data.quantity || data.quantity <= 0) return toast.error("Invalid quantity");
+
         const formattedData = {
             type: grades.find(g => g._id === data.grade.value).type || 'Cold Rolled',
             grade: data.grade?.value,
@@ -72,51 +79,6 @@ const AddForm = () => {
         }
     };
 
-    // const customStyles = {
-    //     control: (provided) => ({
-    //         ...provided,
-    //         minHeight: "18px",        // remove large default height
-    //         height: "auto",           // set exact height
-    //         cursor: "pointer",
-    //         border: '1px solid grey',
-    //         borderRadius: '2rem'
-    //     }),
-    //     valueContainer: (provided) => ({
-    //         ...provided,
-    //         fontWeight: '400',
-    //         height: "36px",
-    //         padding: "0 6px",
-    //     }),
-    //     indicatorsContainer: (provided) => ({
-    //         ...provided,
-    //         height: "36px",
-    //     }),
-    //     dropdownIndicator: (provided) => ({
-    //         ...provided,
-    //         padding: "2px",           // reduce padding around icon
-    //         transform: "scale(0.7)",  // shrink arrow icon
-    //     }),
-    //     indicatorSeparator: () => ({
-    //         display: "none",          // optional: remove | separator
-    //     }),
-    //     option: (styles, { isFocused, isSelected }) => ({
-    //         ...styles,
-    //         zIndex: 1,
-    //     }),
-    //     menu: base => ({
-    //         ...base,
-    //         zIndex: 1000,
-    //         position: 'absolute'
-    //     }),
-    //     container: (provided) => ({
-    //         ...provided,
-    //         position: 'relative'
-    //     }),
-    //     placeholder: (provided) => ({
-    //         ...provided,
-    //     })
-    // };
-
     const customStyles = {
         control: (provided) => ({
             ...provided,
@@ -162,8 +124,6 @@ const AddForm = () => {
             fontSize: "0.75rem",
         })
     };
-
-
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm} onKeyDown={(e) => {

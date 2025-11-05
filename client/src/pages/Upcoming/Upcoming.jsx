@@ -93,15 +93,16 @@ const Upcoming = () => {
                                     <th style={{ minWidth: "8rem", width: "8rem", textAlign: "center" }}>Description</th>
                                     <th style={{ minWidth: "3rem", width: "3rem" }}>Quantity</th>
                                     <th style={{ minWidth: "5rem", width: "5rem" }}>Wagon</th>
-                                    <th style={{ minWidth: "8rem", width: "8rem" }}>Challan date</th>
+                                    <th style={{ minWidth: "4rem", width: "4rem" }}>Challan date</th>
                                     <th style={{ minWidth: "6rem", width: "6rem" }}>Challan No.</th>
                                     <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Ship To</th>
+                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Remarks</th>
                                     <th style={{ minWidth: "4rem", width: "4rem" }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.shipTo._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                             <tfoot>
@@ -188,7 +189,7 @@ const SingleItem = ({ color, item, setView, view }) => {
                     value={itemDetail[type]?._id || ""}
                     onChange={(e) => valueSetter(e.target.value)}
                 >
-                    <option value="">Select</option>
+                    <option value="" disabled>Select</option>
                     {options.map((opt) => (
                         <option key={opt._id} value={opt._id}>
                             {opt.name || opt.value}
@@ -295,9 +296,18 @@ const SingleItem = ({ color, item, setView, view }) => {
                             : <span>{itemDetail?.shipTo?.name}</span>}
                     </div>
                 ) : (
-                    itemDetail.shipTo === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color.backgroundColor, color: color.foregroundColor, border: `1px solid ${color.foregroundColor}` }}>{itemDetail.shipTo.name.toLowerCase()}</p>
+                    itemDetail.shipTo === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.shipTo.name.toLowerCase()}</p>
                 )}
             </td>
+
+            {/* Remark */}
+            <td onClick={() => clickHandler('remark')}>
+                {select === 'remark'
+                    ? renderEditableField('remark', 'text', '5rem')
+                    : itemDetail.remark || '-'}
+            </td>
+
+
             <td>
                 {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <MdDelete style={{ color: 'red' }} onClick={handleDelete} /> : <div>
                     <RxCheck style={{ color: 'green' }} onClick={handleSave} />

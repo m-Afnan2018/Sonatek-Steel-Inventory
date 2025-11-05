@@ -7,6 +7,7 @@ import {
     setBestSuggestion,
     setBookings,
     setOptions,
+    setParty,
     updateBookingStatus
 } from "slices/bookingSlice";
 import { setPagination } from "slices/itemSlice";
@@ -74,7 +75,6 @@ export async function getAllBookingsTable(filters, setBookings, setPagination, d
         dispatch(addLoader('getAllBookingsTable'));
 
         const response = (await apiConnector('POST', bookingEndpoints.GET_ALL_BOOKING_DETAILS_TABLEWISE, filters)).data;
-        console.log(response);
 
         if (response.success) {
             setBookings(response.listView);
@@ -141,6 +141,29 @@ export async function shipBooking(params, dispatch, setter) {
         dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "shipBooking", message: err?.response?.data?.message || "Ship booking failed" }));
+    }
+}
+
+export async function updateRemark(params, dispatch, setter) {
+    try {
+        dispatch(addLoader("updateRemark"));
+
+        const response = (await apiConnector('POST', bookingEndpoints.UPDATE_REMARK, params)).data;
+
+        if (response.success) {
+            dispatch(updateBookingStatus({ bookingId: params.bookingId, remark: params.remark }));
+        }
+
+        setter((prev) => prev.map(i => {
+            if (i._id === params.bookingId) {
+                return { ...i, remark: params.remark }
+            }
+            return i;
+        }));
+
+        dispatch(showSuccess({ id: "updateRemark", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "updateRemark", message: err?.response?.data?.message || "Remark Update failed" }));
     }
 }
 
@@ -242,5 +265,32 @@ export async function getAllIncompleteBookingsDetails(setter, dispatch) {
         dispatch(showSuccess({ id: "fetchAllIncompleteBookings", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "fetchAllIncompleteBookings", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+    }
+}
+
+export async function getAllParty(dispatch) {
+    try {
+        dispatch(addLoader("getAllParty"));
+
+        const response = (await apiConnector('GET', bookingEndpoints.GET_ALL_PARTY)).data;
+
+        dispatch(setParty(response.parties));
+
+        dispatch(showSuccess({ id: "getAllParty", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "getAllParty", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+    }
+}
+
+export async function deleteParty(dispatch) {
+    try {
+        dispatch(addLoader("deleteParty"));
+
+        const response = (await apiConnector('POST', bookingEndpoints.ADD_PARTY)).data;
+
+
+        dispatch(showSuccess({ id: "deleteParty", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "deleteParty", message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
 }

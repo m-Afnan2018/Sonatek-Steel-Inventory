@@ -76,6 +76,11 @@ const itemSchema = new mongoose.Schema({
     transport: {
         type: transportSchema,
     },
+    remark: {
+        type: String,
+        default: '',
+        required: false
+    },
     date: {
         type: Date,
         default: Date.now

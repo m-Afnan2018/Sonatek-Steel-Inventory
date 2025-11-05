@@ -20,5 +20,15 @@ const errorResponse = (response, error) => {
     });
 }
 
+const toObjectId = (id) => {
+    if (!id) return null;
+    try {
+        return new mongoose.Types.ObjectId(id);
+    } catch (err) {
+        return null;
+    }
+};
+
 exports.customError = error;
 exports.errorResponse = errorResponse;
+exports.toObjectId = toObjectId;

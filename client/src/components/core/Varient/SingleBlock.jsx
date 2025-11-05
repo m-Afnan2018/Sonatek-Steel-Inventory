@@ -106,9 +106,11 @@ const SingleBlock = ({ list, name }) => {
             {show && show.length > 0 &&
                 <table className={style.allVarients}>
                     <thead>
-                        <th>Value</th>
-                        <th>Type</th>
-                        <th>Action</th>
+                        <tr>
+                            <th>Value</th>
+                            <th>Type</th>
+                            <th>Action</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {show.map((value) => {

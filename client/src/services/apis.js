@@ -44,13 +44,16 @@ export const bookingEndpoints = {
     GET_BOOKING: `${BASE_URL}/booking/getBooking`,
     GET_ALL_BOOKING: `${BASE_URL}/booking/getAllBookings`,
     UPDATE_BOOKING: `${BASE_URL}/booking/updateBooking`,
+    UPDATE_REMARK: `${BASE_URL}/booking/updateRemark`,
     CONFIRM_BOOKING: `${BASE_URL}/booking/confirmBooking`,
     SHIPPED_BOOKING: `${BASE_URL}/booking/shippedBooking`,
     CANCEL_BOOKING: `${BASE_URL}/booking/cancelBooking`,
     DELIVER_BOOKING: `${BASE_URL}/booking/deliverBooking`,
     GET_ALL_BOOKING_DETAILS: `${BASE_URL}/booking/getAllBookingsDetails`,
     GET_ALL_INCOMPLETE_BOOKING_DETAILS: `${BASE_URL}/booking/getAllIncompleteBookingsDetails`,
-    GET_ALL_BOOKING_DETAILS_TABLEWISE: `${BASE_URL}/booking/getAllBookingsDetailsTablewise`
+    GET_ALL_BOOKING_DETAILS_TABLEWISE: `${BASE_URL}/booking/getAllBookingsDetailsTablewise`,
+    GET_ALL_PARTY: `${BASE_URL}/booking/getAllParty`,
+    DELETE_PARTY: `${BASE_URL}/booking/deleteParty`,
 }
 
 export const cutterEndpoints = {

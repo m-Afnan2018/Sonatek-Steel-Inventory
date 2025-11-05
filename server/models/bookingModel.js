@@ -2,72 +2,176 @@ const { default: mongoose } = require("mongoose");
 
 // Snapshot schema for item details so bookings keep a copy even if the original Item is deleted/modified
 const itemSnapshotSchema = new mongoose.Schema({
-    item_id: { type: mongoose.Schema.Types.ObjectId }, // original item id (if available)
-    type: { type: String },
-    grade: {
-        _id: { type: mongoose.Schema.Types.ObjectId },
-        name: { type: String },
+    item_id: {
+        type: mongoose.Schema.Types.ObjectId
+    }, // original item id (if available)
+    type: {
+        type: String
     },
-    formType: { type: String },
+    grade: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId
+        },
+        name: {
+            type: String
+        },
+    },
+    formType: {
+        type: String
+    },
     width: {
-        _id: { type: mongoose.Schema.Types.ObjectId },
-        name: { type: String },
+        _id: {
+            type: mongoose.Schema.Types.ObjectId
+        },
+        name: {
+            type: String
+        },
     },
     thickness: {
-        _id: { type: mongoose.Schema.Types.ObjectId },
-        name: { type: String },
+        _id: {
+            type: mongoose.Schema.Types.ObjectId
+        },
+        name: {
+            type: String
+        },
     },
-    wagonNumber: { type: String },
+    wagonNumber: {
+        type: String
+    },
     challan: {
-        challanDate: { type: Date },
-        challanNumber: { type: String }
+        challanDate: {
+            type: Date
+        },
+        challanNumber: {
+            type: String
+        }
     },
-    currentStatus: { type: String },
-    quantity: { type: Number }, // original item quantity at time of snapshot
-    takenQuantity: { type: Number },
+    currentStatus: {
+        type: String
+    },
+    quantity: {
+        type: Number
+    }, // original item quantity at time of snapshot
+    takenQuantity: {
+        type: Number
+    },
     shipTo: { // store basic shipTo/cutter info to avoid losing it
-        _id: { type: mongoose.Schema.Types.ObjectId },
-        name: { type: String }
+        _id: {
+            type: mongoose.Schema.Types.ObjectId
+        },
+        name: {
+            type: String
+        }
     },
-    createdAt: { type: Date },
-    updatedAt: { type: Date }
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    }
 }, { _id: false });
 
 // Snapshot schema for bookedBy (user) details so the booking retains who booked it even if user is removed
 const bookedBySnapshotSchema = new mongoose.Schema({
-    user_id: { type: mongoose.Schema.Types.ObjectId },
-    name: { type: String },
-    email: { type: String },
-    phone: { type: String },
-    role: { type: String }
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId
+    },
+    name: {
+        type: String
+    },
+    email: {
+        type: String
+    },
+    phone: {
+        type: String
+    },
+    role: {
+        type: String
+    }
 }, { _id: false });
 
+const partySnapshotSchema = new mongoose.Schema({
+    name: {
+        type: String,
+    },
+    party_id: {
+        type: mongoose.Schema.Types.ObjectId
+    }
+}, { _id: false })
+
 const bookingSchema = new mongoose.Schema({
-    booking_id: { type: String, required: true, unique: true },
-    order_id: { type: String },
-    type: { type: String, enum: ['Hot Rolled', 'Cold Rolled'] },
+    booking_id: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    order_id: {
+        type: String
+    },
+    type: {
+        type: String,
+        enum: ['Hot Rolled', 'Cold Rolled']
+    },
 
     items: [{
-        item: { type: mongoose.Schema.Types.ObjectId, ref: 'Item' },
-        itemSnapshot: { type: itemSnapshotSchema, required: true },
-        formType: { type: String, enum: ['Sheet', 'Coil'], required: true },
-        quantity: { type: Number, required: true }
+        item: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Item'
+        },
+        itemSnapshot: {
+            type: itemSnapshotSchema,
+            required: true
+        },
+        formType: {
+            type: String,
+            enum: ['Sheet', 'Coil'],
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        }
     }],
 
-    quantity: { type: Number, required: true },
-    requirement: { type: Number }, // optional now
-    vehicleNumber: { type: String },
-    bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    bookedBySnapshot: { type: bookedBySnapshotSchema, required: true },
+    quantity: {
+        type: Number,
+        required: true
+    },
+    requirement: {
+        type: Number
+    }, // optional now
+    vehicleNumber: {
+        type: String
+    },
+    bookedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    bookedBySnapshot: {
+        type: bookedBySnapshotSchema,
+        required: true
+    },
+    party: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Party'
+    },
+    partySnapshot: {
+        type: partySnapshotSchema,
+        required: true
+    },
     status: {
         type: String,
         enum: ['Processing', 'Shipped', 'Cancelled'],
         default: 'Processing'
     },
-    description: { type: String, default: '' },
-    deliveryDate: { type: Date },
+    description: {
+        type: String,
+        default: ''
+    },
+    deliveryDate: {
+        type: Date
+    },
 }, { timestamps: { createdAt: 'bookingDate', updatedAt: 'updatedAt' } });
-
 
 // Static helpers to create snapshots from documents. Call these when creating/updating bookings.
 bookingSchema.statics.makeItemSnapshot = function (itemDoc) {
@@ -126,6 +230,14 @@ bookingSchema.statics.makeBookedBySnapshot = function (userDoc) {
         role: userDoc.role || null
     };
 };
+
+bookingSchema.statics.makePartySnapshot = function (partyDoc) {
+    if (!partyDoc) return {};
+    return {
+        party_id: partyDoc._id || null,
+        name: partyDoc.name || null,
+    };
+}
 
 const Booking = mongoose.model('Booking', bookingSchema);
 module.exports = Booking;

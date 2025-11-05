@@ -66,8 +66,8 @@ const Items = () => {
             message: "Enter requirement and form type",
             range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
             data: selection,
-            onAccept: (data) => {
-                bookingItems({ items: data }, dispatch, () => { setSelection([]); setItems(null) })
+            onAccept: (data, party) => {
+                bookingItems({ items: data, party }, dispatch, () => { setSelection([]); setItems(null) })
             }
         })
     }

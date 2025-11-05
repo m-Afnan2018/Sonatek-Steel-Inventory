@@ -62,6 +62,7 @@ const ViewIncompleteBookingDetail = ({ data,
                         <p><strong>Name:</strong> {bookedBy.firstName} {bookedBy.lastName}</p>
                         <p><strong>Email:</strong> {bookedBy.email}</p>
                         <p><strong>Role:</strong> {bookedBy.role}</p>
+                        <p><strong>Party:</strong> {data.partySnapshot?.name}</p>
                     </div>
 
                     <div className={style.FullWidth}>
