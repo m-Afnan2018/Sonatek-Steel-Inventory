@@ -217,3 +217,30 @@
         justify-content: center;
     }
 }
+
+.nestedRow td {
+    background: #f9fafb;
+    padding: 1rem;
+}
+
+.nestedTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nestedTable th,
+.nestedTable td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.nestedTable th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+}

@@ -9,6 +9,7 @@ const initialState = {
     requirement: null,
     options: null,
     bookings: null,
+    incompleteBookings: null,
     loader: false,
     parties: [],
 }
@@ -68,6 +69,50 @@ const bookingSlice = createSlice({
         updateParty(state, action) {
             state.parties = [...state.party, action.payload];
         },
+        setIncompleteBookings(state, action) {
+            state.incompleteBookings = action.payload;
+        },
+        addIncompleteBookings(state, action) {
+            const bookingItem = action.payload;
+            if (state.incompleteBookings) {
+                state.incompleteBookings = [bookingItem, ...state.incompleteBookings];
+            } else {
+                state.incompleteBookings = [bookingItem];
+            }
+        },
+        removeIncompleteBookings(state, action) {
+            const bookingId = action.payload;
+            state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
+        },
+        addBooking(state, action) {
+            const { bookingId, vehicleNumber, reason, status } = action.payload;
+            const item = state.incompleteBookings.find(i => i._id === bookingId);
+            function transformBooking(raw) {
+                if (!raw || typeof raw !== "object") return null;
+
+                const listView = ({
+                    _id: raw._id,
+                    bookedBy: raw.bookedBySnapshot?.name,
+                    bookingDate: raw.bookingDate,
+                    items: raw.items,
+                    status: status || raw.status,
+                    vehicleNumber: vehicleNumber || raw.vehicleNumber,
+                    reason: reason || raw.reason,
+                    remark: raw.description || "-",
+                    party: raw.partySnapshot?.name || "-",
+                });
+                return listView;
+            }
+
+            if (item) {
+                state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
+                if (state.bookings) {
+                    state.bookings = [transformBooking(item), ...state.bookings];
+                } else {
+                    state.bookings = [item];
+                }
+            }
+        }
     }
 })
 
@@ -82,7 +127,11 @@ export const {
     setOptions,
     setParty,
     updateParty,
-    updateBookingRemark
+    updateBookingRemark,
+    addIncompleteBookings,
+    removeIncompleteBookings,
+    setIncompleteBookings,
+    addBooking
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer

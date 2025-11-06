@@ -1,11 +1,14 @@
 import { apiConnector } from "services/apiConnector";
 import { bookingEndpoints } from "services/apis";
 import {
-    addNewBooking,
+    addBooking,
+    addIncompleteBookings,
+    removeIncompleteBookings,
     setAllChoices,
     setAllSuggestion,
     setBestSuggestion,
     setBookings,
+    setIncompleteBookings,
     setOptions,
     setParty,
     updateBookingStatus
@@ -41,8 +44,9 @@ export async function bookingItems(params, dispatch, reset) {
         if (response.success) {
             dispatch(setBestSuggestion(null));
             dispatch(setAllSuggestion(null));
-            dispatch(setAllChoices(null));
-            dispatch(addNewBooking(response.item));
+            // dispatch(setAllChoices(response.booking));
+            // dispatch(addNewBooking(response.booking));
+            dispatch(addIncompleteBookings(response.booking));
         }
 
         dispatch(showSuccess({ id: "bookingItems", message: response.message }));
@@ -70,14 +74,15 @@ export async function getAllBookings(dispatch) {
     }
 }
 
-export async function getAllBookingsTable(filters, setBookings, setPagination, dispatch) {
+export async function getAllBookingsTable(filters, setter, setPagination, dispatch) {
     try {
         dispatch(addLoader('getAllBookingsTable'));
 
         const response = (await apiConnector('POST', bookingEndpoints.GET_ALL_BOOKING_DETAILS_TABLEWISE, filters)).data;
 
         if (response.success) {
-            setBookings(response.listView);
+            setter(response.listView);
+            dispatch(setBookings(response.listView));
             setPagination({ page: response.page, totalPages: response.pages });
         }
         dispatch(showSuccess({ id: 'getAllBookingsTable', message: response.message }));
@@ -103,7 +108,7 @@ export async function getMyBookings(dispatch) {
     }
 }
 
-export async function cancelBooking(params, dispatch, setter) {
+export async function  cancelBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("cancelBooking"));
 
@@ -111,6 +116,8 @@ export async function cancelBooking(params, dispatch, setter) {
 
         if (response.success) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Cancelled' }));
+            dispatch(addBooking({ bookingId: params.bookingId, reason: params.fieldValue, status: "Cancelled" }));
+            dispatch(removeIncompleteBookings(params.bookingId))
         }
 
         setter((prev) => prev.filter(i => i._id === params.bookingId));
@@ -129,6 +136,8 @@ export async function shipBooking(params, dispatch, setter) {
 
         if (response.success) {
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
+            dispatch(addBooking({ bookingId: params.bookingId, vehicleNumber: params.fieldValue, status: "Cancelled" }));
+            // dispatch(removeIncompleteBookings(params.bookingId))
         }
 
         setter((prev) => prev.map(i => {
@@ -260,6 +269,8 @@ export async function getAllIncompleteBookingsDetails(setter, dispatch) {
 
         if (response.success) {
             setter(response.data.bookings);
+            dispatch(setAllChoices(response.data.bookings));
+            dispatch(setIncompleteBookings(response.data.bookings));
         }
 
         dispatch(showSuccess({ id: "fetchAllIncompleteBookings", message: response.message }));

@@ -91,6 +91,7 @@ const createBooking = async (req, res) => {
                 populate: [
                     { path: 'grade', select: 'name' },
                     { path: 'thickness', select: 'name' },
+                    { path: 'width', select: 'name' },
                 ],
             })
             .populate('bookedBy');
@@ -964,21 +965,34 @@ const getAllBookingDetailsTablewise = async (req, res) => {
         const total = await Booking.countDocuments(query);
 
         // 🧾 Transform result
+        // const listView = bookings.map((b) => ({
+        //     _id: b._id,
+        //     orderId: b.order_id,
+        //     bookedBy: b.bookedBySnapshot?.name,
+        //     bookingDate: b.bookingDate,
+        //     form: b.items?.[0].formType || "-",
+        //     type: b.items?.[0]?.itemSnapshot?.type || "-",
+        //     thickness: b.items?.[0]?.itemSnapshot?.thickness || "-",
+        //     width: b.items?.[0]?.itemSnapshot?.width || "-",
+        //     grade: b.items?.[0]?.itemSnapshot?.grade || "-",
+        //     quantity: b.items?.[0]?.quantity,
+        //     requirement: b.requirement,
+        //     status: b.status,
+        //     vehicleNumber: b.vehicleNumber,
+        //     shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
+        //     remark: b.description || "-",
+        //     party: b.partySnapshot?.name || "-",
+        // }));
+
         const listView = bookings.map((b) => ({
             _id: b._id,
             orderId: b.order_id,
             bookedBy: b.bookedBySnapshot?.name,
             bookingDate: b.bookingDate,
-            form: b.items?.[0]?.itemSnapshot?.formType || "-",
-            type: b.items?.[0]?.itemSnapshot?.type || "-",
-            thickness: b.items?.[0]?.itemSnapshot?.thickness || "-",
-            width: b.items?.[0]?.itemSnapshot?.width || "-",
-            grade: b.items?.[0]?.itemSnapshot?.grade || "-",
-            quantity: b.items?.[0]?.quantity,
+            items: b.items,
             requirement: b.requirement,
             status: b.status,
             vehicleNumber: b.vehicleNumber,
-            shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
             remark: b.description || "-",
             party: b.partySnapshot?.name || "-",
         }));
@@ -1067,21 +1081,27 @@ const getExcelTablewiseBooking = async (req, res) => {
         const total = await Booking.countDocuments(query);
 
         // ✅ Convert to frontend table format
-        const listView = bookings.map(b => ({
-            party: b.partySnapshot?.name || "-",
-            bookedBy: b.bookedBySnapshot?.name,
-            bookingDate: b.bookingDate,
-            form: b.items?.[0]?.itemSnapshot?.formType || "-",
-            type: b.items?.[0]?.itemSnapshot?.type || "-",
-            description: `${b.items?.[0]?.itemSnapshot?.thickness?.name || "-"} X ${b.items?.[0]?.itemSnapshot?.width?.name || "-"} X ${b.items?.[0]?.itemSnapshot?.grade?.name || "-"}`,
-            quantity: b.items?.[0]?.quantity,
-            requirement: b.requirement,
-            status: b.status,
-            vehicleNumber: b.vehicleNumber,
-            location: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
-            remark: b.description || '-'
-        }));
+        const listView = [];
 
+        bookings.map(b => {
+            b.items.map((item) => {
+                let temp = {
+                    party: b.partySnapshot?.name || "-",
+                    bookedBy: b.bookedBySnapshot?.name,
+                    bookingDate: b.bookingDate,
+                    form: item.itemSnapshot?.formType || "-",
+                    type: item.itemSnapshot?.type || "-",
+                    description: `${item.itemSnapshot?.thickness?.name || "-"} X ${item.itemSnapshot?.width?.name || "-"} X ${item.itemSnapshot?.grade?.name || "-"}`,
+                    quantity: item.quantity,
+                    status: b.status,
+                    vehicleNumber: b.vehicleNumber,
+                    location: item.itemSnapshot?.shipTo?.name || "-",
+                    remark: b.description || '-'
+                }
+                listView.push(temp);
+            })
+        });
+        console.log(listView);
         // Create workbook and sheet
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.json_to_sheet(listView);

@@ -24,12 +24,18 @@ const STATUS_STYLES = {
 const ViewIncompleteBooking = () => {
     const dispatch = useDispatch();
     const { userData } = useSelector((state) => state.auth);
+    const { incompleteBookings } = useSelector((state) => state.booking);
     const { showOverlay, hideOverlay } = useOverlay();
 
     const [bookings, setBookings] = useState([]);
     const [listing, setListing] = useState([]);
     const [view, setView] = useState('all');
     const [editable, setEditable] = useState({ field: '', id: '', value: '' });
+
+    useEffect(() => {
+        console.log(incompleteBookings);
+        setBookings(incompleteBookings);
+    }, [incompleteBookings])
 
     // Fetch all bookings once
     useEffect(() => {

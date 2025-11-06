@@ -41,10 +41,12 @@
 
 .card {
     /* Style wrapper for the table/content */
-    background: #fff;
+    background: #f3f3ff;
     border-radius: 0 0 1rem 1rem;
     padding: 4px;
     box-shadow: none;
+    border: 1px solid darkgrey;
+    border-radius: 0.5rem;
     /* height: 500px; */
     /* Used in style prop, but style is also used here */
     overflow: hidden;

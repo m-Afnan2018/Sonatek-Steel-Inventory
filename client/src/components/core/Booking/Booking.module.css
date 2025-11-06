@@ -236,11 +236,12 @@
     border-radius: 0.5rem;
     color: rgb(240 251 255);
     border: none;
-    background-color: #001f2b;
-    font-weight: 600;
+    background-color: #11386c;
+    font-weight: 500;
     cursor: pointer;
-    width: 33%;
+    width: 6rem;
     text-align: center;
+    text-transform: uppercase;
 }
 
 .viewOptions button:hover {
@@ -812,4 +813,40 @@
     width: 6.25rem;
     padding: 0.15rem 0.25rem;
     border-radius: 0.25rem;
+}
+
+.nestedRow td {
+    background: #e9f5ff;
+    padding: 1rem;
+}
+
+.nestedTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nestedTable th,
+.nestedTable td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    background: #ffffff;
+    height: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5d5c5c;
+}
+
+.nestedTable th {
+    background-color: white;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.25rem;
+    height: auto;
 }

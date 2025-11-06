@@ -12,7 +12,16 @@ const Items = () => {
     const [setPage, page] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const { bookings } = useSelector(state => state.booking);
+
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        console.log(bookings);
+        if (bookings) {
+            setAllBookings(bookings);
+        }
+    }, [bookings])
 
     useEffect(() => {
         getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
@@ -91,14 +100,9 @@ const Items = () => {
                                     <th style={{ width: '8rem' }}>Party</th>
                                     <th style={{ width: '8rem' }}>Booked By</th>
                                     <th style={{ width: '8rem' }}>Booking Date</th>
-                                    <th style={{ width: '8rem' }}>Form</th>
-                                    <th style={{ width: '8rem' }}>Type</th>
-                                    <th style={{ width: '8rem' }}>Description</th>
-                                    <th style={{ width: '8rem' }}>Quantity</th>
-                                    <th style={{ width: '8rem' }}>Requirement</th>
+                                    <th style={{ width: '8rem' }}>Items</th>
                                     <th style={{ width: '8rem' }}>Status</th>
                                     <th style={{ width: '8rem' }}>Vehicle Number</th>
-                                    <th style={{ width: '8rem' }}>Location</th>
                                     <th style={{ width: '8rem' }}>Remark</th>
                                 </tr>
                             </thead>
@@ -137,52 +141,134 @@ const Items = () => {
     );
 };
 
+// const SingleItem = ({ item, view, setView }) => {
+//     const bookingDate = item.bookingDate
+//         ? new Date(item.bookingDate).toLocaleDateString()
+//         : "-";
+
+//     const status = {
+//         'Pending': {
+//             background: '#FFF4E5', // soft orange
+//             foreground: '#D97706'  // amber/dark orange
+//         },
+//         'Processing': {
+//             background: '#E0E7FF', // light indigo
+//             foreground: '#4338CA'  // deep indigo
+//         },
+//         'Shipped': {
+//             background: '#E0F2FE', // light blue
+//             foreground: '#0369A1'  // sky blue
+//         },
+//         'Delivered': {
+//             background: '#DCFCE7', // light green
+//             foreground: '#15803D'  // deep green
+//         },
+//         'Cancelled': {
+//             background: '#FEE2E2', // light red
+//             foreground: '#B91C1C'  // dark red
+//         }
+//     }
+
+
+//     return (
+//         <tr
+//             className={`${view === item._id ? style.activeRow : ""}`}
+//         >
+//             <td>{item.party || "-"}</td>
+//             <td>{item.bookedBy || "-"}</td>
+//             <td>{bookingDate}</td>
+//             <td>{item.form || "-"}</td>
+//             <td>{item.type}</td>
+//             <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
+//             <td>{item.quantity ?? "-"}</td>
+//             <td>{item.requirement ?? "-"}</td>
+//             <td><p className={style.coloredShipTo} style={{ background: status[item.status].background, color: status[item.status].foreground, border: `1px solid ${status[item.status].foreground}` }}>{item.status ?? "-"}</p></td>
+//             <td>{item.vehicleNumber ?? "-"}</td>
+//             <td>{item.shipTo?.name ?? "-"}</td>
+//             <td>{item.remark ?? "-"}</td>
+//         </tr>
+//     );
+// };
+
 const SingleItem = ({ item, view, setView }) => {
     const bookingDate = item.bookingDate
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
 
     const status = {
-        'Pending': {
-            background: '#FFF4E5', // soft orange
-            foreground: '#D97706'  // amber/dark orange
-        },
-        'Processing': {
-            background: '#E0E7FF', // light indigo
-            foreground: '#4338CA'  // deep indigo
-        },
-        'Shipped': {
-            background: '#E0F2FE', // light blue
-            foreground: '#0369A1'  // sky blue
-        },
-        'Delivered': {
-            background: '#DCFCE7', // light green
-            foreground: '#15803D'  // deep green
-        },
-        'Cancelled': {
-            background: '#FEE2E2', // light red
-            foreground: '#B91C1C'  // dark red
-        }
-    }
+        'Pending': { background: '#FFF4E5', foreground: '#D97706' },
+        'Processing': { background: '#E0E7FF', foreground: '#4338CA' },
+        'Shipped': { background: '#E0F2FE', foreground: '#0369A1' },
+        'Delivered': { background: '#DCFCE7', foreground: '#15803D' },
+        'Cancelled': { background: '#FEE2E2', foreground: '#B91C1C' }
+    };
 
+    const isOpen = view === item._id;
 
     return (
-        <tr
-            className={`${view === item._id ? style.activeRow : ""}`}
-        >
-            <td>{item.party || "-"}</td>
-            <td>{item.bookedBy || "-"}</td>
-            <td>{bookingDate}</td>
-            <td>{item.form || "-"}</td>
-            <td>{item.type}</td>
-            <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
-            <td>{item.quantity ?? "-"}</td>
-            <td>{item.requirement ?? "-"}</td>
-            <td><p className={style.coloredShipTo} style={{ background: status[item.status].background, color: status[item.status].foreground, border: `1px solid ${status[item.status].foreground}` }}>{item.status ?? "-"}</p></td>
-            <td>{item.vehicleNumber ?? "-"}</td>
-            <td>{item.shipTo?.name ?? "-"}</td>
-            <td>{item.remark ?? "-"}</td>
-        </tr>
+        <>
+            <tr
+                className={`${isOpen ? style.activeRow : ""}`}
+                onClick={() => setView(isOpen ? null : item._id)}
+                style={{ cursor: "pointer" }}
+            >
+                <td>{item.party || "-"}</td>
+                <td>{item.bookedBy || "-"}</td>
+                <td>{bookingDate}</td>
+                <td>{item.items?.length}</td>
+                <td style={{ display: 'flex' }}>
+                    <p
+                        className={style.coloredShipTo}
+                        style={{
+                            background: status[item.status]?.background,
+                            color: status[item.status]?.foreground,
+                            border: `1px solid ${status[item.status]?.foreground}`,
+                        }}
+                    >
+                        {item.status ?? "-"}
+                    </p>
+                </td>
+                <td>{item.vehicleNumber ?? "-"}</td>
+                <td>{item.remark ?? "-"}</td>
+            </tr>
+
+            {isOpen && (
+                <tr className={style.nestedRow}>
+                    <td colSpan="12">
+                        <table className={style.nestedTable}>
+                            <thead>
+                                <tr>
+                                    <th>Form Type</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Challan No</th>
+                                    <th>Challan Date</th>
+                                    <th>Wagon No</th>
+                                    <th>Ship To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {item.items?.map((i) => (
+                                    <tr key={i._id}>
+                                        <td>{i.formType}</td>
+                                        <td>{i.itemSnapshot.type}</td>
+                                        <td>{`${i.itemSnapshot.thickness?.name || "-"} X ${i.itemSnapshot.width?.name || "-"} X ${i.itemSnapshot.grade?.name || "-"}`}</td>
+                                        <td>{i.quantity}</td>
+                                        <td>{i.itemSnapshot.challan?.challanNumber || "-"}</td>
+                                        <td>{i.itemSnapshot.challan?.challanDate
+                                            ? new Date(i.itemSnapshot.challan.challanDate).toLocaleDateString()
+                                            : "-"}</td>
+                                        <td>{i.itemSnapshot.wagonNumber || "-"}</td>
+                                        <td>{i.itemSnapshot.shipTo?.name || "-"}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            )}
+        </>
     );
 };
 

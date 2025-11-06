@@ -98,12 +98,8 @@ const SalesReport = () => {
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('party')}>Party</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookedBy')}>Booked By</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookingDate')}>Booking Date</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('formType')}>Form</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('type')}>Type</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('description')}>Description</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('quantity')}>Items</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('vehicleNumber')}>Vehicle Number</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('shipTo')}>Location</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('remark')}>Remark</th>
                                 </tr>
                             </thead>
@@ -147,37 +143,82 @@ const SingleItem = ({ item, view, setView }) => {
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
 
-    const colorType = {
-        'Cold Rolled': {
-            background: '#E0F2FE', // light blue
-            foreground: '#0369A1'  // sky blue
-        },
-        'Hot Rolled': {
-            background: '#FFF4E5', // soft orange
-            foreground: '#D97706'  // amber/dark orange
-        }
-    }
+    const status = {
+        'Pending': { background: '#FFF4E5', foreground: '#D97706' },
+        'Processing': { background: '#E0E7FF', foreground: '#4338CA' },
+        'Shipped': { background: '#E0F2FE', foreground: '#0369A1' },
+        'Delivered': { background: '#DCFCE7', foreground: '#15803D' },
+        'Cancelled': { background: '#FEE2E2', foreground: '#B91C1C' }
+    };
 
+    const isOpen = view === item._id;
 
     return (
-        <tr
-            className={`${view === item._id ? style.activeRow : ""}`}
-        >
-            <td>{item.party || "-"}</td>
-            <td>{item.bookedBy || "-"}</td>
-            <td>{bookingDate}</td>
-            <td>{item.form || "-"}</td>
-            <td><p className={style.coloredShipTo} style={{ background: colorType[item.type].background, color: colorType[item.type].foreground, border: `1px solid ${colorType[item.type].foregroundColor}` }}>{item.type.toLowerCase()}</p></td>
-            {/* <td>{item.type}</td> */}
-            <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
-            <td>{item.quantity ?? "-"}</td>
-            <td>{item.vehicleNumber ?? "-"}</td>
-            <td>{item.shipTo ?? "-"}</td>
-            <td>{item.remark ?? "-"}</td>
-        </tr>
+        <>
+            <tr
+                className={`${isOpen ? style.activeRow : ""}`}
+                onClick={() => setView(isOpen ? null : item._id)}
+                style={{ cursor: "pointer" }}
+            >
+                <td>{item.party || "-"}</td>
+                <td>{item.bookedBy || "-"}</td>
+                <td>{bookingDate}</td>
+                <td>{item.items.length}</td>
+                <td style={{ display: 'flex' }}>
+                    <p
+                        className={style.coloredShipTo}
+                        style={{
+                            background: status[item.status]?.background,
+                            color: status[item.status]?.foreground,
+                            border: `1px solid ${status[item.status]?.foreground}`,
+                        }}
+                    >
+                        {item.status ?? "-"}
+                    </p>
+                </td>
+                <td>{item.vehicleNumber ?? "-"}</td>
+                <td>{item.remark ?? "-"}</td>
+            </tr>
+
+            {isOpen && (
+                <tr className={style.nestedRow}>
+                    <td colSpan="12">
+                        <table className={style.nestedTable}>
+                            <thead>
+                                <tr>
+                                    <th>Form Type</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Challan No</th>
+                                    <th>Challan Date</th>
+                                    <th>Wagon No</th>
+                                    <th>Ship To</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {item.items?.map((i) => (
+                                    <tr key={i._id}>
+                                        <td>{i.formType}</td>
+                                        <td>{i.itemSnapshot.type}</td>
+                                        <td>{`${i.itemSnapshot.thickness?.name || "-"} X ${i.itemSnapshot.width?.name || "-"} X ${i.itemSnapshot.grade?.name || "-"}`}</td>
+                                        <td>{i.quantity}</td>
+                                        <td>{i.itemSnapshot.challan?.challanNumber || "-"}</td>
+                                        <td>{i.itemSnapshot.challan?.challanDate
+                                            ? new Date(i.itemSnapshot.challan.challanDate).toLocaleDateString()
+                                            : "-"}</td>
+                                        <td>{i.itemSnapshot.wagonNumber || "-"}</td>
+                                        <td>{i.itemSnapshot.shipTo?.name || "-"}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            )}
+        </>
     );
 };
-
 
 const Filters = ({ setFilters, setAllBookings, setPagination }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(

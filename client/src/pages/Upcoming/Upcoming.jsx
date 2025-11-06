@@ -75,8 +75,9 @@ const Upcoming = () => {
                 </button>
                 <button onClick={downloadTemplate}>Download Template</button>
             </div>}
-            <h3 className={style.heading}>Upcoming Items</h3>
+            <h3 className={style.heading}>Add Upcoming</h3>
             <AddForm />
+            <h3 className={style.heading}>Upcoming Items</h3>
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -106,7 +107,7 @@ const Upcoming = () => {
                                 ))}
                             </tbody>
                             <tfoot>
-                                <tr>
+                                <tr style={{ borderBottom: 'none' }}>
                                     <td></td>
                                     <td style={{ fontWeight: '600' }}>Total quantity:</td>
                                     <td style={{ fontWeight: '600' }}>{count.toFixed(3)}</td>
