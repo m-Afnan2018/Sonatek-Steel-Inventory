@@ -112,7 +112,7 @@
 .controlsRow button {
     padding: 0.5rem 3rem;
     border-radius: 8px;
-    background-color: rgb(17 56 108);
+    background-color: rgb(0 122 138);
     border: none;
     color: #f0fbff;
     font-weight: 400;
@@ -184,7 +184,7 @@
 .buttonGroup button {
     padding: 0.5rem 3rem;
     border-radius: 8px;
-    background-color: #11386C;
+    background-color: rgb(0 122 138);
     color: #f0fbff;
     border: none;
     font-weight: 400;
@@ -200,7 +200,7 @@
 .paginationInfo {
     padding: 0.5rem 3rem;
     border-radius: 8px;
-    background-color: rgb(17 56 108);
+    background-color: rgb(0 122 138);
     border: none;
     color: #f0fbff;
     font-weight: 400;
@@ -220,7 +220,7 @@
 
 .nestedRow td {
     background: #f9fafb;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .nestedTable {
@@ -232,15 +232,24 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.nestedTable th,
 .nestedTable td {
     border: 1px solid #e5e7eb;
     padding: 0.5rem;
-    text-align: left;
+    text-align: center;
     font-size: 0.9rem;
+    background: #f9fafb;
+    height: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5d5c5c;
 }
 
 .nestedTable th {
     background-color: #f3f4f6;
     font-weight: 600;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.25rem;
+    height: auto;
+    color: #667085;
 }

@@ -89,8 +89,7 @@ const Items = () => {
                                 <tr>
                                     <th>Select</th>
                                     <th>Wagon No.</th>
-                                    <th>Challan date</th>
-                                    <th>Challan No.</th>
+                                    <th>Status</th>
                                     <th>Type</th>
                                     <th>Material Description</th>
                                     <th>Quantity</th>
@@ -113,11 +112,7 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ color, setSelection, item, view, setView }) => {
-    const challanDate = item.challanDate
-        ? new Date(item.challanDate).toLocaleDateString()
-        : "-";
-
+const SingleItem = ({ color, setSelection, item, view }) => {
     const [select, setSelect] = useState(false);
 
     const handleSelect = () => {
@@ -134,6 +129,11 @@ const SingleItem = ({ color, setSelection, item, view, setView }) => {
         });
     };
 
+    const status = {
+        'Cold Rolled': { background: '#E0F2FE', foreground: '#0369A1' },
+        'Hot Rolled': { background: '#FEE2E2', foreground: '#B91C1C' }
+    };
+
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
@@ -142,17 +142,23 @@ const SingleItem = ({ color, setSelection, item, view, setView }) => {
         >
             <td>{select ? <FaCheckSquare style={{ color: '#1D54D9', background: 'white', borderRadius: '0.4rem' }} /> : <FaSquare style={{ color: 'white', background: '#1D54D9', borderRadius: '0.25rem' }} />}</td>
             <td>{item.wagonNumber || "-"}</td>
-            <td>{challanDate}</td>
-            <td>{item.challanNumber || "-"}</td>
-            <td>{item.type || "-"}</td>
+            <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.challanNumber ? 'In Inventory' : "Arriving"}</td>
+            <td>
+                <p className={style.coloredShipTo}
+                    style={{
+                        background: status[item.type]?.background,
+                        color: status[item.type]?.foreground,
+                        border: `1px solid ${status[item.type]?.foreground}`,
+                    }}>{item.type || "-"}</p>
+            </td>
 
-            <td style={{ display: "flex", gap: "5px" }}>
+            <td style={{ display: "flex", gap: "4px" }}>
                 <span>{item.thickness?.name || "-"}</span> X
                 <span>{item.width?.name || "-"}</span> X
                 <span>{item.grade?.name || "-"}</span>
             </td>
 
-            <td>{item.quantity.toFixed(3) ?? "-"}</td>
+            <td style={{ fontWeight: '500', color: 'black' }}>{item.quantity.toFixed(3) ?? "-"}</td>
             <td style={{ display: "flex" }}>{item.shipTo === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.shipTo.name.toLowerCase()}</p>}</td>
 
         </tr>

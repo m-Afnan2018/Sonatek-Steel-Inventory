@@ -1,0 +1,574 @@
+  /* Staff */
+  .staffContainer {
+      font-family: "Poppins", sans-serif;
+      color: #222;
+      margin: 2rem;
+      padding: 1rem;
+      background: #001f2b;
+      border-radius: 1rem;
+  }
+
+  .staffContainer h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem 16px;
+      color: #f0fbff;
+  }
+
+  .heading {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+  }
+
+  .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .loading,
+  .empty {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      font-size: 1rem;
+  }
+
+  .tableWrapper {
+      overflow-x: auto;
+  }
+
+  .table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  .table th,
+  .table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+  }
+
+  .table th {
+      background-color: #f5f6fa;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+  }
+
+  .table tr:hover {
+      background-color: #f9fafc;
+      cursor: pointer;
+  }
+
+  .activeRow {
+      background-color: #e9f5ff;
+  }
+
+  .verified {
+      color: green;
+      font-weight: 600;
+  }
+
+  .notVerified {
+      color: red;
+      font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+
+      .table th,
+      .table td {
+          padding: 8px 10px;
+          font-size: 0.85rem;
+      }
+
+      .heading {
+          font-size: 1.2rem;
+      }
+  }
+
+  /* Items */
+  .inStock {
+      color: green;
+      font-weight: 600;
+  }
+
+  .sold {
+      color: red;
+      font-weight: 600;
+  }
+
+  .reserved {
+      color: orange;
+      font-weight: 600;
+  }
+
+  .cancelled {
+      color: gray;
+      font-weight: 600;
+  }
+
+  /* Varients */
+  .Varient {
+      color: #222;
+      margin: 2rem;
+      padding: 1rem;
+      background: #001f2b;
+      border-radius: 1rem;
+  }
+
+  .Varient h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem 16px;
+      color: #f0fbff;
+  }
+
+  .cardsWrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+  }
+
+  .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 0px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+  }
+
+  .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .card h4 {
+      margin-bottom: 10px;
+      color: #001f2b;
+  }
+
+  .detailTable {
+      overflow-x: auto;
+      height: 10rem;
+      overflow-y: scroll;
+  }
+
+  .table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  .table th,
+  .table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+  }
+
+  .table th {
+      background-color: #f5f6fa;
+      font-weight: 600;
+  }
+
+  .table tr:hover {
+      background-color: #f9fafc;
+  }
+
+  /* Bookings */
+  .bookingsContainer {
+      padding: 20px;
+  }
+
+  .filterWrapper {
+      margin-bottom: 15px;
+  }
+
+  .filterWrapper label {
+      margin-right: 10px;
+      font-weight: 500;
+  }
+
+  .tableWrapper {
+      overflow-x: auto;
+      border-radius: 1rem;
+  }
+
+  .table {
+      /* width: 100%; */
+      border-collapse: collapse;
+      width: 100%;
+      min-width: max-content;
+      /* allows columns to expand to fit content */
+      border-collapse: collapse;
+      table-layout: auto;
+      /* don't force fixed layout */
+  }
+
+  .table th,
+  .table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+  }
+
+  .table th {
+      background-color: #f5f6fa;
+      font-weight: 600;
+  }
+
+  .table tr:hover {
+      background-color: #f9fafc;
+  }
+
+  .pending {
+      color: orange;
+      font-weight: 600;
+  }
+
+  .processing {
+      color: blue;
+      font-weight: 600;
+  }
+
+  .delivered {
+      color: green;
+      font-weight: 600;
+  }
+
+  .cancelled {
+      color: red;
+      font-weight: 600;
+  }
+
+  .itemList {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+  }
+
+  .itemList li {
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+  }
+
+  /* Bookings */
+  .Bookings {
+      font-family: "Poppins", sans-serif;
+      color: #222;
+      margin: 2rem;
+      padding: 1rem;
+      background: #001f2b;
+      border-radius: 1rem;
+  }
+
+  .Bookings .heading {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #f0fbff;
+  }
+
+  /* Summary Cards */
+  .Bookings .summaryGrid {
+      color: #f0fbff;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+  }
+
+  .Bookings .card {
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .Bookings .cardTitle {
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      color: #f0fbff;
+  }
+
+  .Bookings .cardValue {
+      font-size: 1.5rem;
+      font-weight: bold;
+  }
+
+  .Bookings .total {
+      background: rgb(33 78 94);
+      /* background: #4b6cb7; */
+  }
+
+  .Bookings .pending {
+      background: rgb(33 78 94);
+      /* background: #ffb347; */
+  }
+
+  .Bookings .processing {
+      background: rgb(33 78 94);
+      /* background: #6a89cc; */
+  }
+
+  .Bookings .delivered {
+      background: rgb(33 78 94);
+      /* background: #78e08f; */
+  }
+
+  .Bookings .cancelled {
+      background: rgb(33 78 94);
+      /* background: #e55039; */
+  }
+
+  /* Agents Section */
+  .Bookings .agentsSection h2 {
+      color: white;
+      margin-bottom: 1rem;
+  }
+
+  .Bookings .agentGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+  }
+
+  .Bookings .agentCard {
+      flex: 1 1 180px;
+      background: #214e5e;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      color: #f0fbff;
+  }
+
+  .Bookings .agentCard h4 {
+      margin-bottom: 4px;
+      color: #333;
+  }
+
+  /* Table Styles */
+  .Bookings .tableContainer h2 {
+      color: white;
+      margin-bottom: 1rem;
+  }
+
+  .Bookings .tableContainer {
+      margin-top: 30px;
+      overflow-x: auto;
+  }
+
+  .Bookings .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+  }
+
+  .Bookings .table th,
+  .table td {
+      padding: 2px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      justify-content: center;
+  }
+
+  .Bookings .table th {
+      background: #f2f2f2;
+  }
+
+  .Bookings .table tr:hover {
+      background: #f9f9f9;
+  }
+
+  /* Status Colors */
+  .Bookings .pending {
+      color: #f0fbff;
+      /* color: #f39c12; */
+  }
+
+  .Bookings .processing {
+      color: #f0fbff;
+      /* color: #2980b9; */
+  }
+
+  .Bookings .delivered {
+      color: #f0fbff;
+      /* color: #27ae60; */
+  }
+
+  .Bookings .cancelled {
+      color: #f0fbff;
+      /* color: #c0392b; */
+  }
+
+  .Bookings .itemDetails {
+      background: #f7f7f7;
+      margin: 4px 0;
+      padding: 4px 6px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+  }
+
+  /* Loading / Error */
+  .Bookings .loader,
+  .error {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 1.2rem;
+  }
+
+  .controlsRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+  }
+
+  .searchForm {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+  }
+
+  .controlsRow>div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 900;
+  }
+
+  .searchForm button,
+  .controlsRow button {
+      padding: 0.5rem 3rem;
+      border-radius: 8px;
+      color: rgb(0 31 43);
+      border: none;
+      background-color: #f0fbff;
+      font-weight: 600;
+      cursor: pointer;
+  }
+
+  .searchForm button:hover,
+  .controlsRow button:hover {
+      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+      background: #05516f;
+      color: #f0fbff;
+  }
+
+  .searchForm input {
+      border-radius: 1rem;
+      padding: 0.5rem 0.5rem;
+      font-weight: 600;
+      border: none;
+      width: 100%;
+  }
+
+  /* Dashboard filter form */
+  .formBlock {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      background: #f9fafb;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      font-family: "Inter", sans-serif;
+      margin-bottom: 1rem;
+  }
+
+  .formBlock label {
+      display: block;
+      font-size: 0.9rem;
+      color: #374151;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+  }
+
+  .formBlock input,
+  .formBlock select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      background: #fff;
+      font-size: 0.9rem;
+      transition: border-color 0.2s ease;
+  }
+
+  .formBlock input:focus,
+  .formBlock select:focus {
+      border-color: #2563eb;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  }
+
+  .error {
+      color: #dc2626;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+  }
+
+  .twoInOne {
+      display: flex;
+      gap: 1rem;
+  }
+
+  .twoInOne>div {
+      flex: 1;
+  }
+
+  .buttonGroup {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: flex-end;
+      grid-column: 1 / -1;
+      margin-top: 0.5rem;
+  }
+
+  .buttonGroup button {
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.5rem;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+  }
+
+  .buttonGroup button {
+      padding: 0.5rem 3rem;
+      border-radius: 8px;
+      background-color: rgb(0 31 43);
+      color: #f0fbff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+  }
+
+  .buttonGroup button:hover {
+      background-color: #f0fbff;
+      color: rgb(0 31 43);
+  }
+
+  /* Responsive tweak for smaller screens */
+  @media (max-width: 600px) {
+      .formBlock {
+          grid-template-columns: 1fr;
+      }
+
+      .buttonGroup {
+          justify-content: center;
+      }
+  }

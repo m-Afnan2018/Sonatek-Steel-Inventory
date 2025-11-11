@@ -945,6 +945,11 @@ const getAllBookingDetailsTablewise = async (req, res) => {
         if (filters.bookedBy)
             query["bookedBySnapshot.user_id"] = toObjectId(filters.bookedBy);
 
+
+        if (filters.party) {
+            query["partySnapshot.party_id"] = filters.party;
+        }
+
         // 📅 Date range
         if (filters.fromDate || filters.toDate) {
             query.bookingDate = {};
@@ -1059,6 +1064,10 @@ const getExcelTablewiseBooking = async (req, res) => {
             query.items = { $elemMatch: { "itemSnapshot.shipTo.shipTo_id": filters.shipTo } };
         }
 
+        if (filters.party) {
+            query["partySnapshot.party_id"] = filters.party;
+        }
+
         // ✅ Status
         if (filters.status) query.status = filters.status;
 
@@ -1101,7 +1110,6 @@ const getExcelTablewiseBooking = async (req, res) => {
                 listView.push(temp);
             })
         });
-        console.log(listView);
         // Create workbook and sheet
         const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.json_to_sheet(listView);
@@ -1244,6 +1252,44 @@ const deleteParty = async (req, res) => {
     }
 }
 
+const getAllPartyDetails = async (req, res) => {
+    try {
+        const parties = await Party.find();
+
+        // Count bookings for each party
+        const bookingCounts = await Booking.aggregate([
+            {
+                $group: {
+                    _id: "$partySnapshot.party_id", // change this according to your schema
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Convert aggregation result to a lookup object
+        const countsMap = bookingCounts.reduce((acc, item) => {
+            acc[item._id] = item.count;
+            return acc;
+        }, {});
+
+        // Attach booking count to each party
+        const partiesWithCounts = parties.map(party => ({
+            ...party.toObject(),
+            totalBookings: countsMap[party._id] || 0
+        }));
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched all parties",
+            parties: partiesWithCounts
+        });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+
 
 module.exports = {
     createBooking,
@@ -1264,5 +1310,6 @@ module.exports = {
     getAllBookingDetailsTablewise,
     getAllIncompleteBookingsDetails,
     getAllParty,
-    deleteParty
+    deleteParty,
+    getAllPartyDetails
 }

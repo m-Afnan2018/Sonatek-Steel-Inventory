@@ -226,8 +226,9 @@
 }
 
 .viewOptions .selected {
-    background-color: white;
-    color: #001f2b;
+    background-color: #11386c;
+    color: #f0fbff;
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
     /* border-radius: 0.5rem 0.5rem 0 0; */
 }
 
@@ -236,7 +237,7 @@
     border-radius: 0.5rem;
     color: rgb(240 251 255);
     border: none;
-    background-color: #11386c;
+    background-color: rgb(0 122 138);
     font-weight: 500;
     cursor: pointer;
     width: 6rem;
@@ -487,7 +488,6 @@
 
 .card {
     background: #fff;
-    border-radius: 0 0 1rem 1rem;
     padding: 4px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     max-height: 500px;
@@ -520,53 +520,6 @@
     /* overflow-x: auto; */
 }
 
-.table {
-    min-width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.table th,
-.table td {
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    padding: 2px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* ✅ Prevents breaking layout */
-    white-space: nowrap;
-}
-
-.table td {
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    font-weight: 400;
-    height: 2rem;
-    border-bottom: 0;
-    font-size: 0.75rem;
-    height: 3rem;
-}
-
-.table td svg {
-    font-size: 1rem;
-}
-
-.table th {
-    background-color: white;
-    font-weight: 500;
-    font-size: 0.75rem;
-    text-align: center;
-    padding: 0.5rem;
-}
-
-.table tr:hover {
-    background-color: #f9fafc;
-    cursor: pointer;
-}
-
 .activeRow {
     background-color: #e9f5ff;
 }
@@ -588,14 +541,17 @@
     font-weight: 900;
 }
 
-.controlsRow button {
-    padding: 0.5rem 3rem;
-    border-radius: 8px;
-    color: rgb(0 31 43);
+.controlsRow>button {
+    padding: 0.5rem 0;
+    border-radius: 0.5rem;
+    color: rgb(240 251 255);
     border: none;
-    background-color: #f0fbff;
-    font-weight: 600;
+    background-color: #11386c;
+    font-weight: 500;
     cursor: pointer;
+    width: 10rem;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .controlsRow button:hover {
@@ -732,18 +688,22 @@
 }
 
 .confirmationButton>button {
-    padding: 0.5rem 3rem;
-    border-radius: 8px;
-    color: rgb(0 31 43);
-    background-color: #f0fbff;
+    padding: 0.5rem 0;
+    border-radius: 0.5rem;
+    color: rgb(240 251 255);
     border: none;
-    font-weight: 600;
+    background-color: #11386c;
+    font-weight: 500;
     cursor: pointer;
+    width: 10rem;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .confirmationButton button:hover {
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
+    background: #05516f;
     color: #f0fbff;
-    background-color: rgb(0 31 43);
 }
 
 /* Responsive tweak for smaller screens */
@@ -816,8 +776,8 @@
 }
 
 .nestedRow td {
-    background: #e9f5ff;
-    padding: 1rem;
+        background: #f9fafb;
+    padding: 0.5rem;
 }
 
 .nestedTable {
@@ -829,13 +789,12 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.nestedTable th,
 .nestedTable td {
-    border: 1px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
     padding: 0.5rem;
-    text-align: left;
+    text-align: center;
     font-size: 0.9rem;
-    background: #ffffff;
+    background: #f9fafb;
     height: auto;
     font-size: 0.75rem;
     font-weight: 600;
@@ -843,10 +802,11 @@
 }
 
 .nestedTable th {
-    background-color: white;
-    font-weight: 500;
+    background-color: #f3f4f6;
+    font-weight: 600;
     font-size: 0.75rem;
     text-align: center;
     padding: 0.25rem;
     height: auto;
+    color: #667085;
 }

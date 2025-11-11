@@ -22,6 +22,7 @@ import { OverlayProvider } from 'hooks/useOverlay';
 import Cutter from 'pages/Cutter/Cutter';
 import SalesReport from 'pages/SalesReport/SalesReport';
 import Upcoming from 'pages/Upcoming/Upcoming';
+import Party from 'pages/Party/Party';
 
 function App() {
     //  If User Logged in
@@ -89,6 +90,7 @@ function App() {
                         <Route path='/manage-cutters' element={<Cutter />} />
                         <Route path='/manage-bookings' element={<Booking />} />
                         <Route path='/sales-report' element={<SalesReport />} />
+                        <Route path='/manage-party' element={<Party />} />
                         <Route path='/manage-users' element={<User />} />
                         <Route path='/manage-account' element={<Account />} />
                         <Route path='*' element={<Error />} />

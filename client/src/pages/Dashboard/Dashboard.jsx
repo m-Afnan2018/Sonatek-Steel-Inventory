@@ -1,35 +1,35 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import style from './Dashboard.module.css'
-// import Staff from 'components/core/Users/Staff'
-import Items from 'components/core/Dashboard/Items'
-import Varient from 'components/core/Dashboard/Varient'
-import Bookings from 'components/core/Dashboard/Bookings'
 import { getAllUsers } from 'services/operations/userAPI'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { getAllItem } from 'services/operations/itemAPI'
-// import UploadCSV from 'components/core/Inventory/UploadCSV'
+import UpcomingDashboard from 'components/core/Dashboard/UpcomingDashboard'
+import InventoryDashboard from 'components/core/Dashboard/InventoryDashboard'
+import BookingDashboard from 'components/core/Dashboard/BookingDashboard'
 
 const Dashboard = () => {
     const dispatch = useDispatch();
 
-    const { userData } = useSelector((state) => state.auth);
+    const [selection, setSelection] = useState('Upcoming');
+
     useEffect(() => {
         getAllUsers(dispatch);
         getAllItem({ search: '' }, dispatch)
     }, [dispatch])
 
-
     return (
         <div className={style.Dashboard}>
-            <h2>Dashboard</h2>
-            {/* <UploadCSV /> */}
-            {['admin', 'director', 'inventory_associate'].includes(userData.role) && <Bookings />}
-
-            {/* {['admin', 'director', 'ad'].includes(userData.role) && <Staff />} */}
-
-            <Varient />
-
-            <Items />
+            <div>
+                <button onClick={() => setSelection('Upcoming')}>Upcoming</button>
+                <button onClick={() => setSelection('Inventory')}>Inventory</button>
+                {/* <button onClick={() => setSelection('Cutter')}>Cutters</button> */}
+                <button onClick={() => setSelection('Booking')}>Bookings</button>
+            </div>
+            <div>
+                {selection === 'Upcoming' && <UpcomingDashboard />}
+                {selection === 'Inventory' && <InventoryDashboard />}
+                {selection === 'Booking' && <BookingDashboard />}
+            </div>
         </div>
     )
 }

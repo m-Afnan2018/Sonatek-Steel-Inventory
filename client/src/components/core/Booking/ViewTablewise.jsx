@@ -12,20 +12,35 @@ const Items = () => {
     const [setPage, page] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const { bookings } = useSelector(state => state.booking);
 
     const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
+    const { bookings } = useSelector(state => state.booking);
+
+    const [allowed, setAllowed] = useState(userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors'));
 
     useEffect(() => {
-        console.log(bookings);
         if (bookings) {
             setAllBookings(bookings);
         }
     }, [bookings])
 
     useEffect(() => {
-        getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
-    }, [dispatch])
+        if (userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors')) {
+            setAllowed(true);
+        } else {
+            setAllowed(false);
+        }
+    }, [userData])
+
+    useEffect(() => {
+        if (allowed) {
+            // getAllBookings(dispatch);
+            getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
+        } else {
+            getAllBookingsTable({ bookedBy: userData.userId }, setAllBookings, setPagination, dispatch);
+        }
+    }, [allowed, dispatch, userData.userId])
 
     useEffect(() => {
         if (allBookings !== null) {
@@ -46,15 +61,6 @@ const Items = () => {
         fromDate: "",
         toDate: "",
     })
-
-    // useEffect(() => {
-    //     getAllBookingsTable(
-    //         { page: 1, limit: 50, filters: filters },
-    //         setAllBookings,
-    //         setPagination,
-    //         dispatch
-    //     );
-    // }, [dispatch, filters])
 
     const onDownload = async () => {
         try {
@@ -85,7 +91,7 @@ const Items = () => {
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Order Report</h3>
-            <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
+            <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -98,7 +104,7 @@ const Items = () => {
                             <thead>
                                 <tr>
                                     <th style={{ width: '8rem' }}>Party</th>
-                                    <th style={{ width: '8rem' }}>Booked By</th>
+                                    {allowed && <th style={{ width: '8rem' }}>Booked By</th>}
                                     <th style={{ width: '8rem' }}>Booking Date</th>
                                     <th style={{ width: '8rem' }}>Items</th>
                                     <th style={{ width: '8rem' }}>Status</th>
@@ -108,7 +114,7 @@ const Items = () => {
                             </thead>
                             <tbody>
                                 {allBookings?.map((item) => (
-                                    <SingleItem key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem allowed={allowed} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -141,56 +147,7 @@ const Items = () => {
     );
 };
 
-// const SingleItem = ({ item, view, setView }) => {
-//     const bookingDate = item.bookingDate
-//         ? new Date(item.bookingDate).toLocaleDateString()
-//         : "-";
-
-//     const status = {
-//         'Pending': {
-//             background: '#FFF4E5', // soft orange
-//             foreground: '#D97706'  // amber/dark orange
-//         },
-//         'Processing': {
-//             background: '#E0E7FF', // light indigo
-//             foreground: '#4338CA'  // deep indigo
-//         },
-//         'Shipped': {
-//             background: '#E0F2FE', // light blue
-//             foreground: '#0369A1'  // sky blue
-//         },
-//         'Delivered': {
-//             background: '#DCFCE7', // light green
-//             foreground: '#15803D'  // deep green
-//         },
-//         'Cancelled': {
-//             background: '#FEE2E2', // light red
-//             foreground: '#B91C1C'  // dark red
-//         }
-//     }
-
-
-//     return (
-//         <tr
-//             className={`${view === item._id ? style.activeRow : ""}`}
-//         >
-//             <td>{item.party || "-"}</td>
-//             <td>{item.bookedBy || "-"}</td>
-//             <td>{bookingDate}</td>
-//             <td>{item.form || "-"}</td>
-//             <td>{item.type}</td>
-//             <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
-//             <td>{item.quantity ?? "-"}</td>
-//             <td>{item.requirement ?? "-"}</td>
-//             <td><p className={style.coloredShipTo} style={{ background: status[item.status].background, color: status[item.status].foreground, border: `1px solid ${status[item.status].foreground}` }}>{item.status ?? "-"}</p></td>
-//             <td>{item.vehicleNumber ?? "-"}</td>
-//             <td>{item.shipTo?.name ?? "-"}</td>
-//             <td>{item.remark ?? "-"}</td>
-//         </tr>
-//     );
-// };
-
-const SingleItem = ({ item, view, setView }) => {
+const SingleItem = ({ item, view, setView, allowed }) => {
     const bookingDate = item.bookingDate
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
@@ -212,8 +169,8 @@ const SingleItem = ({ item, view, setView }) => {
                 onClick={() => setView(isOpen ? null : item._id)}
                 style={{ cursor: "pointer" }}
             >
-                <td>{item.party || "-"}</td>
-                <td>{item.bookedBy || "-"}</td>
+                <td style={{ fontWeight: '500', color: 'black' }}>{item.party || "-"}</td>
+                {allowed && <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.bookedBy || "-"}</td>}
                 <td>{bookingDate}</td>
                 <td>{item.items?.length}</td>
                 <td style={{ display: 'flex' }}>
@@ -228,14 +185,14 @@ const SingleItem = ({ item, view, setView }) => {
                         {item.status ?? "-"}
                     </p>
                 </td>
-                <td>{item.vehicleNumber ?? "-"}</td>
+                <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
                 <td>{item.remark ?? "-"}</td>
             </tr>
 
             {isOpen && (
-                <tr className={style.nestedRow}>
+                <tr className='nestedRow'>
                     <td colSpan="12">
-                        <table className={style.nestedTable}>
+                        <table className='nestedTable'>
                             <thead>
                                 <tr>
                                     <th>Form Type</th>
@@ -273,7 +230,7 @@ const SingleItem = ({ item, view, setView }) => {
 };
 
 
-const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
+const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
@@ -283,6 +240,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
     const dispatch = useDispatch();
 
     const { allUsers } = useSelector(state => state.user);
+    const { parties } = useSelector(state => state.booking);
 
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
@@ -302,7 +260,6 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
     const onSubmit = (data) => {
         let filterPayload = {};
         if (data.type !== filters.type) {
-            console.log(`Data: ${data.type}, Filter: ${filters.type}`)
             reset({
                 grade: "",
                 width: "",
@@ -336,6 +293,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
         if (data.formType) filterPayload.formType = data.formType;
         if (data.status) filterPayload.status = data.status;
         if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
+        if (data.party) filterPayload.party = data.party;
         if (data.fromDate) filterPayload.fromDate = data.fromDate;
         if (data.toDate) filterPayload.toDate = data.toDate;
 
@@ -427,13 +385,26 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters }) => {
             </div>
 
             {/* Booked By */}
-            <div>
+            {allowed && <div>
                 <label htmlFor="bookedBy">Booked By:</label>
                 <select id="bookedBy" {...register("bookedBy")}>
                     <option value="">All</option>
                     {allUsers?.map((users) => (
                         <option key={users._id} value={users._id}>
                             {`${users.firstName} ${users.lastName}`}
+                        </option>
+                    ))}
+                </select>
+            </div>}
+
+            {/* Booked For */}
+            <div>
+                <label htmlFor="party">Party name:</label>
+                <select id="party" {...register("party")}>
+                    <option value="">All</option>
+                    {parties?.map((users) => (
+                        <option key={users._id} value={users._id}>
+                            {`${users.name}`}
                         </option>
                     ))}
                 </select>

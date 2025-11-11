@@ -81,7 +81,6 @@ export async function showCutter(params, dispatch, list, setter) {
             dispatch(showSuccess({ id: "showCutter", message: response.message }));
         }
     } catch (err) {
-        console.log(err);
         dispatch(showError({
             id: "showCutter",
             message: err?.response?.data?.message || "Failed to show Cutter"
@@ -107,8 +106,6 @@ export async function hideCutter(params, dispatch, list, setCutters) {
             dispatch(showSuccess({ id: "hideCutter", message: response.message }));
         }
     } catch (err) {
-
-        console.log(err);
         dispatch(showError({
             id: "hideCutter",
             message: err?.response?.data?.message || "Failed to show Cutter"

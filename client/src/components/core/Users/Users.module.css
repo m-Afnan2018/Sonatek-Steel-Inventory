@@ -2,16 +2,19 @@
 .staffContainer {
     font-family: "Poppins", sans-serif;
     color: #222;
-    margin: 2rem;
-    padding: 1rem;
-    background: #001f2b;
+    margin: 0.25rem;
+    padding: 0.25rem;
+    background: #11386c;
     border-radius: 1rem;
 }
 
 .staffContainer h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem 16px;
+    margin-bottom: 0;
     color: #f0fbff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1rem;
+    padding: 0.25rem;
 }
 
 .heading {
@@ -22,8 +25,8 @@
 .card {
     background: #fff;
     border-radius: 12px;
-    padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .loading,

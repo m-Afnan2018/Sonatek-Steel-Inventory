@@ -53,6 +53,7 @@ export const bookingEndpoints = {
     GET_ALL_INCOMPLETE_BOOKING_DETAILS: `${BASE_URL}/booking/getAllIncompleteBookingsDetails`,
     GET_ALL_BOOKING_DETAILS_TABLEWISE: `${BASE_URL}/booking/getAllBookingsDetailsTablewise`,
     GET_ALL_PARTY: `${BASE_URL}/booking/getAllParty`,
+    GET_ALL_PARTY_DETAILS: `${BASE_URL}/booking/getAllPartyDetails`,
     DELETE_PARTY: `${BASE_URL}/booking/deleteParty`,
 }
 

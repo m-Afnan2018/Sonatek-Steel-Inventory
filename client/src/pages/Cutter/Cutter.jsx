@@ -48,10 +48,6 @@ const Cutter = () => {
         setPhoneNumber("");
     };
 
-    useEffect(()=>{
-        console.log(cutters);
-    }, [cutters])
-
     const startEdit = (c) => {
         setEditingId(c._id);
         setEditFields({ name: c.name || "", address: c.address || "", phoneNumber: c.phoneNumber || "" });

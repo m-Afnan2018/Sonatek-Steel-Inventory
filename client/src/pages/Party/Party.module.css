@@ -1,0 +1,260 @@
+/* Page layout */
+.Cutter {
+    background: rgba(240, 251, 255, 1);
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: #012029;
+}
+
+/* Page title */
+.Cutter>h2 {
+    font-size: 28px;
+    margin: 0 0 1rem 0;
+    color: #002a32;
+    font-weight: 700;
+}
+
+/* Header area */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #004452;
+}
+
+.count {
+    margin-top: 6px;
+    color: #007a8a;
+    font-weight: 600;
+}
+
+/* controls (search + add) */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d9e9ec;
+    min-width: 260px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search:focus {
+    border-color: #007a8a;
+    box-shadow: 0 0 0 4px rgba(0, 122, 138, 0.06);
+}
+
+/* Buttons */
+.addBtn {
+    background-color: #007a8a;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.addBtn:hover {
+    transform: translateY(-1px);
+}
+
+/* Form */
+.form {
+    margin: 1rem 0 1.25rem;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(10, 40, 50, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.formRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.form input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e0eef0;
+    min-width: 190px;
+    font-size: 14px;
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.formActions button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.formActions button[type="submit"] {
+    background: #007a8a;
+    color: white;
+}
+
+.formActions button[type="button"] {
+    background: #f0f2f4;
+    color: #333;
+}
+
+/* Table container */
+.tableWrap {
+    margin-top: 8px;
+    background: white;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 6px 18px rgba(10, 40, 50, 0.04);
+    overflow-x: auto;
+    margin-bottom: 4rem;
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    font-size: 14px;
+}
+
+.table thead th {
+    text-align: left;
+    font-weight: 700;
+    color: #004452;
+    border-bottom: 1px solid #e6f0f2;
+    background: linear-gradient(180deg, rgba(250, 254, 255, 1), #ffffff);
+}
+
+.table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f4f8f9;
+    vertical-align: middle;
+    text-align: justify;
+}
+
+/* Row hover */
+.row:hover {
+    background: rgba(0, 122, 138, 0.02);
+}
+
+/* Cells */
+.cellPrimary {
+    font-weight: 600;
+    color: #002a32;
+}
+
+.cellSecondary {
+    color: #376b70;
+    font-size: 13px;
+}
+
+/* Inline edit inputs */
+.inlineInput {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #dfeff1;
+    font-size: 14px;
+}
+
+.inlineInput:focus {
+    outline: none;
+    border-color: #007a8a;
+    box-shadow: 0 0 0 4px rgba(0, 122, 138, 0.06);
+}
+
+/* Actions */
+.actionGroup {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.editBtn,
+.itemsBtn,
+.saveBtn,
+.cancelBtn {
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.editBtn {
+    background: #007a8a;
+    color: #fff;
+}
+
+.itemsBtn {
+    background: #f0f2f4;
+    color: #333;
+}
+
+.saveBtn {
+    background: #006f62;
+    color: #fff;
+}
+
+.cancelBtn {
+    background: transparent;
+    color: #555;
+    border: 1px solid #e6eef0;
+    padding: 6px 10px;
+}
+
+/* Centered cells */
+.center {
+    text-align: center;
+}
+
+/* No data row */
+.noData {
+    text-align: center;
+    padding: 30px 0;
+    color: #667;
+}
+
+/* Loader */
+.loader {
+    padding: 24px;
+    text-align: center;
+    color: #006f62;
+}
+
+/* Responsive adjustments */
+@media (max-width: 880px) {
+    .search {
+        min-width: 160px;
+    }
+
+    .table {
+        font-size: 13px;
+        min-width: 700px;
+    }
+}

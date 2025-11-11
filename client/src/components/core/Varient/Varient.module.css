@@ -28,7 +28,6 @@
 
 .Varient>div {
     overflow: hidden;
-    gap: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -36,7 +35,7 @@
 }
 
 .Varient>div>button {
-    width: 100%;
+    width: 5rem;
 }
 
 .Varient form {
@@ -52,7 +51,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
 }
 
 
@@ -69,61 +67,6 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-}
-
-table {
-    /* Styles for the table in Upcoming */
-    min-width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-table th,
-table td {
-    /* Shared styles for table cells/headers */
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    padding: 2px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* ✅ Prevents breaking layout */
-    white-space: nowrap;
-    /* Overridden later for td: */
-    /* padding: 8px 12px; */
-    padding: 2px 0;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-}
-
-table td {
-    /* Overrides for table data cells */
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    font-weight: 400;
-    height: 2rem;
-    border-bottom: 0;
-    font-size: 0.75rem;
-    height: 3rem;
-}
-
-table td span {
-    text-align: center;
-}
-
-table th {
-    /* Overrides for table headers */
-    background-color: white;
-    font-weight: 500;
-    font-size: 0.75rem;
-    width: 33%;
-}
-
-table tr {
-    /* Styles for table rows */
-    border-bottom: 1px solid #80808038;
 }
 
 .SingleVarient svg {

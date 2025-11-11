@@ -38,7 +38,7 @@ input:focus {
 }
 
 body {
-    font-family: "Inter", "system-ui";
+    font-family: "Roboto", "system-ui";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;

@@ -1,28 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react'
-import style from './Upcoming.module.css'
+import React, { useEffect, useState } from 'react'
+import style from './Dashboard.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/itemAPI';
-import AddForm from 'components/core/Upcoming/AddForm';
-import { IoTrashOutline } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
-import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 
-const Upcoming = () => {
+const UpcomingDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState([]);
     const [view, setView] = useState(null);
     const [count, setCount] = useState(null);
     const [colors, setColors] = useState(null);
 
-
-    const [file, setFile] = useState(null);
-    const [uploading, setUploading] = useState(false);
-
     const dispatch = useDispatch();
 
     const { upcomingItem } = useSelector(state => state.item)
-    const { userData } = useSelector(state => state.auth);
 
     useEffect(() => {
         if (upcomingItem) {
@@ -37,51 +30,13 @@ const Upcoming = () => {
         }
     }, [upcomingItem])
 
-
-    const inputRef = useRef();
-
-    const handleFileChange = async (e) => {
-        if (e.target.files[0]) {
-            uploadCSV(e.target.files[0], setUploading, inputRef);
-            setFile(null);
-        }
-    };
-    const handleUpload = async () => {
-        if (!file) {
-            inputRef.current.click();
-            return;
-        }
-    };
-
     useEffect(() => {
         getUpcomingItem({}, dispatch);
     }, [dispatch])
 
     return (
-        <div className={style.Upcoming}>
-            {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
-                {/* <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button> */}
-                {/* <button onClick={handleUpload} >
-                    {uploading ? "Uploading..." : "Import"}
-                </button> */}
-                {/* <button onClick={downloadTemplate}>Download Template</button> */}
-            </div>}
-            <input
-                ref={inputRef}
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                onChange={handleFileChange}
-                className="block w-full mb-4 border border-gray-300 rounded-lg p-2 cursor-pointer"
-                disabled={uploading}
-                hidden
-            />
-            <h3 className={style.heading}>
-                Add Upcoming
-                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={handleUpload} style={{ marginLeft: 'auto', fontSize: '0.875rem', background: '#11386c', padding: '0.5rem 1.5rem', borderRadius: '0.25rem', color: 'white' }}>{uploading ? "Uploading..." : "Import"}</span>}
-                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={downloadTemplate} style={{ fontSize: '0.875rem', textDecoration: 'underline' }}>Template</span>}
-            </h3>
-            <AddForm />
-            <h3 className={style.heading}>Upcoming Items</h3>
+        <div className={style.Dashboard}>
+            <h3 className='main-heading'>Upcoming Items</h3>
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -113,8 +68,8 @@ const Upcoming = () => {
                             <tfoot>
                                 <tr style={{ borderBottom: 'none' }}>
                                     <td></td>
-                                    <td style={{ fontWeight: '600', color: 'black' }}>Total quantity:</td>
-                                    <td style={{ fontWeight: '600', color: 'black' }}>{count.toFixed(3)}</td>
+                                    <td style={{ fontWeight: '600' }}>Total quantity:</td>
+                                    <td style={{ fontWeight: '600' }}>{count.toFixed(3)}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -263,10 +218,10 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Quantity */}
-            <td style={{ textDecoration: 'underline', fontWeight: '500' }} onClick={() => clickHandler('originalQuantity')}>
+            <td onClick={() => clickHandler('originalQuantity')}>
                 {select === 'originalQuantity'
                     ? renderEditableField('originalQuantity', 'number', '3rem')
-                    : Number(itemDetail.originalQuantity).toFixed(3)}
+                    : itemDetail.originalQuantity}
             </td>
 
             {/* Wagon Number */}
@@ -279,14 +234,14 @@ const SingleItem = ({ color, item, setView, view }) => {
             {/* Challan Date */}
             <td onClick={() => clickHandler('challanDate')}>
                 {select === 'challanDate'
-                    ? renderEditableField('challanDate', 'date', '4rem')
+                    ? renderEditableField('challanDate', 'date')
                     : itemDetail.challanDate?.slice(0, 10) || '-'}
             </td>
 
             {/* Challan Number */}
             <td onClick={() => clickHandler('challanNumber')}>
                 {select === 'challanNumber'
-                    ? renderEditableField('challanNumber', '4rem')
+                    ? renderEditableField('challanNumber', '6rem')
                     : itemDetail.challanNumber || '-'}
             </td>
 
@@ -312,7 +267,7 @@ const SingleItem = ({ color, item, setView, view }) => {
 
 
             <td>
-                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <IoTrashOutline style={{ color: 'red' }} onClick={handleDelete} /> : <div>
+                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <MdDelete style={{ color: 'red' }} onClick={handleDelete} /> : <div>
                     <RxCheck style={{ color: 'green' }} onClick={handleSave} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleCancel} />
                 </div>}
@@ -322,4 +277,4 @@ const SingleItem = ({ color, item, setView, view }) => {
 };
 
 
-export default Upcoming
+export default UpcomingDashboard

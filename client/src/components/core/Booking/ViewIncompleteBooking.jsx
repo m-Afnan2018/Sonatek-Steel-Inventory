@@ -33,7 +33,6 @@ const ViewIncompleteBooking = () => {
     const [editable, setEditable] = useState({ field: '', id: '', value: '' });
 
     useEffect(() => {
-        console.log(incompleteBookings);
         setBookings(incompleteBookings);
     }, [incompleteBookings])
 
@@ -145,9 +144,9 @@ const ViewIncompleteBooking = () => {
 
                             return (
                                 <tr key={booking._id} onClick={() => viewData(booking)}>
-                                    <td>{booking.partySnapshot?.name}</td>
+                                    <td style={{ fontWeight: '500', color: 'black' }}>{booking.partySnapshot?.name}</td>
                                     <td>{formatDate(booking.bookingDate)}</td>
-                                    <td>{`${booking.bookedBy.firstName} ${booking.bookedBy.lastName}`}</td>
+                                    <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{`${booking.bookedBy.firstName} ${booking.bookedBy.lastName}`}</td>
                                     <td style={{ display: 'flex' }}>
                                         <p
                                             className={style.coloredShipTo}

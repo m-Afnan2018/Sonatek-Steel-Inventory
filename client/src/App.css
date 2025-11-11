@@ -10,3 +10,135 @@
     width: -webkit-fill-available;
     background: #f3f3ff;
 }
+
+.main-heading {
+    background-color: #f3f3ff;
+    font-weight: 500;
+    color: grey;
+    font-size: 1rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    text-align: start;
+    margin-bottom: 0.5rem;
+}
+
+form label {
+    display: block;
+    font-size: 0.75rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.75rem;
+    transition: border-color 0.2s ease;
+    font-weight: 400;
+}
+
+table {
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: white;
+}
+
+table th {
+    font-size: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+table td {
+    padding: 0.5rem;
+    background-color: white;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    font-size: 0.75rem;
+    height: 3rem;
+    color: #667085;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* ✅ Prevents breaking layout */
+    white-space: nowrap;
+    text-transform: capitalize;
+}
+
+table tr {
+    border-bottom: 1px solid #EAECF0;
+}
+
+table td svg {
+    font-size: 1rem;
+}
+
+table td p {
+    border-radius: 0.25rem;
+    width: fit-content;
+    padding: 0.15rem 0.25rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.15;
+    padding-top: 0.3rem;
+}
+
+table th {
+    background-color: #F9FAFB;
+    font-weight: 400;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.5rem;
+    line-height: 1.125rem;
+    color: #667085;
+}
+
+table tr:hover {
+    background-color: #f9fafc;
+    cursor: pointer;
+}
+
+.nestedRow td {
+    background: #f9fafb;
+    padding: 0.5rem;
+}
+
+.nestedTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nestedTable td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    background: #f9fafb;
+    height: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5d5c5c;
+}
+
+.nestedTable th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.25rem;
+    height: auto;
+    color: #667085;
+}

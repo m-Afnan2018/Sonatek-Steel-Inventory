@@ -135,7 +135,6 @@ const SingleItem = ({ color, item, setView, view }) => {
                     // ✅ Auto-open dropdown using callback ref
                     ref={(el) => {
                         if (el) {
-                            console.log(el.click())
                             setTimeout(() => {
                                 el.focus();
                                 el.click(); // Programmatically open it
@@ -162,7 +161,6 @@ const SingleItem = ({ color, item, setView, view }) => {
 
         const valueSetter = (val) => {
             setItemDetail((prev) => ({ ...prev, [type]: val }));
-            // console.log(`${type}: ${val}`)
         }
 
         return <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>

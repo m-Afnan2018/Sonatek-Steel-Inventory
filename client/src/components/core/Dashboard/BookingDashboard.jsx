@@ -1,25 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import style from './SalesReport.module.css';
+import style from './Dashboard.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { getAllBookingsTable } from 'services/operations/bookingAPI';
 
-const SalesReport = () => {
+const Items = () => {
     const [view, setView] = useState(null);
 
     const [allBookings, setAllBookings] = useState(null);
     const [pagination, setPagination] = useState(null);
     const [setPage, page] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [order, setOrder] = useState('desc')
-    const [sortType, setSortType] = useState(null)
+
 
     const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
+    const { bookings } = useSelector(state => state.booking);
+
+    const [allowed, setAllowed] = useState(userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors'));
 
     useEffect(() => {
-        getAllBookingsTable({ filters: { status: 'Shipped' } }, setAllBookings, setPagination, dispatch);
-    }, [dispatch])
+        if (bookings) {
+            setAllBookings(bookings);
+        }
+    }, [bookings])
+
+    useEffect(() => {
+        if (userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors')) {
+            setAllowed(true);
+        } else {
+            setAllowed(false);
+        }
+    }, [userData])
+
+    useEffect(() => {
+        if (allowed) {
+            // getAllBookings(dispatch);
+            getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
+        } else {
+            getAllBookingsTable({ bookedBy: userData.userId }, setAllBookings, setPagination, dispatch);
+        }
+    }, [allowed, dispatch, userData.userId])
 
     useEffect(() => {
         if (allBookings !== null) {
@@ -35,7 +56,7 @@ const SalesReport = () => {
         thickness: "",
         shipTo: "",
         formType: "",
-        status: "Shipped",
+        status: "",
         bookedBy: "",
         fromDate: "",
         toDate: "",
@@ -49,7 +70,7 @@ const SalesReport = () => {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': 'http://localhost:3000'
                 },
-                body: JSON.stringify({ filters, sortBy: sortType, order: order })
+                body: JSON.stringify({ filters })
             });
             const blob = await response.blob();
 
@@ -67,23 +88,10 @@ const SalesReport = () => {
         }
     };
 
-    const sortBy = (val) => {
-        setOrder(order === 'asc' ? 'desc' : 'asc');
-        setSortType(val);
-        // getAllBookingsTable({ sortBy: val, order: order, filters }, setAllBookings, setPagination, dispatch);
-        getAllBookingsTable(
-            { page: 1, limit: 50, filters, sortBy: val, order: order === 'asc' ? 'desc' : 'asc' },
-            setAllBookings,
-            setPagination,
-            dispatch
-        );
-        // getAllItem({ filters, sortBy: val, order: order }, dispatch);
-    }
-
     return (
-        <div className={style.staffContainer}>
-            <h3 className={style.heading}>Sales Report</h3>
-            <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} />
+        <div className={style.Dashboard}>
+            <h3 className='main-heading'>Order Report</h3>
+            <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -95,17 +103,18 @@ const SalesReport = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('party')}>Party</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('bookedBy')}>Booked By</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('bookingDate')}>Booking Date</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('quantity')}>Items</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('vehicleNumber')}>Vehicle Number</th>
-                                    <th style={{ width: '8rem' }} onClick={() => sortBy('remark')}>Remark</th>
+                                    <th style={{ width: '8rem' }}>Party</th>
+                                    {allowed && <th style={{ width: '8rem' }}>Booked By</th>}
+                                    <th style={{ width: '8rem' }}>Booking Date</th>
+                                    <th style={{ width: '8rem' }}>Items</th>
+                                    <th style={{ width: '8rem' }}>Status</th>
+                                    <th style={{ width: '8rem' }}>Vehicle Number</th>
+                                    <th style={{ width: '8rem' }}>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {allBookings?.map((item) => (
-                                    <SingleItem key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem allowed={allowed} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -220,22 +229,18 @@ const SingleItem = ({ item, view, setView, allowed }) => {
     );
 };
 
-const Filters = ({ setFilters, setAllBookings, setPagination }) => {
+
+const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(
         (state) => state.varient
     );
-    const dispatch = useDispatch();
 
     const [currentType, setCurrentType] = useState('Both');
-    const handleTypeChange = (e) => {
-        if (e.target.value === '') {
-            setCurrentType('Both')
-        } else {
-            setCurrentType(e.target.value);
-        }
-    }
+
+    const dispatch = useDispatch();
 
     const { allUsers } = useSelector(state => state.user);
+    const { parties } = useSelector(state => state.booking);
 
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
@@ -245,6 +250,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
             thickness: "",
             shipTo: "",
             formType: "",
+            status: "",
             bookedBy: "",
             fromDate: "",
             toDate: "",
@@ -253,17 +259,47 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
     const onSubmit = (data) => {
         let filterPayload = {};
-
+        if (data.type !== filters.type) {
+            reset({
+                grade: "",
+                width: "",
+                thickness: "",
+                shipTo: "",
+                formType: "",
+                status: "",
+                bookedBy: "",
+                fromDate: "",
+                toDate: "",
+            });
+            if (data.type === '') {
+                setCurrentType('Both')
+            } else {
+                setCurrentType(data.type);
+            }
+            getAllBookingsTable(
+                { page: 1, limit: 50, filters: { type: data.type } },
+                setAllBookings,
+                setPagination,
+                dispatch
+            );
+            setFilters({ type: data.type })
+            return;
+        }
         if (data.grade) filterPayload.grade = data.grade;
         if (data.type) filterPayload.type = data.type;
         if (data.width) filterPayload.width = data.width;
         if (data.thickness) filterPayload.thickness = data.thickness;
         if (data.shipTo) filterPayload.shipTo = data.shipTo;
         if (data.formType) filterPayload.formType = data.formType;
+        if (data.status) filterPayload.status = data.status;
         if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
+        if (data.party) filterPayload.party = data.party;
         if (data.fromDate) filterPayload.fromDate = data.fromDate;
         if (data.toDate) filterPayload.toDate = data.toDate;
+
         setFilters(filterPayload);
+
+
         getAllBookingsTable(
             { page: 1, limit: 50, filters: filterPayload },
             setAllBookings,
@@ -274,17 +310,22 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
 
     const handleReset = (filters) => {
-        getAllItem({}, dispatch);
+        getAllBookingsTable(
+            { page: 1, limit: 50, filters: {} },
+            setAllBookings,
+            setPagination,
+            dispatch
+        );
         reset();
         setFilters({});
     };
 
     return (
-        <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)}>
+        <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
             <div>
                 <label htmlFor="type">Type:</label>
-                <select id="type" {...register("type")} onChange={handleTypeChange}>
+                <select id="type" {...register("type")}>
                     <option value="">All</option>
                     <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
@@ -344,7 +385,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
             </div>
 
             {/* Booked By */}
-            <div>
+            {allowed && <div>
                 <label htmlFor="bookedBy">Booked By:</label>
                 <select id="bookedBy" {...register("bookedBy")}>
                     <option value="">All</option>
@@ -354,11 +395,37 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
                         </option>
                     ))}
                 </select>
+            </div>}
+
+            {/* Booked For */}
+            <div>
+                <label htmlFor="party">Party name:</label>
+                <select id="party" {...register("party")}>
+                    <option value="">All</option>
+                    {parties?.map((users) => (
+                        <option key={users._id} value={users._id}>
+                            {`${users.name}`}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {/* Status  */}
+            <div>
+                <label htmlFor="status">Status:</label>
+                <select id="status" {...register("status")}>
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
             </div>
 
             {/* FormType  */}
             <div>
-                <label htmlFor="formType">Form:</label>
+                <label htmlFor="formType">Status:</label>
                 <select id="formType" {...register("formType")}>
                     <option value="">All</option>
                     <option value="Sheet">Sheet</option>a
@@ -379,9 +446,8 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 
             {/* Buttons */}
             <div className={style.buttonGroup}>
-                <button type="submit">Filter</button>
                 <button type="button" onClick={handleReset}>
-                    Cancel
+                    Reset
                 </button>
             </div>
         </form>
@@ -389,4 +455,4 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
 };
 
 
-export default SalesReport;
+export default Items;

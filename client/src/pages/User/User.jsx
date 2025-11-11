@@ -108,7 +108,7 @@ const User = () => {
     return (
         <div className={style.User}>
             <Staff />
-            <h2>Manage Users</h2>
+            {/* <h2>Manage Users</h2> */}
             <div className={style.pendingRequest}>
                 <h3>All Users</h3>
                 <div className={style.filters}>
@@ -205,7 +205,7 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
             {view !== user._id ? <button onClick={() => setView(user._id)}>View Detail</button> :
                 <button onClick={() => setView(null)}>Close</button>}
         </div>
-        <div style={{ height: view === user._id ? '250px' : 0, padding: view === user._id ? '1rem' : 0 }} className={style.moreDetails}>
+        <div style={{ height: view === user._id ? '185px' : 0, padding: view === user._id ? '0.25rem 1rem' : 0, borderBottom: view === user._id ? '1px solid #11386c2b' : 0 }} className={style.moreDetails}>
             <div>
                 <p>Name:</p>
                 <p style={{ textTransform: 'capitalize' }}>{user.firstName} {user.lastName}</p>
@@ -231,7 +231,7 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
                 <p>{formatDate(user.updatedAt)}, {formatTime(user.updatedAt)}</p>
             </div>
 
-            {userData.userId !== user._id && !user.isVerified && <div className={style.disignation}>
+            {userData.userId !== user._id && !user.isVerified && <div className={style.disignation} style={{ justifyContent: 'flex-end' }}>
                 <select name='designation' onChange={(e) => setRole(e.target.value)} defaultValue={role}>
                     {!user.isVerified && <option value={''} disabled>Select Designation</option>}
                     {
@@ -251,7 +251,7 @@ const SingleUser = ({ user, userData, view, setView, dispatch }) => {
 
             </div>}
 
-            {userData.userId !== user._id && user.isVerified && <div className={style.disignation}>
+            {userData.userId !== user._id && user.isVerified && <div className={style.disignation} style={{ justifyContent: 'flex-end' }}>
                 {user.status === 'active' && <select name='designation' onChange={(e) => setRole(e.target.value)} defaultValue={user.role}>
                     {
                         ([{ val: 'admin', show: 'Admin' },

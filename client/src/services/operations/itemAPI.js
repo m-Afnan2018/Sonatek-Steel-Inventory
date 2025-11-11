@@ -67,7 +67,6 @@ export async function updateItem(params, dispatch) {
 
         dispatch(showSuccess({ id: "updateItem", message: response.message }));
     } catch (err) {
-        console.log(err);
         dispatch(showError({ id: "updateItem", message: err?.response?.data?.message || "Failed to update item" }));
     }
 }

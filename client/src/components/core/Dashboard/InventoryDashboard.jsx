@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import style from './Inventory.module.css';
+import style from './Dashboard.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 
-const Items = () => {
+const InventoryDashboard = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
@@ -90,8 +90,8 @@ const Items = () => {
     }
 
     return (
-        <div className={style.staffContainer}>
-            <h3 className={style.heading}>Inventory Items</h3>
+        <div className={style.Dashboard}>
+            <h3 className='main-heading'>Inventory Items</h3>
             <form onSubmit={onSearch} className={style.searchForm}>
                 <input
                     type="text"
@@ -551,4 +551,4 @@ const Filters = ({ setFilters }) => {
     </form>
 }
 
-export default Items;
+export default InventoryDashboard;

@@ -1,6 +1,6 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
-const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark } = require('../controllers/bookingController')
+const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark, getAllPartyDetails } = require('../controllers/bookingController')
 const { inventoryAccess, agentAccess, accountantAccess, directorAccess } = require('../middlewares/authorization');
 const router = express.Router();
 
@@ -24,6 +24,7 @@ router.get('/getExcelBooking', getExcelBooking);
 
 // Party Route
 router.get('/getAllParty', authentication, getAllParty);
+router.get('/getAllPartyDetails', authentication, getAllPartyDetails);
 router.delete('/deleteParty', authentication, deleteParty);
 
 module.exports = router

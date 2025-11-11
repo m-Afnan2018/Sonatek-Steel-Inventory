@@ -51,7 +51,6 @@ const Choices = () => {
             mini = Math.max(mini, element.quantity);
         });
         mini = maxi - mini;
-        console.log(items, mini, maxi)
         showOverlay(SingleField, {
             message: "Enter requirement and form type",
             range: { min: mini.toFixed(3), max: maxi.toFixed(3) },

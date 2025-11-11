@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import style from "./Upcoming.module.css";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
+
+    const [type, setType] = useState(false);
 
     const { register, handleSubmit, control, setFocus } = useForm({
         defaultValues: {
@@ -43,11 +45,21 @@ const AddForm = () => {
         setFocus("type");
     };
 
-    const toOptions = (arr, labelField = "name", valueField = "_id") =>
-        arr?.map((i) => ({
+    const toOptions = (arr, labelField = "name", valueField = "_id") => {
+        return arr?.map((i) => ({
             label: i[labelField] || i.value,
             value: i[valueField] || i.label,
         })) || [];
+    }
+
+    const typeOption = [{
+        label: 'HR',
+        value: 'Hot Rolled'
+    },
+    {
+        label: 'CR',
+        value: 'Cold Rolled'
+    }]
 
     const handleKeyDown = (e, prevField, nextField) => {
         if (e.key === "Enter") {
@@ -125,6 +137,10 @@ const AddForm = () => {
         })
     };
 
+    const typeChange = (e) => {
+        setType(e.value);
+    }
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm} onKeyDown={(e) => {
             if (e.ctrlKey && e.key === "Enter") {
@@ -142,6 +158,31 @@ const AddForm = () => {
                 />
             </div>
 
+            {/* Type */}
+            <div>
+                <Controller
+                    name="type"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            classNames={{
+                                control: (state) =>
+                                    state.isFocused ? style.test : style.test,
+
+                            }}
+                            {...field}
+                            options={typeOption}
+                            value={field.value}
+                            onChange={(option) => { field.onChange(option); typeChange(option) }}
+                            onKeyDown={(e) => handleSelectEnter(e, field, typeOption, 'date', "width")}
+                            placeholder="Type"
+                            styles={customStyles}
+                            isSearchable
+                        />
+                    )}
+                />
+            </div>
+
             {/* Thickness */}
             <div>
                 <Controller
@@ -155,7 +196,7 @@ const AddForm = () => {
 
                             }}
                             {...field}
-                            options={toOptions(thicknesses)}
+                            options={toOptions(thicknesses.filter(t => t.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, 'date', "width")}
@@ -175,7 +216,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(widths)}
+                            options={toOptions(widths.filter(w => w.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, widths, "thickness", "grade")}
@@ -195,7 +236,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(grades)}
+                            options={toOptions(grades.filter(g => g.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, grades, "width", "quantity")}

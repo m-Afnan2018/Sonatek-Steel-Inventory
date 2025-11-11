@@ -87,7 +87,6 @@ export async function getAllBookingsTable(filters, setter, setPagination, dispat
         }
         dispatch(showSuccess({ id: 'getAllBookingsTable', message: response.message }));
     } catch (err) {
-        console.log(err)
         dispatch(showError({ id: 'getAllBookingsTable', message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
 }
@@ -108,7 +107,7 @@ export async function getMyBookings(dispatch) {
     }
 }
 
-export async function  cancelBooking(params, dispatch, setter) {
+export async function cancelBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("cancelBooking"));
 
@@ -290,6 +289,20 @@ export async function getAllParty(dispatch) {
         dispatch(showSuccess({ id: "getAllParty", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getAllParty", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+    }
+}
+
+export async function getAllPartyDetails(dispatch) {
+    try {
+        dispatch(addLoader("getAllPartyDetails"));
+
+        const response = (await apiConnector('GET', bookingEndpoints.GET_ALL_PARTY_DETAILS)).data;
+
+        dispatch(setParty(response.parties));
+
+        dispatch(showSuccess({ id: "getAllPartyDetails", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "getAllPartyDetails", message: err?.response?.data?.message || "Failed to fetch bookings" }));
     }
 }
 
