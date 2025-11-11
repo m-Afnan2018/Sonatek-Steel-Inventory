@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
+import { LuDownload } from "react-icons/lu";
 
 const InventoryDashboard = () => {
     const [items, setItems] = useState([]);
@@ -91,7 +92,10 @@ const InventoryDashboard = () => {
 
     return (
         <div className={style.Dashboard}>
-            <h3 className='main-heading'>Inventory Items</h3>
+            <h3 className={style.heading}>Inventory Items
+                <span style={{ marginLeft: 'auto', fontSize: '0.75rem' }}>Total Quantity: {totalQuantity}</span>
+                <span><LuDownload onClick={onDownload} /></span>
+            </h3>
             <form onSubmit={onSearch} className={style.searchForm}>
                 <input
                     type="text"
@@ -142,8 +146,6 @@ const InventoryDashboard = () => {
 
             {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
-                <button onClick={onDownload}>Download</button>
-
                 <div className={style.paginationControls}>
                     {pagination?.page > 1 && <button onClick={prevPage}>
                         Prev
@@ -156,9 +158,6 @@ const InventoryDashboard = () => {
                     >
                         Next
                     </button>}
-                </div>
-                <div>
-                    <button>Total Quantity: {totalQuantity}</button>
                 </div>
             </div>
         </div >

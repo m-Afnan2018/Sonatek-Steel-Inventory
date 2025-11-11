@@ -20,22 +20,14 @@ const SingleVarient = ({ onDelete, onUpdate, value }) => {
 
     return (
         <tr className={style.SingleVarient} onClick={() => setEditable(true)}>
-            <td> {editable ? <input placeholder={value.name} type='text' value={edit} onChange={(e) => setEdit(e.target.value)} /> : value.name}</td>
-            <td> {value.type}</td>
+            <td style={{ color: 'black' }}> {editable ? <input placeholder={value.name} type='text' value={edit} onChange={(e) => setEdit(e.target.value)} /> : value.name}</td>
+            <td style={{ fontWeight: '500', textDecoration: 'underline' }}> {value.type}</td>
             <td>
                 {editable ? <div>
                     <RxCheck style={{ color: 'green' }} onClick={updating} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleEdit} />
-                </div> : <MdDelete style={{ color: 'red' }} onClick={onDelete} />}
+                </div> : <MdDelete style={{ color: 'red' }} onClick={() => onDelete(value._id)} />}
             </td>
-            {/* {!editable && <h4>{value.name}</h4>}
-            {editable && <input placeholder={value.name} type='text' value={edit} onChange={(e) => setEdit(e.target.value)} />}
-            <div>
-                {editable && <button style={{ width: edit.length > 0 ? '7rem' : '0rem', padding: '0.5rem 0' }} onClick={updating}>Update</button>}
-                {editable && <button onClick={() => setEditable(false)}>Cancel</button>}
-                {!editable && <button onClick={() => setEditable(true)}>Edit</button>}
-                {!editable && <button onClick={() => onDelete(value._id)}>Delete</button>}
-            </div> */}
         </tr>
     )
 }

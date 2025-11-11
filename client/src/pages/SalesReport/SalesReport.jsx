@@ -95,6 +95,7 @@ const SalesReport = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
+                                    <th style={{ width: '8rem' }} onClick={() => sortBy('order_id')}>ID</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('party')}>Party</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookedBy')}>Booked By</th>
                                     <th style={{ width: '8rem' }} onClick={() => sortBy('bookingDate')}>Booking Date</th>
@@ -160,6 +161,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                 onClick={() => setView(isOpen ? null : item._id)}
                 style={{ cursor: "pointer" }}
             >
+                <td style={{ fontWeight: '500', color: 'black' }}>{item.orderId || "-"}</td>
                 <td style={{ fontWeight: '500', color: 'black' }}>{item.party || "-"}</td>
                 {allowed && <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.bookedBy || "-"}</td>}
                 <td>{bookingDate}</td>

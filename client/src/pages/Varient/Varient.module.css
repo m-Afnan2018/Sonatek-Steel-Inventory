@@ -6,6 +6,7 @@
 }
 
 .Varient {
+    display: flex;
     background: rgba(240, 251, 255, 1);
 }
 

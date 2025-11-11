@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+const getNextIndex = require("../utils/counerHandler");
 
 // Snapshot schema for item details so bookings keep a copy even if the original Item is deleted/modified
 const itemSnapshotSchema = new mongoose.Schema({
@@ -106,7 +107,8 @@ const bookingSchema = new mongoose.Schema({
         unique: true
     },
     order_id: {
-        type: String
+        type: Number,
+        unique: true,
     },
     type: {
         type: String,
@@ -238,6 +240,14 @@ bookingSchema.statics.makePartySnapshot = function (partyDoc) {
         name: partyDoc.name || null,
     };
 }
+
+bookingSchema.pre("save", async function (next) {
+    if (this.isNew) {
+        this.order_id = await getNextIndex("order_index");
+    }
+    console.log("Here: ", this.order_id);
+    next();
+});
 
 const Booking = mongoose.model('Booking', bookingSchema);
 module.exports = Booking;

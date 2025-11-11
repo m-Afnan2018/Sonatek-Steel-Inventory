@@ -3,6 +3,7 @@ import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { getAllBookingsTable } from 'services/operations/bookingAPI';
+import { LuDownload } from "react-icons/lu";
 
 const Items = () => {
     const [view, setView] = useState(null);
@@ -90,7 +91,10 @@ const Items = () => {
 
     return (
         <div className={style.staffContainer}>
-            <h3 className={style.heading}>Order Report</h3>
+            {/* <h3 className={style.heading}>Order Report</h3> */}
+            <h3 className={style.heading}>Inventory Items
+                <span style={{marginLeft: 'auto', cursor: 'pointer'}}><LuDownload onClick={onDownload} /></span>
+            </h3>
             <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
@@ -103,6 +107,7 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
+                                    <th style={{ width: '8rem' }}>Order ID</th>
                                     <th style={{ width: '8rem' }}>Party</th>
                                     {allowed && <th style={{ width: '8rem' }}>Booked By</th>}
                                     <th style={{ width: '8rem' }}>Booking Date</th>
@@ -169,6 +174,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                 onClick={() => setView(isOpen ? null : item._id)}
                 style={{ cursor: "pointer" }}
             >
+                <td style={{ fontWeight: '500' }}>{item.orderId || "-"}</td>
                 <td style={{ fontWeight: '500', color: 'black' }}>{item.party || "-"}</td>
                 {allowed && <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.bookedBy || "-"}</td>}
                 <td>{bookingDate}</td>
@@ -228,7 +234,6 @@ const SingleItem = ({ item, view, setView, allowed }) => {
         </>
     );
 };
-
 
 const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }) => {
     const { grades, thicknesses, cutters, widths } = useSelector(

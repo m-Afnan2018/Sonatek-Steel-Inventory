@@ -318,6 +318,7 @@ const getAllItem = async (req, res) => {
         // 🧩 Build listView
         const listView = items.map((item) => ({
             _id: item._id,
+            item_id: item.item_id,
             wagonNumber: item.wagonNumber,
             challanNumber: item?.challan?.challanNumber,
             challanDate: item?.challan?.challanDate,
@@ -765,7 +766,6 @@ const uploadCSV = async (req, res) => {
         if (!itemsToInsert.length) {
             return errorResponse(res, "No valid items found in file");
         }
-        console.log(itemsToInsert)
         await Item.insertMany(itemsToInsert);
 
         res.status(200).json({

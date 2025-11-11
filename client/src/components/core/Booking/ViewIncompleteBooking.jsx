@@ -138,7 +138,16 @@ const ViewIncompleteBooking = () => {
                 <tbody>
                     {listing.length > 0 ? (
                         listing.map((booking) => {
-                            const s = STATUS_STYLES[booking.status] || {};
+                            const threeDaysAgo = new Date();
+                            threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+                            const bookingDate = new Date(booking.bookingDate);
+                            let status;
+                            if (bookingDate < threeDaysAgo) {
+                                status = 'Pending';
+                            } else {
+                                status = 'Processing';
+                            }
+                            const s = STATUS_STYLES[status] || {};;
                             const isEditing =
                                 editable.id === booking._id && editable.field === 'remark';
 
@@ -156,7 +165,7 @@ const ViewIncompleteBooking = () => {
                                                 border: `1px solid ${s.foreground}`,
                                             }}
                                         >
-                                            {booking.status ?? '-'}
+                                            {status ?? '-'}
                                         </p>
                                     </td>
                                     <td onClick={(e) => { e.stopPropagation(); startEdit('remark', booking._id, booking.remark || ''); }}>

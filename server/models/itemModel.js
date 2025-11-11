@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+const getNextIndex = require("../utils/counerHandler");
 
 
 const challanSchema = new mongoose.Schema({
@@ -9,7 +10,6 @@ const challanSchema = new mongoose.Schema({
         type: String,
     },
 });
-
 
 const transportSchema = new mongoose.Schema({
     vehicleNumber: {
@@ -24,6 +24,10 @@ const transportSchema = new mongoose.Schema({
 })
 
 const itemSchema = new mongoose.Schema({
+    item_id: {
+        type: Number,
+        unique: true,
+    },
     type: {
         type: String,
         enum: ['Hot Rolled', 'Cold Rolled', 'Galvanized', 'Color Coated', 'Stainless Steel', 'Aluminum'],
@@ -94,5 +98,12 @@ const itemSchema = new mongoose.Schema({
         default: Date.now
     }
 })
+
+itemSchema.pre("save", async function (next) {
+    if (this.isNew) {
+        this.item_id = await getNextIndex("item_index");
+    }
+    next();
+});
 
 module.exports = mongoose.model('Item', itemSchema);

@@ -45,49 +45,6 @@
     /* overflow-x: auto; */
 }
 
-.table {
-    min-width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.table th,
-.table td {
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    padding: 2px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* ✅ Prevents breaking layout */
-    white-space: nowrap;
-}
-
-.table td {
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    font-weight: 400;
-    height: 2rem;
-    border-bottom: 0;
-    font-size: 0.75rem;
-    height: 3rem;
-}
-
-.table th {
-    background-color: white;
-    font-weight: 500;
-    font-size: 0.75rem;
-    text-align: center;
-    padding: 0.5rem;
-}
-
-.table tr:hover {
-    background-color: #f9fafc;
-    cursor: pointer;
-}
-
 .activeRow {
     background-color: #e9f5ff;
 }
@@ -216,40 +173,4 @@
     .buttonGroup {
         justify-content: center;
     }
-}
-
-.nestedRow td {
-    background: #f9fafb;
-    padding: 0.5rem;
-}
-
-.nestedTable {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.nestedTable td {
-    border: 1px solid #e5e7eb;
-    padding: 0.5rem;
-    text-align: center;
-    font-size: 0.9rem;
-    background: #f9fafb;
-    height: auto;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #5d5c5c;
-}
-
-.nestedTable th {
-    background-color: #f3f4f6;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-align: center;
-    padding: 0.25rem;
-    height: auto;
-    color: #667085;
 }

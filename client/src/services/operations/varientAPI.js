@@ -94,6 +94,7 @@ export async function updateVarient(id, type, value, dispatch, list) {
 export async function deleteVarient(id, type, dispatch, list) {
     try {
         dispatch(addLoader("deleteVarient"));
+        console.log({id, type})
 
         const response = (await apiConnector("DELETE", varientEndpoints.DELETE_VARIENT, { id, type })).data;
 
@@ -108,6 +109,7 @@ export async function deleteVarient(id, type, dispatch, list) {
             dispatch(showSuccess({ id: "deleteVarient", message: response.message }));
         }
     } catch (err) {
+        console.log(err);
         dispatch(showError({
             id: "deleteVarient",
             message: err?.response?.data?.message || "Failed to delete variant"

@@ -74,7 +74,7 @@ const createBooking = async (req, res) => {
 
         const totalQty = takenItems.reduce((sum, it) => sum + it.quantity, 0);
 
-        const newBooking = await Booking.create({
+        let newBooking = new Booking({
             booking_id: uuidv4(),
             items: takenItems,
             quantity: totalQty,
@@ -84,6 +84,8 @@ const createBooking = async (req, res) => {
             party: selectedParty._id,
             partySnapshot: Booking.makePartySnapshot(selectedParty)
         });
+        console.log("Here");
+        newBooking = await newBooking.save();
 
         const populatedBooking = await Booking.findById(newBooking._id)
             .populate({
@@ -991,7 +993,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
 
         const listView = bookings.map((b) => ({
             _id: b._id,
-            orderId: b.order_id,
+            orderId: b.order_id || ' - ',
             bookedBy: b.bookedBySnapshot?.name,
             bookingDate: b.bookingDate,
             items: b.items,
@@ -1095,6 +1097,7 @@ const getExcelTablewiseBooking = async (req, res) => {
         bookings.map(b => {
             b.items.map((item) => {
                 let temp = {
+                    order_id: b.order_id,
                     party: b.partySnapshot?.name || "-",
                     bookedBy: b.bookedBySnapshot?.name,
                     bookingDate: b.bookingDate,

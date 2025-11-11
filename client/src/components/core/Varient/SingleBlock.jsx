@@ -83,7 +83,7 @@ const SingleBlock = ({ list, name }) => {
                 <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && 'rgb(0 122 138)', color: type === 'ALL' && '#f0fbff' }}>All</button>
                 <button onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && 'rgb(0 122 138)', color: type === 'HR' && '#f0fbff' }}>HR</button>
                 <button onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && 'rgb(0 122 138)', color: type === 'CR' && '#f0fbff' }}>CR</button>
-                <button onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '10rem'}}>Add new {name}</button>
+                <button onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '4rem'}}>Add</button>
             </div>
             <form style={{ height: showForm ? '40px' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
                 <div>
@@ -91,14 +91,14 @@ const SingleBlock = ({ list, name }) => {
                         id='type'
                         defaultValue={option}
                         onChange={(e) => setOption(e.target.value)}
-                        style={{width: '8rem'}}
+                        style={{width: '4rem'}}
                     >
                         {name !== 'Grade' && <option value='Both'>All</option>}
-                        <option value='Hot Rolled'>  Hot Rolled </option>
-                        <option value='Cold Rolled'>  Cold Rolled </option>
+                        <option value='Hot Rolled'>  HR </option>
+                        <option value='Cold Rolled'>  CR </option>
                     </select>
                 </div>
-                <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of new ${name}`} style={{ width: '100%' }} />
+                <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of ${name}`} style={{ width: '100%' }} />
                 <div>
                     <button type='submit'>Add</button>
                     <button type='reset' onClick={() => setShowForm(false)}>Cancle</button>
