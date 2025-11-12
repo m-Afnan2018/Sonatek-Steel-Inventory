@@ -633,7 +633,7 @@ const getUpcomingItem = async (req, res) => {
     try {
         const items = await Item.find({ 'challan.challanNumber': null })
             .populate("grade width thickness shipTo challan")
-            .sort({ createdAt: 1 })
+            .sort({ wagonNumber: 1 })
 
         let listView = [];
 
@@ -670,6 +670,7 @@ const getUpcomingItem = async (req, res) => {
 
 // const xlsx = require('xlsx');
 const xlsx = require('xlsx');
+const getNextIndex = require("../utils/counerHandler");
 const uploadCSV = async (req, res) => {
     try {
         const { file } = req.files;
@@ -766,6 +767,12 @@ const uploadCSV = async (req, res) => {
         if (!itemsToInsert.length) {
             return errorResponse(res, "No valid items found in file");
         }
+
+        // ✅ STEP: Assign serials before bulk insert
+        for (const item of itemsToInsert) {
+            item.item_id = await getNextIndex("product_index"); // 👈 auto-increment ID
+        }
+
         await Item.insertMany(itemsToInsert);
 
         res.status(200).json({

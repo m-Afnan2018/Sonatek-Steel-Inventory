@@ -3,7 +3,6 @@
     background: white;
     padding: 0.25rem;
     border-radius: 0.5rem;
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
