@@ -770,7 +770,7 @@ const uploadCSV = async (req, res) => {
 
         // ✅ STEP: Assign serials before bulk insert
         for (const item of itemsToInsert) {
-            item.item_id = await getNextIndex("product_index"); // 👈 auto-increment ID
+            item.item_id = await getNextIndex("item_index"); // 👈 auto-increment ID
         }
 
         await Item.insertMany(itemsToInsert);
