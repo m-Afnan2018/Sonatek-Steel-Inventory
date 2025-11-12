@@ -340,7 +340,6 @@
 .notFound {
     background-color: #f0fbff;
     border-radius: 0 0 0.5rem 0.5rem;
-    padding: 4rem 1rem;
     display: flex;
     justify-content: center;
     align-items: center;

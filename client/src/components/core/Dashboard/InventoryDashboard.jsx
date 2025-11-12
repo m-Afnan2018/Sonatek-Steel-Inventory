@@ -92,7 +92,7 @@ const InventoryDashboard = () => {
 
     return (
         <div className={style.Dashboard}>
-            <h3 className={style.heading}>Inventory Items
+            <h3 className='main-heading'>Inventory Items
                 <span style={{ marginLeft: 'auto', fontSize: '0.75rem' }}>Total Quantity: {totalQuantity}</span>
                 <span><LuDownload onClick={onDownload} /></span>
             </h3>

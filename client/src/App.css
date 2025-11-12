@@ -22,6 +22,10 @@
     border-radius: 0.25rem;
     text-align: start;
     margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
 }
 
 form label {
@@ -36,7 +40,7 @@ form select {
     width: 100%;
     padding: 0.25rem;
     border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     background: #fff;
     font-size: 0.75rem;
     transition: border-color 0.2s ease;

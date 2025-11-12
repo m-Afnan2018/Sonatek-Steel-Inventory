@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { getAllBookingsTable } from 'services/operations/bookingAPI';
+import { LuDownload } from "react-icons/lu";
 
 const SalesReport = () => {
     const [view, setView] = useState(null);
@@ -82,7 +83,9 @@ const SalesReport = () => {
 
     return (
         <div className={style.staffContainer}>
-            <h3 className={style.heading}>Sales Report</h3>
+            <h3 className={style.heading}>Inventory Items
+                <span style={{ marginLeft: 'auto', fontSize: '1rem' }}><LuDownload onClick={onDownload} /></span>
+            </h3>
             <Filters setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
@@ -118,7 +121,7 @@ const SalesReport = () => {
             </div>}
             {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
-                <button onClick={onDownload}>Download</button>
+                {/* <button onClick={onDownload}>Download</button> */}
 
                 <div className={style.paginationControls}>
                     {pagination?.page > 1 && <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>

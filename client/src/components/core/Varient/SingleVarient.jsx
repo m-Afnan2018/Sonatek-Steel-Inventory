@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import style from './Varient.module.css'
-import { MdDelete } from "react-icons/md";
+import { IoTrashOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 
 const SingleVarient = ({ onDelete, onUpdate, value }) => {
@@ -26,7 +26,7 @@ const SingleVarient = ({ onDelete, onUpdate, value }) => {
                 {editable ? <div>
                     <RxCheck style={{ color: 'green' }} onClick={updating} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleEdit} />
-                </div> : <MdDelete style={{ color: 'red' }} onClick={() => onDelete(value._id)} />}
+                </div> : <IoTrashOutline style={{ color: 'red' }} onClick={() => onDelete(value._id)} />}
             </td>
         </tr>
     )
