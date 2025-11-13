@@ -20,6 +20,7 @@ export function OverlayProvider({ children }) {
         left: 0,
         right: 0,
         backgroundColor: '#001f2bd4',
+        zIndex: 10,
     }
 
     const hideStyle = {

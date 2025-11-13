@@ -676,13 +676,20 @@
     padding: 0.6rem 1rem;
     border-radius: 8px;
     cursor: pointer;
+    min-width: 6rem;
+    font-weight: 600;
+}
+
+.FullWidth button:hover {
+    box-shadow: 0px 0px 4px 2px black;
 }
 
 .buttons {
     border-bottom: 0px;
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-end;
     align-items: center;
+    gap: 1rem;
 }
 
 .FullWidth .inputField {

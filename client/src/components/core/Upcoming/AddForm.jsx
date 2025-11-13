@@ -6,12 +6,18 @@ import Select from "react-select";
 import { addItem } from "services/operations/itemAPI";
 import { FaCirclePlus } from "react-icons/fa6";
 import toast from "react-hot-toast";
+import OrderConfirmationOverlay from "components/common/Overlay/CreateAndConfirmationOverlay";
+import { useOverlay } from "hooks/useOverlay";
+import { bookingItems } from "services/operations/bookingAPI";
+import CreateAndConfirmationOverlay from "components/common/Overlay/CreateAndConfirmationOverlay";
 
 const AddForm = () => {
     const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
 
     const [type, setType] = useState(false);
+
+    const { showOverlay } = useOverlay()
 
     const { register, handleSubmit, control, setFocus } = useForm({
         defaultValues: {
@@ -23,12 +29,19 @@ const AddForm = () => {
         },
     });
 
-    const onSubmit = (data) => {
+    const onSubmit = (data, e) => {
         // Basic validation
         if (!data.thickness?.value) return toast.error("Please select thickness");
         if (!data.width?.value) return toast.error("Please select a width");
         if (!data.grade?.value) return toast.error("Please select a grade");
         if (!data.quantity || data.quantity <= 0) return toast.error("Invalid quantity");
+
+        const button = e?.nativeEvent?.submitter; // safely access submitter
+
+        if (button && button.innerText === 'Book') {
+            onBookinging(data);
+            return;
+        }
 
         const formattedData = {
             type: grades.find(g => g._id === data.grade.value).type || 'Cold Rolled',
@@ -141,6 +154,19 @@ const AddForm = () => {
         setType(e.value);
     }
 
+    const onBookinging = (data) => {
+        let mini = 0;
+        let maxi = 0;
+        mini = maxi - mini;
+        showOverlay(CreateAndConfirmationOverlay, {
+            range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
+            data: data,
+            onAccept: (data, party) => {
+                bookingItems({ items: data, party }, dispatch, () => { console.log("Compelted") })
+            }
+        })
+    }
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={style.AddForm} onKeyDown={(e) => {
             if (e.ctrlKey && e.key === "Enter") {
@@ -196,7 +222,7 @@ const AddForm = () => {
 
                             }}
                             {...field}
-                            options={toOptions(thicknesses.filter(t => t.type === type))}
+                            options={toOptions(thicknesses?.filter(t => t.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, 'date', "width")}
@@ -216,7 +242,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(widths.filter(w => w.type === type))}
+                            options={toOptions(widths?.filter(w => w.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, widths, "thickness", "grade")}
@@ -236,7 +262,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(grades.filter(g => g.type === type))}
+                            options={toOptions(grades?.filter(g => g.type === type))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, grades, "width", "quantity")}
@@ -281,7 +307,10 @@ const AddForm = () => {
             </div>
 
             <div>
-                <button type="submit"><FaCirclePlus /></button>
+                <button type="submit">Add</button>
+            </div>
+            <div>
+                <button type="submit">Book</button>
             </div>
 
         </form>

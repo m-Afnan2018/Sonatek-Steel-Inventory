@@ -1,5 +1,6 @@
 import React from 'react'
 import style from './Overlay.module.css'
+import { RxCross2 } from "react-icons/rx";
 
 const ViewIncompleteBookingDetail = ({ data,
     cancel,
@@ -46,6 +47,8 @@ const ViewIncompleteBookingDetail = ({ data,
             <div className={style.DetailsContent} onClick={(e) => e.stopPropagation()}>
                 <div className={style.DetailsHeader}>
                     <h2>Booking Details</h2>
+
+                    <button className='crossButton' onClick={close}><RxCross2 /></button>
                 </div>
 
                 <div className={style.DetailsGrid}>
@@ -102,9 +105,8 @@ const ViewIncompleteBookingDetail = ({ data,
                             <input type='text' placeholder={'Enter the Vechicle number to confirm deliver it or reason to cancel'} />
                         </div>}
                         {['admin', 'director', 'accountant'].includes(userData.role) && data.status !== 'Cancelled' && <div className={style.buttons}>
-                            <button type='submit'>Cancel</button>
-                            <button type='submit'>Ship</button>
-                            <button className={style.PrimaryButton} onClick={close}>Close</button>
+                            <button type='submit' style={{ backgroundColor: '#6f0505' }}>Cancel</button>
+                            <button type='submit' style={{ backgroundColor: '#056f18' }}>Ship</button>
                         </div>}
                     </form>
                 </div>

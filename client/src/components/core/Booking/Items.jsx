@@ -33,13 +33,6 @@ const Items = () => {
         to: ''
     })
 
-    // useEffect(() => {
-    //     if (allChoices) {
-    //         setItems(allChoices);
-    //         setLoading(false);
-    //     }
-    // }, [allChoices])
-
     useEffect(() => {
         if (items === null) {
             setLoading(true);

@@ -743,7 +743,7 @@ const uploadCSV = async (req, res) => {
                 : null;
 
             itemsToInsert.push({
-                type: detectMaterialType(row["MATERIAL-DESCRIPTION"]),
+                type: grade.type,
                 grade: grade._id,
                 thickness: thickness._id,
                 width: width._id,
@@ -788,6 +788,8 @@ const uploadCSV = async (req, res) => {
 
 // 🔍 Helper to detect material type
 function detectMaterialType(description = '') {
+    const parts = desc.split('X').map(p => p.trim());
+    let grade = parts[2] || '';
     const lower = description.toLowerCase();
     if (lower.includes('hot')) return 'Hot Rolled';
     if (lower.includes('cold')) return 'Cold Rolled';
