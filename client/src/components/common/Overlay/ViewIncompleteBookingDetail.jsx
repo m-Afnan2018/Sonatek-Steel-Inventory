@@ -54,10 +54,12 @@ const ViewIncompleteBookingDetail = ({ data,
                 <div className={style.DetailsGrid}>
                     <div className={style.Card}>
                         <h4>Booking</h4>
-                        <p><strong>ID:</strong> {data.booking_id}</p>
+                        <p><strong>ID:</strong> {data.order_id}</p>
                         <p><strong>Status:</strong> <span className={style[data.status?.toLowerCase()] || ''}>{data.status}</span></p>
                         <p><strong>Quantity:</strong> {data.quantity?.toFixed(3)}</p>
                         <p><strong>Booked At:</strong> {new Date(data.bookingDate).toLocaleString()}</p>
+                        <p><strong>Party:</strong> {data.partySnapshot?.name}</p>
+                        <p><strong>Ship To:</strong> {data.shipTo || 'NA'}</p>
                     </div>
 
                     <div className={style.Card}>
@@ -65,7 +67,6 @@ const ViewIncompleteBookingDetail = ({ data,
                         <p><strong>Name:</strong> {bookedBy.firstName} {bookedBy.lastName}</p>
                         <p><strong>Email:</strong> {bookedBy.email}</p>
                         <p><strong>Role:</strong> {bookedBy.role}</p>
-                        <p><strong>Party:</strong> {data.partySnapshot?.name}</p>
                     </div>
 
                     <div className={style.FullWidth}>

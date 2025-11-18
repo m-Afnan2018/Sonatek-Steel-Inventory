@@ -19,7 +19,7 @@ import NotVerified from 'pages/NotVerified/NotVerified';
 import toast from 'react-hot-toast';
 import { removeError, removeSuccess } from 'slices/loaderSlice';
 import { OverlayProvider } from 'hooks/useOverlay';
-import Cutter from 'pages/Cutter/Cutter';
+import Warehouse from 'pages/Warehouse/Warehouse';
 import SalesReport from 'pages/SalesReport/SalesReport';
 import Upcoming from 'pages/Upcoming/Upcoming';
 import Party from 'pages/Party/Party';
@@ -87,7 +87,7 @@ function App() {
                         <Route path='/manage-varient' element={<Varient />} />
                         <Route path='/manage-inventory' element={<Inventory />} />
                         <Route path='/manage-upcoming' element={<Upcoming />} />
-                        <Route path='/manage-cutters' element={<Cutter />} />
+                        <Route path='/manage-warehouses' element={<Warehouse />} />
                         <Route path='/manage-bookings' element={<Booking />} />
                         <Route path='/sales-report' element={<SalesReport />} />
                         <Route path='/manage-party' element={<Party />} />

@@ -30,10 +30,10 @@ export function generateShipToColors(data) {
 
   const colorMap = {};
   data.forEach(item => {
-    if (item.shipTo && !colorMap[item.shipTo._id]) {
+    if (item.warehouse && !colorMap[item.warehouse._id]) {
       const bg = generateBrightColor();
-      colorMap[item.shipTo._id] = {
-        shipToId: item.shipTo._id,
+      colorMap[item.warehouse._id] = {
+        warehouseId: item.warehouse._id,
         backgroundColor: bg,
         foregroundColor: getContrastText(bg)
       };

@@ -2,18 +2,7 @@
 import React from 'react'
 import style from './Overlay.module.css'
 
-/**
- * VarientDetail
- * Props:
- *  - cutter: { _id, name, address, phoneNumber, visible, createdAt, updatedAt }
- *  - items: [ { _id, wagonNumber, grade, width, thickness, quantity, challan, shipTo, createdAt } ] (optional)
- *  - bookings: [ { booking_id, status, quantity, bookingDate, bookedBySnapshot } ] (optional)
- *  - onClose: function to close overlay
- *
- * This component only renders UI for a single cutter variant. If `items` or `bookings`
- * are not provided the related sections will be hidden.
- */
-const VarientDetail = ({ cutter = {}, items = [], bookings = [], close }) => {
+const VarientDetail = ({ warehouse = {}, items = [], bookings = [], close }) => {
     const fmt = (d) => {
         if (!d) return '-'
         const date = new Date(d)
@@ -29,19 +18,19 @@ const VarientDetail = ({ cutter = {}, items = [], bookings = [], close }) => {
         <div className={style.Overlay}>
             <div className={style.VarientDetailCard} role="dialog" aria-modal="true">
                 <header className={style.overlayHeader}>
-                    <h3 className={style.title}>Cutter / Ship-To Details</h3>
+                    <h3 className={style.title}>Warehouse / Ship-To Details</h3>
                     <button className={style.closeBtn} onClick={close} aria-label="Close">✕</button>
                 </header>
 
                 <section className={style.grid}>
                     {/* <div className={style.card}>
                         <h4 className={style.cardTitle}>Basic Information</h4>
-                        <div className={style.infoRow}><span className={style.label}>Name</span><span>{cutter.name || '-'}</span></div>
-                        <div className={style.infoRow}><span className={style.label}>Phone</span><span>{cutter.phoneNumber || '-'}</span></div>
-                        <div className={style.infoRow}><span className={style.label}>Address</span><span className={style.address}>{cutter.address || '-'}</span></div>
-                        <div className={style.infoRow}><span className={style.label}>Visible</span><span>{cutter.visible ? 'Yes' : 'No'}</span></div>
-                        <div className={style.infoRow}><span className={style.label}>Created</span><span>{fmt(cutter.createdAt)}</span></div>
-                        <div className={style.infoRow}><span className={style.label}>Updated</span><span>{fmt(cutter.updatedAt)}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Name</span><span>{warehouse.name || '-'}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Phone</span><span>{warehouse.phoneNumber || '-'}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Address</span><span className={style.address}>{warehouse.address || '-'}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Visible</span><span>{warehouse.visible ? 'Yes' : 'No'}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Created</span><span>{fmt(warehouse.createdAt)}</span></div>
+                        <div className={style.infoRow}><span className={style.label}>Updated</span><span>{fmt(warehouse.updatedAt)}</span></div>
                     </div> */}
 
                     <div className={style.card}>

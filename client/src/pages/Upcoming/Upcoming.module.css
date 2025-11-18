@@ -75,7 +75,7 @@
 
 
 .coloredShipTo {
-    /* Used for the Ship To cell in SingleItem */
+    /* Used for the Warehouse cell in SingleItem */
     border-radius: 0.25rem;
     width: fit-content;
     padding: 0.15rem 0.25rem;

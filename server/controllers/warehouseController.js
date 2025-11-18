@@ -1,9 +1,9 @@
 const { errorResponse, customError } = require("../utils/errorHandler");
-const Cutter = require("../models/cutterModel");
+const Warehouse = require("../models/warehouseModel");
 const Item = require("../models/itemModel");
 const mongoose = require('mongoose');
 
-const addCutter = async (req, res) => {
+const addWarehouse = async (req, res) => {
     try {
         const { name, address, phoneNumber } = req.body;
 
@@ -11,126 +11,126 @@ const addCutter = async (req, res) => {
             throw customError("All fields are required", 400);
         }
 
-        const newCutter = new Cutter({ name, address, phoneNumber });
-        await newCutter.save();
+        const newWarehouse = new Warehouse({ name, address, phoneNumber });
+        await newWarehouse.save();
 
         return res.status(201).json({
             success: true,
-            message: "Cutter added successfully",
-            cutter: newCutter
+            message: "Warehouse added successfully",
+            warehouse: newWarehouse
         });
     } catch (err) {
         return errorResponse(res, err)
     }
 }
 
-const updateCutter = async (req, res) => {
+const updateWarehouse = async (req, res) => {
     try {
-        const { cutterId, name, address, phoneNumber } = req.body;
+        const { warehouseId, name, address, phoneNumber } = req.body;
 
         if (!name && !address && !phoneNumber) {
             throw customError("Atleast one field is required", 400);
         }
 
-        const cutter = await Cutter.findById(cutterId);
+        const warehouse = await Warehouse.findById(warehouseId);
 
-        if (!cutter) {
-            throw customError("Unable to find the cutter");
+        if (!warehouse) {
+            throw customError("Unable to find the warehouse");
         }
 
-        const newCutter = await Cutter.findByIdAndUpdate(cutterId, {
-            name: name || cutter.name,
-            address: address || cutter.address,
-            phoneNumber: phoneNumber || cutter.phoneNumber
+        const newWarehouse = await Warehouse.findByIdAndUpdate(warehouseId, {
+            name: name || warehouse.name,
+            address: address || warehouse.address,
+            phoneNumber: phoneNumber || warehouse.phoneNumber
         }, { new: true })
 
         return res.status(201).json({
             success: true,
-            message: "Cutter added successfully",
-            cutter: newCutter
+            message: "Warehouse added successfully",
+            warehouse: newWarehouse
         });
     } catch (err) {
         return errorResponse(res, err)
     }
 }
 
-const getAllCutters = async (req, res) => {
+const getAllWarehouses = async (req, res) => {
     try {
-        const cutters = await Cutter.find().sort({ createdAt: -1 });
+        const warehouses = await Warehouse.find().sort({ createdAt: -1 });
         return res.status(200).json({
             success: true,
-            cutters
+            warehouses
         });
     } catch (err) {
         return errorResponse(res, err)
     }
 }
 
-const showCutter = async (req, res) => {
+const showWarehouse = async (req, res) => {
     try {
-        const { cutterId } = req.body;
-        if (!cutterId) {
-            throw customError("Cutter ID is required", 400);
+        const { warehouseId } = req.body;
+        if (!warehouseId) {
+            throw customError("Warehouse ID is required", 400);
         }
 
-        const cutter = await Cutter.findByIdAndUpdate(cutterId, { visible: true }, { new: true });
-        if (!cutter) {
-            throw customError("Cutter not found", 404);
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: 'Visibility Changed Successfully',
-            cutter
-        });
-    } catch (err) {
-        return errorResponse(res, err)
-    }
-}
-
-const hideCutter = async (req, res) => {
-    try {
-        const { cutterId } = req.body;
-        if (!cutterId) {
-            throw customError("Cutter ID is required", 400);
-        }
-
-        const cutter = await Cutter.findByIdAndUpdate(cutterId, { visible: false }, { new: true });
-        if (!cutter) {
-            throw customError("Cutter not found", 404);
+        const warehouse = await Warehouse.findByIdAndUpdate(warehouseId, { visible: true }, { new: true });
+        if (!warehouse) {
+            throw customError("Warehouse not found", 404);
         }
 
         return res.status(200).json({
             success: true,
             message: 'Visibility Changed Successfully',
-            cutter
+            warehouse
         });
     } catch (err) {
         return errorResponse(res, err)
     }
 }
 
-const getDataByCutters = async (req, res) => {
+const hideWarehouse = async (req, res) => {
     try {
-        const { cutter } = req.body;
+        const { warehouseId } = req.body;
+        if (!warehouseId) {
+            throw customError("Warehouse ID is required", 400);
+        }
 
-        if (!cutter) {
+        const warehouse = await Warehouse.findByIdAndUpdate(warehouseId, { visible: false }, { new: true });
+        if (!warehouse) {
+            throw customError("Warehouse not found", 404);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Visibility Changed Successfully',
+            warehouse
+        });
+    } catch (err) {
+        return errorResponse(res, err)
+    }
+}
+
+const getDataByWarehouses = async (req, res) => {
+    try {
+        const { warehouse } = req.body;
+
+        if (!warehouse) {
             return res.status(400).json({
                 success: false,
-                message: "Cutter ID is required",
+                message: "Warehouse ID is required",
             });
         }
 
-        // Get cutter + basic item aggregation
-        const cutterData = await Cutter.aggregate([
+        // Get warehouse + basic item aggregation
+        const warehouseData = await Warehouse.aggregate([
             {
-                $match: { _id: new mongoose.Types.ObjectId(cutter) },
+                $match: { _id: new mongoose.Types.ObjectId(warehouse) },
             },
             {
                 $lookup: {
                     from: "items",
                     localField: "_id",
-                    foreignField: "shipTo",
+                    foreignField: "warehouse",
                     as: "items",
                 },
             },
@@ -144,49 +144,49 @@ const getDataByCutters = async (req, res) => {
             }
         ]);
 
-        if (!cutterData || cutterData.length === 0) {
+        if (!warehouseData || warehouseData.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Cutter not found",
+                message: "Warehouse not found",
             });
         }
 
         // Populate item fields (grade, width, thickness)
-        const populatedItems = await Item.find({ shipTo: cutter })
+        const populatedItems = await Item.find({ warehouse: warehouse })
             .populate("grade", "name")
             .populate("width", "name")
             .populate("thickness", "name");
 
         // Final result
         const result = {
-            ...cutterData[0],
+            ...warehouseData[0],
             items: populatedItems,
         };
 
         res.status(200).json({
             success: true,
-            message: "Fetched cutter details successfully",
+            message: "Fetched warehouse details successfully",
             data: result,
         });
 
     } catch (err) {
-        console.error("Error fetching cutter details:", err);
+        console.error("Error fetching warehouse details:", err);
         res.status(500).json({
             success: false,
-            message: "Failed to fetch cutter details",
+            message: "Failed to fetch warehouse details",
             error: err.message,
         });
     }
 };
 
-const getAllCutterDetails = async (req, res) => {
+const getAllWarehouseDetails = async (req, res) => {
     try {
-        const cutters = await Cutter.aggregate([
+        const warehouses = await Warehouse.aggregate([
             {
                 $lookup: {
                     from: "items",
                     localField: "_id",
-                    foreignField: "shipTo",
+                    foreignField: "warehouse",
                     as: "items",
                 },
             },
@@ -207,17 +207,17 @@ const getAllCutterDetails = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "Fetched all cutter details successfully",
+            message: "Fetched all warehouse details successfully",
             data: {
-                total: cutters.length,
-                list: cutters,
+                total: warehouses.length,
+                list: warehouses,
             },
         });
     } catch (err) {
-        console.error("Error fetching cutter details:", err);
+        console.error("Error fetching warehouse details:", err);
         res.status(500).json({
             success: false,
-            message: "Failed to fetch cutter details",
+            message: "Failed to fetch warehouse details",
             error: err.message,
         });
     }
@@ -226,11 +226,11 @@ const getAllCutterDetails = async (req, res) => {
 
 
 module.exports = {
-    addCutter,
-    updateCutter,
-    getAllCutters,
-    showCutter,
-    hideCutter,
-    getAllCutterDetails,
-    getDataByCutters
+    addWarehouse,
+    updateWarehouse,
+    getAllWarehouses,
+    showWarehouse,
+    hideWarehouse,
+    getAllWarehouseDetails,
+    getDataByWarehouses
 };  

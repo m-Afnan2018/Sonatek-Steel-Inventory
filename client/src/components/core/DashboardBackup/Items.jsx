@@ -24,7 +24,7 @@ const Items = () => {
         wagonNumber: '',
         challanNumber: '',
         challanDate: '',
-        shipTo: '',
+        warehouse: '',
         from: '',
         to: ''
     })
@@ -111,7 +111,7 @@ const Items = () => {
                                     <th>Type</th>
                                     <th>Material Description</th>
                                     <th>Quantity</th>
-                                    <th>Ship To</th>
+                                    <th>Warehouse</th>
                                     <th>Vehicle Number</th>
                                     <th>Loader</th>
                                     <th>Transport</th>
@@ -166,7 +166,7 @@ const SingleItem = ({ item, view, setView }) => {
             <td>{item.type || "-"}</td>
             <td> {`${item.thickness?.name || "-"} X ${item.width?.name || "-"} X ${item.grade?.name || "-"}`}</td>
             <td>{item.quantity ?? "-"}</td>
-            <td>{item.shipTo?.name ?? "-"}</td>
+            <td>{item.warehouse?.name ?? "-"}</td>
             <td>{item.vehicleNumber || "-"}</td>
             <td>{item.loader || "-"}</td>
             <td>{item.transport || "-"}</td>
@@ -175,7 +175,7 @@ const SingleItem = ({ item, view, setView }) => {
 };
 
 const Filters = ({ setFilters }) => {
-    const { grades, thicknesses, cutters, widths } = useSelector(
+    const { grades, thicknesses, warehouses, widths } = useSelector(
         (state) => state.varient
     );
     const dispatch = useDispatch();
@@ -191,7 +191,7 @@ const Filters = ({ setFilters }) => {
             challanNumber: "",
             challanDate: "",
             quantity: "",
-            shipTo: "",
+            warehouse: "",
             fromDate: "",
             toDate: "",
         },
@@ -215,7 +215,7 @@ const Filters = ({ setFilters }) => {
             challanNumber: "",
             challanDate: "",
             quantity: "",
-            shipTo: "",
+            warehouse: "",
             fromDate: "",
             toDate: "",
         })
@@ -327,14 +327,14 @@ const Filters = ({ setFilters }) => {
                 />
             </div>
 
-            {/* Ship To */}
+            {/* Warehouse */}
             <div>
-                <label htmlFor="shipTo">Ship To:</label>
-                <select id="shipTo" {...register("shipTo")}>
+                <label htmlFor="warehouse">Warehouse:</label>
+                <select id="warehouse" {...register("warehouse")}>
                     <option value="">All</option>
-                    {cutters?.map((cutter) => (
-                        <option key={cutter._id} value={cutter._id}>
-                            {cutter.name}
+                    {warehouses?.map((warehouse) => (
+                        <option key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
                         </option>
                     ))}
                 </select>

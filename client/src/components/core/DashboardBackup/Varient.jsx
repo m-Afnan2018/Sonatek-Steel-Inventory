@@ -45,7 +45,7 @@ const Varient = () => {
             <h3>Variant Dashboard</h3>
 
             <div className={style.cardsWrapper}>
-                {['cutters', 'grades', 'thicknesses', 'widths'].map((key) => (
+                {['warehouses', 'grades', 'thicknesses', 'widths'].map((key) => (
                     <div
                         key={key}
                         className={style.card}

@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 
-const cutterSchema = new mongoose.Schema({
+const warehouseSchema = new mongoose.Schema({
     name: {
         type: String,
     },
@@ -24,4 +24,4 @@ const cutterSchema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Cutter', cutterSchema);
+module.exports = mongoose.model('Warehouse', warehouseSchema);

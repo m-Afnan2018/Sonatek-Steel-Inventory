@@ -12,7 +12,7 @@ const Varient = () => {
             <SingleBlock list={thicknesses} name={'Thickness'} />
             <SingleBlock list={widths} name={'Width'} />
             <SingleBlock list={grades} name={'Grade'} />
-            {/* <SingleBlock list={cutters} name={'Cutter'} /> */}
+            {/* <SingleBlock list={warehouses} name={'Warehouse'} /> */}
         </div >
     )
 }

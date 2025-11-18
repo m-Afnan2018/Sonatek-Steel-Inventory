@@ -2,22 +2,22 @@
 const { customError, errorResponse } = require("../utils/errorHandler");
 const Item = require("../models/itemModel");
 const Thickness = require('../models/thicknessModel')
-const Cutter = require('../models/cutterModel')
+const Warehouse = require('../models/warehouseModel')
 const Grade = require('../models/gradeModel')
 const Width = require('../models/widthModel')
 
 const addItem = async (req, res) => {
     try {
         // Fetching
-        const { type, grade, width, thickness, quantity, shipTo, wagonNumber, date } = req.body;
+        const { type, grade, width, thickness, quantity, warehouse, wagonNumber, date } = req.body;
 
         // Validation
         if (!type || !grade || !width || !thickness || !quantity) {
             throw customError('All fields are required', 400);
         }
-        let cutterChecker = true;
-        if (shipTo && shipTo.trim() !== "") {
-            cutterChecker = await Cutter.findById(shipTo);
+        let warehouseChecker = true;
+        if (warehouse && warehouse.trim() !== "") {
+            warehouseChecker = await Warehouse.findById(warehouse);
         }
         const widthChecker = await Width.findById(width);
         const thicknessChecker = await Thickness.findById(thickness);
@@ -32,8 +32,8 @@ const addItem = async (req, res) => {
         if (!widthChecker) {
             throw customError('Invalid Width is selected');
         }
-        if (!cutterChecker) {
-            throw customError('Invalid Cutter is selected');
+        if (!warehouseChecker) {
+            throw customError('Invalid Warehouse is selected');
         }
 
         // Create new item
@@ -42,7 +42,7 @@ const addItem = async (req, res) => {
             grade,
             width,
             thickness,
-            shipTo: shipTo && shipTo.trim() === "" ? null : shipTo,
+            warehouse: warehouse && warehouse.trim() === "" ? null : warehouse,
             quantity,
             originalQuantity: quantity,
             wagonNumber: wagonNumber || null,
@@ -67,13 +67,14 @@ const addItem = async (req, res) => {
             data: {
                 _id: item._id,
                 type: item.type,
+                item_id: item.item_id,
                 grade: item.grade?.name,
                 width: item.width?.name,
                 thickness: item.thickness?.name,
                 quantity: item.originalQuantity,
                 challanNumber: item.challan?.challanNumber,
                 challanDate: item.challan?.challanDate,
-                shipTo: item.shipTo?.name,
+                warehouse: item.warehouse?.name,
                 createdAt: item.createdAt,
                 date: item.date
             }
@@ -85,6 +86,7 @@ const addItem = async (req, res) => {
             _id: item._id,
             name: `${item.wagonNumber} - ${item.type}`,
             type: item.type,
+            item_id: item.item_id,
             grade: gradeChecker,
             width: widthChecker,
             originalQuantity: item.originalQuantity,
@@ -92,7 +94,7 @@ const addItem = async (req, res) => {
             challanNumber: item.challan?.challanNumber,
             challanDate: item.challan?.challanDate,
             thickness: thicknessChecker,
-            shipTo: cutterChecker === true ? null : cutterChecker,
+            warehouse: warehouseChecker === true ? null : warehouseChecker,
             createdAt: item.createdAt,
             date: item.date
         };
@@ -116,8 +118,8 @@ const updateItem = async (req, res) => {
         const id = updateData._id;
         if (updateData._id) delete updateData._id;
 
-        if (updateData?.shipTo?.trim() === "") {
-            updateData.shipTo = null;
+        if (updateData?.warehouse?.trim() === "") {
+            updateData.warehouse = null;
         }
 
         // If challan fields are present, nest them
@@ -145,11 +147,12 @@ const updateItem = async (req, res) => {
         updateData.updatedAt = Date.now();
 
         const updatedItem = await Item.findByIdAndUpdate(id, updateData, { new: true })
-            .populate("grade width thickness shipTo");
+            .populate("grade width thickness warehouse");
         if (!updatedItem) throw customError('Item not found', 404);
 
         const formattedItems = {
             _id: updatedItem._id,
+            item_id: updatedItem.item_id,
             name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
             type: updatedItem.type,
             grade: updatedItem.grade,
@@ -160,7 +163,7 @@ const updateItem = async (req, res) => {
             wagonNumber: updatedItem.wagonNumber,
             challanNumber: updatedItem?.challan?.challanNumber,
             challanDate: updatedItem?.challan?.challanDate,
-            shipTo: updatedItem?.shipTo,
+            warehouse: updatedItem?.warehouse,
             originalQuantity: updatedItem.originalQuantity,
             vehicleNumber: updatedItem?.transport?.vehicleNumber,
             loader: updatedItem?.transport?.loader,
@@ -185,7 +188,7 @@ const getItem = async (req, res) => {
         const item = await Item.findById(itemId)
             .populate('width')
             .populate('thickness')
-            .populate('shipTo')
+            .populate('warehouse')
             .populate('grade')
             .populate('challan');
         if (!item) throw customError('Item not found', 404);
@@ -270,8 +273,8 @@ const getAllItem = async (req, res) => {
                         query[key] = Number(value);
                     }
                 }
-                else if (key === "shipTo") {
-                    // shipTo is likely ObjectId
+                else if (key === "warehouse") {
+                    // warehouse is likely ObjectId
                     query[key] = value;
                 }
                 else if (key === "challanNumber") {
@@ -289,7 +292,7 @@ const getAllItem = async (req, res) => {
 
         // Fetch items
         let items = await Item.find(query)
-            .populate("grade width thickness shipTo transport")
+            .populate("grade width thickness warehouse transport")
             .sort(sortBy === "materialDescription" ? {} : { [sortBy]: order === "asc" ? 1 : -1 })
             .skip(skip)
             .limit(Number(limit));
@@ -327,7 +330,7 @@ const getAllItem = async (req, res) => {
             width: item.width,
             originalQuantity: Number(item.originalQuantity),
             thickness: item.thickness,
-            shipTo: item?.shipTo,
+            warehouse: item?.warehouse,
             createdAt: item.createdAt,
             transporterName: item.transport?.transporterName,
             loader: item.transport?.loader,
@@ -387,7 +390,7 @@ const addVarient = async (req, res) => {
         if (!type || !value) {
             throw customError("Type and Value are required", 404);
         }
-        if (!['thickness', 'grade', 'width', 'cutter'].includes(type)) {
+        if (!['thickness', 'grade', 'width', 'warehouse'].includes(type)) {
             throw customError("Invalid Type", 400)
         }
 
@@ -411,11 +414,11 @@ const addVarient = async (req, res) => {
                 type: value.type
             })
             returnValue = await newWidth.save();
-        } else if (type === 'cutter') {
-            const newCutter = new Cutter({
+        } else if (type === 'warehouse') {
+            const newWarehouse = new Warehouse({
                 name: value
             })
-            returnValue = await newCutter.save();
+            returnValue = await newWarehouse.save();
         }
 
         // Sending response
@@ -432,7 +435,7 @@ const addVarient = async (req, res) => {
 const getAllVarients = async (req, res) => {
     try {
         // Performing Task
-        const cutters = await Cutter.find({});
+        const warehouses = await Warehouse.find({});
         const grades = await Grade.find({})
         const thickness = await Thickness.find({});
         const widths = await Width.find({});
@@ -440,7 +443,7 @@ const getAllVarients = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Successfully fetched the varients",
-            cutters,
+            warehouses,
             grades,
             thickness,
             widths
@@ -459,7 +462,7 @@ const getAllDetailVarient = async (req, res) => {
                     $lookup: {
                         from: "items", // collection name in MongoDB
                         localField: "_id",
-                        foreignField: field, // field in items (e.g. shipTo, grade, etc.)
+                        foreignField: field, // field in items (e.g. warehouse, grade, etc.)
                         as: "items",
                     },
                 },
@@ -482,8 +485,8 @@ const getAllDetailVarient = async (req, res) => {
         };
 
         // Run in parallel
-        const [cutters, grades, thicknesses, widths] = await Promise.all([
-            getVariantWithItemStats(Cutter, "shipTo"),
+        const [warehouses, grades, thicknesses, widths] = await Promise.all([
+            getVariantWithItemStats(Warehouse, "warehouse"),
             getVariantWithItemStats(Grade, "grade"),
             getVariantWithItemStats(Thickness, "thickness"),
             getVariantWithItemStats(Width, "width"),
@@ -493,9 +496,9 @@ const getAllDetailVarient = async (req, res) => {
             success: true,
             message: "Fetched all variant details successfully",
             data: {
-                cutters: {
-                    total: cutters.length,
-                    list: cutters,
+                warehouses: {
+                    total: warehouses.length,
+                    list: warehouses,
                 },
                 grades: {
                     total: grades.length,
@@ -523,7 +526,7 @@ const getVarients = async (req, res) => {
         if (!type) {
             throw customError("Type is required", 400);
         }
-        if (!['thickness', 'grade', 'width', 'cutter'].includes(type)) {
+        if (!['thickness', 'grade', 'width', 'warehouse'].includes(type)) {
             throw customError("Invalid Type", 400);
         }
 
@@ -531,7 +534,7 @@ const getVarients = async (req, res) => {
         if (type === 'thickness') data = await Thickness.find();
         else if (type === 'grade') data = await Grade.find();
         else if (type === 'width') data = await Width.find();
-        else if (type === 'cutter') data = await Cutter.find();
+        else if (type === 'warehouse') data = await Warehouse.find();
 
         res.status(200).json({
             success: true,
@@ -550,7 +553,7 @@ const updateVarient = async (req, res) => {
         if (!type || !id || !value) {
             throw customError("Type, Id and Value are required", 400);
         }
-        if (!['thickness', 'grade', 'width', 'cutter'].includes(type)) {
+        if (!['thickness', 'grade', 'width', 'warehouse'].includes(type)) {
             throw customError("Invalid Type", 400);
         }
 
@@ -561,8 +564,8 @@ const updateVarient = async (req, res) => {
             updatedDoc = await Grade.findByIdAndUpdate(id, { grade: value }, { new: true });
         } else if (type === 'width') {
             updatedDoc = await Width.findByIdAndUpdate(id, { width: value }, { new: true });
-        } else if (type === 'cutter') {
-            updatedDoc = await Cutter.findByIdAndUpdate(id, { name: value }, { new: true });
+        } else if (type === 'warehouse') {
+            updatedDoc = await Warehouse.findByIdAndUpdate(id, { name: value }, { new: true });
         }
 
         if (!updatedDoc) {
@@ -586,7 +589,7 @@ const deleteVarient = async (req, res) => {
         if (!type || !id) {
             throw customError("Type and Id are required", 400);
         }
-        if (!['thickness', 'grade', 'width', 'cutter'].includes(type)) {
+        if (!['thickness', 'grade', 'width', 'warehouse'].includes(type)) {
             throw customError("Invalid Type", 400);
         }
 
@@ -595,7 +598,7 @@ const deleteVarient = async (req, res) => {
         if (type === 'thickness') variantDoc = await Thickness.findById(id);
         else if (type === 'grade') variantDoc = await Grade.findById(id);
         else if (type === 'width') variantDoc = await Width.findById(id);
-        else if (type === 'cutter') variantDoc = await Cutter.findById(id);
+        else if (type === 'warehouse') variantDoc = await Warehouse.findById(id);
 
         if (!variantDoc) {
             throw customError("Variant not found", 404);
@@ -609,8 +612,8 @@ const deleteVarient = async (req, res) => {
             isUsed = await Item.exists({ grade: variantDoc._id });
         } else if (type === 'width') {
             isUsed = await Item.exists({ width: variantDoc._id });
-        } else if (type === 'cutter') {
-            isUsed = await Item.exists({ shipTo: variantDoc._id });
+        } else if (type === 'warehouse') {
+            isUsed = await Item.exists({ warehouse: variantDoc._id });
         }
 
         if (isUsed) {
@@ -632,7 +635,7 @@ const deleteVarient = async (req, res) => {
 const getUpcomingItem = async (req, res) => {
     try {
         const items = await Item.find({ 'challan.challanNumber': null })
-            .populate("grade width thickness shipTo challan")
+            .populate("grade width thickness warehouse challan")
             .sort({ wagonNumber: 1 })
 
         let listView = [];
@@ -650,7 +653,7 @@ const getUpcomingItem = async (req, res) => {
                 currentQuantity: String(item.quantity),
                 thickness: item.thickness,
                 createdAt: item.createdAt,
-                shipTo: item.shipTo,
+                warehouse: item.warehouse,
                 date: item.date,
                 remark: item.remark,
             };
@@ -705,7 +708,7 @@ const uploadCSV = async (req, res) => {
             let grade = await Grade.findOne({ name: gradeName });
             let thickness = await Thickness.findOne({ name: thicknessValue });
             let width = await Width.findOne({ name: widthValue });
-            let shipTo = await Cutter.findOne({ name: row["SHIP-TO"] });
+            let warehouse = await Warehouse.findOne({ name: row["SHIP-TO"] });
             if (!grade && gradeName) {
                 grade = await Grade.create({
                     name: gradeName
@@ -721,8 +724,8 @@ const uploadCSV = async (req, res) => {
                     name: widthValue
                 })
             }
-            if (!shipTo && row["SHIP-TO"]) {
-                shipTo = await Cutter.create({
+            if (!warehouse && row["SHIP-TO"]) {
+                warehouse = await Warehouse.create({
                     name: row["SHIP-TO"]
                 })
             }
@@ -754,7 +757,7 @@ const uploadCSV = async (req, res) => {
                 },
                 originalQuantity: Number(row["QUANTITY"] || 0),
                 quantity: Number(row["QUANTITY"] || 0),
-                shipTo: shipTo ? shipTo._id : null,
+                warehouse: warehouse ? warehouse._id : null,
                 transport: {
                     vehicleNumber: row["VEHICLE"] || null,
                     loader: row["LOADER"] || null,
@@ -908,8 +911,8 @@ const getExcelItem = async (req, res) => {
                             query[key] = Number(value);
                         }
                     }
-                    else if (key === "shipTo") {
-                        // shipTo is likely ObjectId
+                    else if (key === "warehouse") {
+                        // warehouse is likely ObjectId
                         query[key] = value;
                     }
                     else if (key === "challanNumber") {
@@ -935,11 +938,11 @@ const getExcelItem = async (req, res) => {
 
         // 📦 Fetch items
         // const items = await Item.find(query)
-        //     .populate("grade width thickness shipTo challan transport")
+        //     .populate("grade width thickness warehouse challan transport")
         //     .sort({ createdAt: - 1 })
 
         const items = await Item.find(query)
-            .populate("grade width thickness shipTo challan transport") // removed challan populate (it's embedded)
+            .populate("grade width thickness warehouse challan transport") // removed challan populate (it's embedded)
             .sort({ [sortBy]: order === "asc" ? 1 : -1 })
 
         const total = await Item.countDocuments(query);
@@ -959,7 +962,7 @@ const getExcelItem = async (req, res) => {
                 width: item.width?.name || 'NA',
                 quantity: item.originalQuantity || 'NA',
                 thickness: item.thickness?.name || 'NA',
-                shipTo: item?.shipTo?.name || 'NA',
+                warehouse: item?.warehouse?.name || 'NA',
                 createdAt: item.createdAt || 'NA',
                 transporterName: item.transport?.transporterName || 'NA',
                 loader: item.transport?.loader || 'NA',
@@ -978,7 +981,7 @@ const getExcelItem = async (req, res) => {
             Type: item.type,
             Description: `${item.thickness || "N/A"} X ${item.width || "N/A"} ${item.grade || "N/A"}`,
             Weight: item.quantity,
-            Cutters: item.shipTo || "N/A",
+            Warehouses: item.warehouse || "N/A",
             vehicle: item.vehicleNumber,
             loader: item.loader,
             transport: item.transporterName,
@@ -999,7 +1002,7 @@ const getExcelItem = async (req, res) => {
             { wch: 10 }, // Weight
             { wch: 10 }, // Remaining
             { wch: 30 }, // Description
-            { wch: 12 }, // Cutters
+            { wch: 12 }, // Warehouses
             { wch: 14 }, // WagonNumber
         ];
 

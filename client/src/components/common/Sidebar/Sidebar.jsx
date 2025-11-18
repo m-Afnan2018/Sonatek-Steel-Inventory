@@ -33,7 +33,7 @@ const Sidebar = ({ sidebar }) => {
         { to: '/manage-upcoming', label: 'Upcoming', icon: <MdEvent />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
         { to: '/manage-inventory', label: 'Inventory', icon: <MdOutlineInventory2 />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
         { to: '/manage-varient', label: 'Varients', icon: <TbCodeVariablePlus />, roles: ['admin'] },
-        { to: '/manage-cutters', label: 'Cutters', icon: <IoLocationOutline />, roles: ['admin'] },
+        { to: '/manage-warehouses', label: 'Warehouse', icon: <IoLocationOutline />, roles: ['admin'] },
         { to: '/manage-bookings', label: 'Booking', icon: <RiShoppingCartLine />, roles: ['admin', 'agent', 'accountant', 'director'] },
         { to: '/sales-report', label: 'Sales Report', icon: <HiOutlineDocumentReport />, roles: ['admin', 'accountant', 'director'] },
         { to: '/manage-party', label: 'Party', icon: <IoLocationOutline />, roles: ['admin'] },

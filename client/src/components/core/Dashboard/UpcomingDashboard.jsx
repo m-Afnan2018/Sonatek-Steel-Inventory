@@ -55,14 +55,14 @@ const UpcomingDashboard = () => {
                                     <th style={{ minWidth: "5rem", width: "5rem" }}>Wagon</th>
                                     <th style={{ minWidth: "4rem", width: "4rem" }}>Challan date</th>
                                     <th style={{ minWidth: "6rem", width: "6rem" }}>Challan No.</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Ship To</th>
+                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Warehouse</th>
                                     <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Remarks</th>
                                     <th style={{ minWidth: "4rem", width: "4rem" }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.warehouse?._id === i.warehouseId)} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                             <tfoot>
@@ -86,7 +86,7 @@ const SingleItem = ({ color, item, setView, view }) => {
     // const challanDate = item.challanDate
     //     ? new Date(item.challanDate).toLocaleDateString()
     //     : '-';
-    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+    const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [itemDetail, setItemDetail] = useState(item);
@@ -104,8 +104,8 @@ const SingleItem = ({ color, item, setView, view }) => {
         const grade = itemDetail.grade._id;
         const thickness = itemDetail.thickness._id;
         const width = itemDetail.width._id;
-        const cutter = itemDetail.shipTo?._id;
-        let Item = { ...itemDetail, grade, thickness, width, shipTo: cutter };
+        const warehouse = itemDetail.warehouse?._id;
+        let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
         // let updatedItem = { ...Item };
         updateItem(Item, dispatch);
         setSelect('');
@@ -245,16 +245,16 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : itemDetail.challanNumber || '-'}
             </td>
 
-            {/* Ship To */}
-            <td onClick={() => clickHandler('shipTo')} style={{ display: 'flex' }}>
-                {select === 'shipTo' ? (
-                    <div onClick={() => clickHandler('shipTo')}>
-                        {select === 'shipTo'
-                            ? renderDropdownField('shipTo', cutters)
-                            : <span>{itemDetail?.shipTo?.name}</span>}
+            {/* Warehouse */}
+            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
+                {select === 'warehouse' ? (
+                    <div onClick={() => clickHandler('warehouse')}>
+                        {select === 'warehouse'
+                            ? renderDropdownField('warehouse', warehouses)
+                            : <span>{itemDetail?.warehouse?.name}</span>}
                     </div>
                 ) : (
-                    itemDetail.shipTo === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.shipTo.name.toLowerCase()}</p>
+                    itemDetail.warehouse === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.warehouse.name.toLowerCase()}</p>
                 )}
             </td>
 

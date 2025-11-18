@@ -7,7 +7,7 @@ import { addItem } from "services/operations/itemAPI";
 import { FaCirclePlus } from "react-icons/fa6";
 
 const AddForm = ({ setShowUpcoming }) => {
-    const { thicknesses, grades, widths, cutters } = useSelector((state) => state.varient);
+    const { thicknesses, grades, widths, warehouses } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
 
     const { register, handleSubmit, control, setFocus } = useForm({
@@ -28,12 +28,12 @@ const AddForm = ({ setShowUpcoming }) => {
             width: data.width?.value,
             thickness: data.thickness?.value,
             quantity: data.quantity,
-            shipTo: data.cutter?.value || null,
+            warehouse: data.warehouse?.value || null,
             date: data.date
         };
 
         addItem(formattedData, dispatch);
-        // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, shipTo: data.cutter?.label || null }]);
+        // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, warehouse: data.warehouse?.label || null }]);
         setFocus("type");
     };
 
@@ -254,25 +254,25 @@ const AddForm = ({ setShowUpcoming }) => {
                     style={{ width: '100%', height: '2rem' }}
                     type="number"
                     {...register("quantity")}
-                    onKeyDown={(e) => handleKeyDown(e, 'grade', "cutter")}
+                    onKeyDown={(e) => handleKeyDown(e, 'grade', "warehouse")}
                     placeholder="Quantity"
                     step={'any'}
                 />
             </div>
 
-            {/* Cutters */}
+            {/* Warehouses */}
             <div>
                 <Controller
-                    name="cutter"
+                    name="warehouse"
                     control={control}
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={[{ label: 'NULL', value: null }, ...(toOptions(cutters))]}
+                            options={[{ label: 'NULL', value: null }, ...(toOptions(warehouses))]}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, cutters, "quantity", null)}
-                            placeholder="Cutter"
+                            onKeyDown={(e) => handleSelectEnter(e, field, warehouses, "quantity", null)}
+                            placeholder="Warehouse"
                             styles={customStyles}
                             isSearchable
                         />

@@ -12,7 +12,7 @@ const createBooking = async (req, res) => {
     try {
         const { userId } = req.user;
         const { items } = req.body;
-        const { party } = req.body;
+        const { party, shipTo } = req.body;
 
         let selectedParty;
         if (party.type === 'id') {
@@ -31,7 +31,7 @@ const createBooking = async (req, res) => {
 
         const allItemsId = items.map(i => i.id);
         const allItems = await Item.find({ _id: { $in: allItemsId } })
-            .populate('thickness shipTo grade width');
+            .populate('thickness warehouse grade width');
 
         const takenItems = [];
 
@@ -80,11 +80,11 @@ const createBooking = async (req, res) => {
             quantity: totalQty,
             bookedBy: userId,
             bookedBySnapshot,
+            shipTo: shipTo,
             status: "Processing",
             party: selectedParty._id,
             partySnapshot: Booking.makePartySnapshot(selectedParty)
         });
-        console.log("Here");
         newBooking = await newBooking.save();
 
         const populatedBooking = await Booking.findById(newBooking._id)
@@ -114,6 +114,7 @@ const createBooking = async (req, res) => {
             quantity: populatedBooking.quantity,
             status: populatedBooking.status,
             bookingDate: populatedBooking.bookingDate,
+            order_id: populatedBooking.order_id,
             bookedBy:
                 (populatedBooking.bookedBy && `${populatedBooking.bookedBy.firstName} ${populatedBooking.bookedBy.lastName}`) ||
                 populatedBooking.bookedBySnapshot?.name ||
@@ -348,7 +349,7 @@ const getMyBookings = async (req, res) => {
 
 const searchOptions = async (req, res) => {
     try {
-        const { type, grade, formType, thickness, width, shipTo, quantity } = req.body;
+        const { type, grade, formType, thickness, width, warehouse, quantity } = req.body;
 
         // Build dynamic query object - only include fields that are provided
         const query = {};
@@ -358,7 +359,7 @@ const searchOptions = async (req, res) => {
         if (formType) query.formType = formType;
         if (thickness !== undefined) query.thickness = thickness;
         if (width !== undefined) query.width = width;
-        if (shipTo !== undefined) query.shipTo = shipTo;
+        if (warehouse !== undefined) query.warehouse = warehouse;
 
         // Always filter for items with remaining quantity > 0
         query.quantity = { $gt: 0 };
@@ -366,7 +367,7 @@ const searchOptions = async (req, res) => {
         const findAll = await Item.find(query)
             .select('-__v') // Exclude version key
             .sort({ quantity: -1 }) // Sort by remaining quantity (highest first)
-            .populate('shipTo thickness width grade')
+            .populate('warehouse thickness width grade')
             .lean(); // Return plain JavaScript objects for better performance
 
         // Return appropriate message based on results
@@ -873,7 +874,7 @@ const getAllIncompleteBookingsDetails = async (req, res) => {
 //                 challanNumber: it.itemSnapshot?.challan?.challanNumber || null,
 //                 challanDate: it.itemSnapshot?.challan?.challanDate || null,
 //                 currentStatus: it.itemSnapshot?.currentStatus || null,
-//                 shipTo: it.itemSnapshot?.shipTo || null,
+//                 warehouse: it.itemSnapshot?.warehouse || null,
 //             })),
 //             createdAt: b.createdAt || b.bookingDate || null,
 //             updatedAt: b.updatedAt || null,
@@ -935,8 +936,8 @@ const getAllBookingDetailsTablewise = async (req, res) => {
         if (filters.width) itemMatch["itemSnapshot.width._id"] = toObjectId(filters.width);
         if (filters.thickness) itemMatch["itemSnapshot.thickness._id"] = toObjectId(filters.thickness);
         if (filters.formType) itemMatch["itemSnapshot.formType"] = filters.formType;
-        if (filters.shipTo)
-            itemMatch["itemSnapshot.shipTo._id"] = toObjectId(filters.shipTo);
+        if (filters.warehouse)
+            itemMatch["itemSnapshot.warehouse._id"] = toObjectId(filters.warehouse);
 
         if (Object.keys(itemMatch).length > 0) {
             query.items = { $elemMatch: itemMatch };
@@ -986,7 +987,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
         //     requirement: b.requirement,
         //     status: b.status,
         //     vehicleNumber: b.vehicleNumber,
-        //     shipTo: b.items?.[0]?.itemSnapshot?.shipTo?.name || "-",
+        //     warehouse: b.items?.[0]?.itemSnapshot?.warehouse?.name || "-",
         //     remark: b.description || "-",
         //     party: b.partySnapshot?.name || "-",
         // }));
@@ -1062,8 +1063,8 @@ const getExcelTablewiseBooking = async (req, res) => {
             query.items = { $elemMatch: { "itemSnapshot.formType": filters.formType } };
         }
 
-        if (filters.shipTo) {
-            query.items = { $elemMatch: { "itemSnapshot.shipTo.shipTo_id": filters.shipTo } };
+        if (filters.warehouse) {
+            query.items = { $elemMatch: { "itemSnapshot.warehouse.warehouse_id": filters.warehouse } };
         }
 
         if (filters.party) {
@@ -1107,7 +1108,7 @@ const getExcelTablewiseBooking = async (req, res) => {
                     quantity: item.quantity,
                     status: b.status,
                     vehicleNumber: b.vehicleNumber,
-                    location: item.itemSnapshot?.shipTo?.name || "-",
+                    location: item.itemSnapshot?.warehouse?.name || "-",
                     remark: b.description || '-'
                 }
                 listView.push(temp);
@@ -1177,7 +1178,7 @@ const getExcelBooking = async (req, res) => {
                     Weight: it.quantity || "N/A",
                     Description: `${snap.type || ""} X ${snap.grade || "N/A"} X ${snap.thickness || "N/A"
                         } ${snap.width || "N/A"}`,
-                    Cutters: snap.shipTo?.name || "N/A",
+                    Warehouses: snap.warehouse?.name || "N/A",
                     WagonNumber: snap.wagonNumber || "N/A",
                     Status: snap.currentStatus || booking.status || "N/A",
                 };
@@ -1195,7 +1196,7 @@ const getExcelBooking = async (req, res) => {
             { wch: 16 }, // ChallanNumber
             { wch: 10 }, // Weight
             { wch: 30 }, // Description
-            { wch: 12 }, // Cutters
+            { wch: 12 }, // Warehouses
             { wch: 14 }, // WagonNumber
             { wch: 12 }, // Status
         ];

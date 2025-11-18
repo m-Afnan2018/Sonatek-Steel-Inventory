@@ -60,7 +60,9 @@ const ViewIncompleteBooking = () => {
 
     // Common actions
     const handleAction = (apiFn, payload) => {
-        if (!payload?.bookingId || !payload?.fieldValue) return;
+        if (!payload?.bookingId || !payload?.fieldValue){
+            return;
+        }
         apiFn(payload, dispatch, setBookings);
         hideOverlay();
     };

@@ -41,13 +41,13 @@ app.route('/').get((req, res) => {
 // Importing routes
 const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes')
-const cutterRoutes = require('./routes/cutterRoutes');
+const warehouseRoutes = require('./routes/warehouseRoutes');
 const itemRoutes = require('./routes/itemRoutes')
 const bookingRoutes = require('./routes/bookingRoutes')
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/cutters', cutterRoutes);
+app.use('/api/v1/warehouses', warehouseRoutes);
 app.use('/api/v1/item', itemRoutes);
 app.use('/api/v1/booking', bookingRoutes);
 

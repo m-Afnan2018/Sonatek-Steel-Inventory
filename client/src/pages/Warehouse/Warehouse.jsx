@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-import style from "./Cutter.module.css";
+import style from "./Warehouse.module.css";
 import { useDispatch } from "react-redux";
 import {
-    addCutter,
-    getAllCutterDetails,
-    getDataByCutters,
-    hideCutter,
-    showCutter,
-    updateCutter,
-} from "services/operations/cuttersAPI";
+    addWarehouse,
+    getAllWarehouseDetails,
+    getDataByWarehouses,
+    hideWarehouse,
+    showWarehouse,
+    updateWarehouse,
+} from "services/operations/warehouseAPI";
 
-const Cutter = () => {
-    const [cutters, setCutters] = useState([]);
+const Warehouse = () => {
+    const [warehouses, setWarehouses] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [showForm, setShowForm] = useState(false);
@@ -24,7 +24,7 @@ const Cutter = () => {
     const [editFields, setEditFields] = useState({ name: "", address: "", phoneNumber: "" });
 
     // Expandable Items
-    const [expandedCutterId, setExpandedCutterId] = useState(null);
+    const [expandedWarehouseId, setExpandedWarehouseId] = useState(null);
     const [itemsList, setItemsList] = useState([]);
     const [loadingItems, setLoadingItems] = useState(false);
 
@@ -32,16 +32,16 @@ const Cutter = () => {
 
     useEffect(() => {
         setLoading(true);
-        getAllCutterDetails((data) => {
+        getAllWarehouseDetails((data) => {
             const list = Array.isArray(data) ? data : data.list ?? [];
-            setCutters(list);
+            setWarehouses(list);
             setLoading(false);
         });
     }, []);
 
     const onSubmit = (e) => {
         e.preventDefault();
-        addCutter({ name, address, phoneNumber }, dispatch, cutters, setCutters);
+        addWarehouse({ name, address, phoneNumber }, dispatch, warehouses, setWarehouses);
         setShowForm(false);
         setName("");
         setAddress("");
@@ -59,35 +59,35 @@ const Cutter = () => {
     };
 
     const saveEdit = async (id) => {
-        setCutters((prev) => prev.map((c) => (c._id === id ? { ...c, ...editFields } : c)));
+        setWarehouses((prev) => prev.map((c) => (c._id === id ? { ...c, ...editFields } : c)));
         setEditingId(null);
-        updateCutter({ ...editFields, cutterId: id }, dispatch, cutters, setCutters);
+        updateWarehouse({ ...editFields, warehouseId: id }, dispatch, warehouses, setWarehouses);
     };
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
-        if (!q) return cutters;
-        return cutters.filter((c) =>
+        if (!q) return warehouses;
+        return warehouses.filter((c) =>
             (c.name || "").toLowerCase().includes(q) ||
             (c.address || "").toLowerCase().includes(q) ||
             (c.phoneNumber || "").toLowerCase().includes(q)
         );
-    }, [cutters, search]);
+    }, [warehouses, search]);
 
-    const handleLoadItems = async (cutterId) => {
-        if (expandedCutterId === cutterId) {
+    const handleLoadItems = async (warehouseId) => {
+        if (expandedWarehouseId === warehouseId) {
             // toggle close
-            setExpandedCutterId(null);
+            setExpandedWarehouseId(null);
             setItemsList([]);
             return;
         }
         setLoadingItems(true);
         setItemsList([]);
         try {
-            getDataByCutters(cutterId, setItemsList, dispatch); // expects data in res.data
-            // const cutterData = res?.data;
-            // setItemsList(cutterData?.items ?? []);
-            setExpandedCutterId(cutterId);
+            getDataByWarehouses(warehouseId, setItemsList, dispatch); // expects data in res.data
+            // const warehouseData = res?.data;
+            // setItemsList(warehouseData?.items ?? []);
+            setExpandedWarehouseId(warehouseId);
         } catch (err) {
             console.error("Failed to load items:", err);
         } finally {
@@ -97,19 +97,19 @@ const Cutter = () => {
 
     const handleVisibility = (id, visible) => {
         if (visible) {
-            hideCutter({ cutterId: id }, dispatch, cutters, setCutters);
+            hideWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
         } else {
-            showCutter({ cutterId: id }, dispatch, cutters, setCutters);
+            showWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
         }
     }
 
     return (
-        <div className={style.Cutter}>
-            <h2>Manage Cutters</h2>
+        <div className={style.Warehouse}>
+            <h2>Manage Warehouses</h2>
             <div className={style.header}>
                 <div>
-                    <h3>Cutter Details</h3>
-                    <p className={style.count}>Total Cutters: {cutters?.length || 0}</p>
+                    <h3>Warehouse Details</h3>
+                    <p className={style.count}>Total Warehouses: {warehouses?.length || 0}</p>
                 </div>
                 <div className={style.controls}>
                     <input
@@ -120,7 +120,7 @@ const Cutter = () => {
                     />
                     {!showForm && (
                         <button className={style.addBtn} onClick={() => setShowForm(true)}>
-                            ➕ Add New Cutter
+                            ➕ Add New Warehouse
                         </button>
                     )}
                 </div>
@@ -129,7 +129,7 @@ const Cutter = () => {
             {showForm && (
                 <form className={style.form} onSubmit={onSubmit}>
                     <div className={style.formRow}>
-                        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Cutter Name" required />
+                        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Warehouse Name" required />
                         <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" />
                         <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="Phone Number" />
                     </div>
@@ -158,7 +158,7 @@ const Cutter = () => {
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className={style.noData}>No cutters found</td>
+                                    <td colSpan={6} className={style.noData}>No warehouses found</td>
                                 </tr>
                             ) : filtered.map((c) => (
                                 <React.Fragment key={c._id}>
@@ -202,7 +202,7 @@ const Cutter = () => {
                                                 <div className={style.actionGroup}>
                                                     <button className={style.editBtn} onClick={() => startEdit(c)}>Edit</button>
                                                     <button className={style.itemsBtn} onClick={() => handleLoadItems(c._id)}>
-                                                        {expandedCutterId === c._id ? "Hide Items" : "Load Items"}
+                                                        {expandedWarehouseId === c._id ? "Hide Items" : "Load Items"}
                                                     </button>
                                                     <button className={style.itemsBtn} onClick={() => handleVisibility(c._id, c.visible)}>
                                                         {c.visible ? "Hide" : "Show"}
@@ -211,7 +211,7 @@ const Cutter = () => {
                                             )}
                                         </td>
                                     </tr>
-                                    {expandedCutterId === c._id && (
+                                    {expandedWarehouseId === c._id && (
                                         <tr className={style.itemsRow}>
                                             <td colSpan={6}>
                                                 {loadingItems ? (
@@ -255,4 +255,4 @@ const Cutter = () => {
     );
 };
 
-export default Cutter;
+export default Warehouse;

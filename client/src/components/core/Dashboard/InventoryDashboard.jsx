@@ -29,7 +29,7 @@ const InventoryDashboard = () => {
         wagonNumber: '',
         challanNumber: '',
         challanDate: '',
-        shipTo: '',
+        warehouse: '',
     })
 
     const dispatch = useDispatch();
@@ -124,7 +124,7 @@ const InventoryDashboard = () => {
                                     <th onClick={() => sortBy('type')}>Type</th>
                                     <th onClick={() => sortBy('materialDescription')}>Material Description</th>
                                     <th onClick={() => sortBy('quantity')}>Quantity</th>
-                                    <th onClick={() => sortBy('shipTo')}>Ship To</th>
+                                    <th onClick={() => sortBy('warehouse')}>Warehouse</th>
                                     <th onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
                                     <th onClick={() => sortBy('transport.loader')}>Loader</th>
                                     <th onClick={() => sortBy('transport.transporterName')}>Transport</th>
@@ -133,7 +133,7 @@ const InventoryDashboard = () => {
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.warehouse?._id === i.warehouseId)} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -169,7 +169,7 @@ const SingleItem = ({ color, item, setView, view }) => {
         ? new Date(item.challanDate).toLocaleDateString()
         : '-';
 
-    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+    const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [select, setSelect] = useState('');
@@ -185,8 +185,8 @@ const SingleItem = ({ color, item, setView, view }) => {
         const grade = item.grade._id;
         const thickness = item.thickness._id;
         const width = item.width._id;
-        const cutter = item.shipTo?._id;
-        let Item = { ...item, grade, thickness, width, shipTo: cutter };
+        const warehouse = item.warehouse?._id;
+        let Item = { ...item, grade, thickness, width, warehouse: warehouse };
         let updatedItem = { ...Item, [select]: value };
         updateItem(updatedItem, dispatch);
         setSelect('');
@@ -317,16 +317,16 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : item.originalQuantity}
             </td>
 
-            {/* Ship To */}
-            <td onClick={() => clickHandler('shipTo')} style={{ display: 'flex' }}>
-                {select === 'shipTo' ? (
-                    <div onClick={() => clickHandler('shipTo')}>
-                        {select === 'shipTo'
-                            ? renderDropdownField('shipTo', cutters)
-                            : <span>{item.shipTo?.name || '-'}</span>}
+            {/* Warehouse */}
+            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
+                {select === 'warehouse' ? (
+                    <div onClick={() => clickHandler('warehouse')}>
+                        {select === 'warehouse'
+                            ? renderDropdownField('warehouse', warehouses)
+                            : <span>{item.warehouse?.name || '-'}</span>}
                     </div>
                 ) : (
-                    item.shipTo === null ? "-" : <p className={style.coloredShipTo} style={{ background: color.backgroundColor, color: color.foregroundColor, border: `1px solid ${color.foregroundColor}` }}>{item.shipTo.name.toLowerCase()}</p>
+                    item.warehouse === null ? "-" : <p className={style.coloredShipTo} style={{ background: color.backgroundColor, color: color.foregroundColor, border: `1px solid ${color.foregroundColor}` }}>{item.warehouse.name.toLowerCase()}</p>
                 )}
             </td>
 
@@ -337,14 +337,14 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : item.vehicleNumber || '-'}
             </td>
 
-            {/* Ship To */}
+            {/* Warehouse */}
             <td onClick={() => clickHandler('loader')}>
                 {select === 'loader'
                     ? renderEditableField('loader')
                     : item.loader || '-'}
             </td>
 
-            {/* Ship To */}
+            {/* Warehouse */}
             <td onClick={() => clickHandler('transporterName')}>
                 {select === 'transporterName'
                     ? renderEditableField('transporterName')
@@ -362,7 +362,7 @@ const SingleItem = ({ color, item, setView, view }) => {
 };
 
 const Filters = ({ setFilters }) => {
-    const { grades, thicknesses, cutters, widths } = useSelector(state => state.varient)
+    const { grades, thicknesses, warehouses, widths } = useSelector(state => state.varient)
     const dispatch = useDispatch();
     const [currentType, setCurrentType] = useState('Both');
 
@@ -377,7 +377,7 @@ const Filters = ({ setFilters }) => {
             challanNumber: '',
             challanDate: '',
             quantity: '',
-            shipTo: '',
+            warehouse: '',
         }
     })
 
@@ -518,19 +518,19 @@ const Filters = ({ setFilters }) => {
         </div>
 
         <div>
-            <label htmlFor='shipTo'>Ship To:</label>
+            <label htmlFor='warehouse'>Warehouse:</label>
             <select
-                id='shipTo'
-                {...register('shipTo')}
+                id='warehouse'
+                {...register('warehouse')}
             >
                 <option value=''>All</option>
-                {cutters && cutters.map((cutter) => (
-                    <option key={cutter._id} value={cutter._id}>
-                        {cutter.name}
+                {warehouses && warehouses.map((warehouse) => (
+                    <option key={warehouse._id} value={warehouse._id}>
+                        {warehouse.name}
                     </option>
                 ))}
             </select>
-            {errors.shipTo && <span className={style.error}>{errors.shipTo.message}</span>}
+            {errors.warehouse && <span className={style.error}>{errors.warehouse.message}</span>}
         </div>
 
         {/* 📅 Date Range Filter */}

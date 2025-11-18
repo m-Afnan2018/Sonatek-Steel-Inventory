@@ -1,5 +1,5 @@
 /* Page layout */
-.Cutter {
+.Warehouse {
     background: rgba(240, 251, 255, 1);
     min-height: 100vh;
     padding: 2rem;
@@ -8,7 +8,7 @@
 }
 
 /* Page title */
-.Cutter>h2 {
+.Warehouse>h2 {
     font-size: 28px;
     margin: 0 0 1rem 0;
     color: #002a32;

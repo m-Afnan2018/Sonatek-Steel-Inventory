@@ -73,9 +73,9 @@ const itemSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    shipTo: {
+    warehouse: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Cutter',
+        ref: 'Warehouse',
     },
     transport: {
         type: transportSchema,

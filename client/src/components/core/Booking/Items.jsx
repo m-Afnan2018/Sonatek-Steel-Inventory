@@ -28,7 +28,7 @@ const Items = () => {
         wagonNumber: '',
         challanNumber: '',
         challanDate: '',
-        shipTo: '',
+        warehouse: '',
         from: '',
         to: ''
     })
@@ -91,7 +91,7 @@ const Items = () => {
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setSelection={setSelection} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.warehouse?._id === i.warehouseId)} key={item._id} item={item} view={view} setSelection={setSelection} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -152,14 +152,14 @@ const SingleItem = ({ color, setSelection, item, view }) => {
             </td>
 
             <td style={{ fontWeight: '500', color: 'black' }}>{item.quantity.toFixed(3) ?? "-"}</td>
-            <td style={{ display: "flex" }}>{item.shipTo === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.shipTo.name.toLowerCase()}</p>}</td>
+            <td style={{ display: "flex" }}>{item.warehouse === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.warehouse.name.toLowerCase()}</p>}</td>
 
         </tr>
     );
 };
 
 const Filters = ({ setFilters, setItems }) => {
-    const { grades, thicknesses, cutters, widths } = useSelector(
+    const { grades, thicknesses, warehouses, widths } = useSelector(
         (state) => state.varient
     );
     const dispatch = useDispatch();
@@ -179,7 +179,7 @@ const Filters = ({ setFilters, setItems }) => {
             type: "",
             width: "",
             thickness: "",
-            shipTo: "",
+            warehouse: "",
         },
     });
 
@@ -197,8 +197,8 @@ const Filters = ({ setFilters, setItems }) => {
         if (data.thickness !== '') {
             payload.thickness = data.thickness
         }
-        if (data.shipTo !== '') {
-            payload.shipTo = data.shipTo
+        if (data.warehouse !== '') {
+            payload.warehouse = data.warehouse
         }
         searchOptions(payload, dispatch, setItems);
         // 🧠 You can now trigger search or dispatch action here
@@ -212,7 +212,7 @@ const Filters = ({ setFilters, setItems }) => {
             type: "",
             width: "",
             thickness: "",
-            shipTo: "",
+            warehouse: "",
         })
     };
 
@@ -267,14 +267,14 @@ const Filters = ({ setFilters, setItems }) => {
                 </select>
             </div>
 
-            {/* Ship To */}
+            {/* Warehouse */}
             <div>
-                <label htmlFor="shipTo">Location:</label>
-                <select id="shipTo" {...register("shipTo")}>
+                <label htmlFor="warehouse">Location:</label>
+                <select id="warehouse" {...register("warehouse")}>
                     <option value="">All</option>
-                    {cutters?.map((cutter) => (
-                        <option key={cutter._id} value={cutter._id}>
-                            {cutter.name}
+                    {warehouses?.map((warehouse) => (
+                        <option key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
                         </option>
                     ))}
                 </select>

@@ -34,8 +34,8 @@ const SingleBlock = ({ list, name }) => {
         if (type === 'Thickness') {
             addVarient('thickness', { name: varient, type: option }, dispatch, list);
         }
-        if (type === 'Cutter') {
-            addVarient('cutter', { name: varient, type: option }, dispatch, list);
+        if (type === 'Warehouse') {
+            addVarient('warehouse', { name: varient, type: option }, dispatch, list);
         }
 
         if (type === 'Width') {
@@ -51,8 +51,8 @@ const SingleBlock = ({ list, name }) => {
         if (name === 'Thickness') {
             updateVarient(id, 'thickness', value, dispatch, list);
         }
-        if (name === 'Cutter') {
-            updateVarient(id, 'cutter', value, dispatch, list);
+        if (name === 'Warehouse') {
+            updateVarient(id, 'warehouse', value, dispatch, list);
         }
 
         if (name === 'Width') {
@@ -67,8 +67,8 @@ const SingleBlock = ({ list, name }) => {
         if (name === 'Thickness') {
             deleteVarient(id, 'thickness', dispatch, list);
         }
-        if (name === 'Cutter') {
-            deleteVarient(id, 'cutter', dispatch, list);
+        if (name === 'Warehouse') {
+            deleteVarient(id, 'warehouse', dispatch, list);
         }
 
         if (name === 'Width') {

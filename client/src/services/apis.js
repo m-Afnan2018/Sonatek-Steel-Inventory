@@ -57,13 +57,13 @@ export const bookingEndpoints = {
     DELETE_PARTY: `${BASE_URL}/booking/deleteParty`,
 }
 
-export const cutterEndpoints = {
-    ADD_CUTTERS: `${BASE_URL}/cutters/addCutter`,
-    UPDATE_CUTTER: `${BASE_URL}/cutters/updateCutter`,
-    HIDE_CUTTERS: `${BASE_URL}/cutters/hideCutter`,
-    SHOW_CUTTERS: `${BASE_URL}/cutters/showCutter`,
-    GET_DATA_BY_CUTTERS: `${BASE_URL}/cutters/getDataByCutters`,
-    GET_ALL_CUTTER_DETAILS: `${BASE_URL}/cutters/getAllCutterDetails`
+export const warehouseEndpoints = {
+    ADD_WAREHOUSES: `${BASE_URL}/warehouses/addWarehouse`,
+    UPDATE_WAREHOUSE: `${BASE_URL}/warehouses/updateWarehouse`,
+    HIDE_WAREHOUSES: `${BASE_URL}/warehouses/hideWarehouse`,
+    SHOW_WAREHOUSES: `${BASE_URL}/warehouses/showWarehouse`,
+    GET_DATA_BY_WAREHOUSES: `${BASE_URL}/warehouses/getDataByWarehouses`,
+    GET_ALL_WAREHOUSE_DETAILS: `${BASE_URL}/warehouses/getAllWarehouseDetails`
 }
 
 export const utilEndpoints = {

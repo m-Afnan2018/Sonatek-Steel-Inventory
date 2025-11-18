@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 
 const Filter = ({ filterOptions, setFilterOptions }) => {
-    const { cutters, thicknesses, widths, grades } = useSelector(state => state.varient);
+    const { warehouses, thicknesses, widths, grades } = useSelector(state => state.varient);
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
@@ -18,7 +18,7 @@ const Filter = ({ filterOptions, setFilterOptions }) => {
             challanNumber: '',
             challanDate: '',
             quantity: '',
-            shipTo: '',
+            warehouse: '',
         }
     })
 
@@ -124,19 +124,19 @@ const Filter = ({ filterOptions, setFilterOptions }) => {
             </div>
 
             <div>
-                <label htmlFor='shipTo'>Ship To:</label>
+                <label htmlFor='warehouse'>Warehouse:</label>
                 <select
-                    id='shipTo'
-                    {...register('shipTo', { required: 'Ship To is required' })}
+                    id='warehouse'
+                    {...register('warehouse', { required: 'Warehouse is required' })}
                 >
-                    <option value=''>Select cutter</option>
-                    {cutters && cutters.map((cutter) => (
-                        <option key={cutter._id} value={cutter._id}>
-                            {cutter.name}
+                    <option value=''>Select warehouse</option>
+                    {warehouses && warehouses.map((warehouse) => (
+                        <option key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
                         </option>
                     ))}
                 </select>
-                {errors.shipTo && <span className={style.error}>{errors.shipTo.message}</span>}
+                {errors.warehouse && <span className={style.error}>{errors.warehouse.message}</span>}
             </div>
 
             <div className={style.buttonGroup}>

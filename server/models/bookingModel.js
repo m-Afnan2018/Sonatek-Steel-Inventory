@@ -56,7 +56,7 @@ const itemSnapshotSchema = new mongoose.Schema({
     takenQuantity: {
         type: Number
     },
-    shipTo: { // store basic shipTo/cutter info to avoid losing it
+    warehouse: { 
         _id: {
             type: mongoose.Schema.Types.ObjectId
         },
@@ -161,6 +161,9 @@ const bookingSchema = new mongoose.Schema({
         type: partySnapshotSchema,
         required: true
     },
+    shipTo: {
+        type: String,
+    },
     status: {
         type: String,
         enum: ['Processing', 'Shipped', 'Cancelled'],
@@ -211,10 +214,9 @@ bookingSchema.statics.makeItemSnapshot = function (itemDoc) {
         currentStatus: itemDoc.currentStatus || null,
         quantity: itemDoc.quantity ?? null,
 
-        // ✅ shipTo now stores {_id, name}
-        shipTo: itemDoc.shipTo ? {
-            _id: itemDoc.shipTo._id || null,
-            name: itemDoc.shipTo.name || null
+        warehouse: itemDoc.warehouse ? {
+            _id: itemDoc.warehouse._id || null,
+            name: itemDoc.warehouse.name || null
         } : { _id: null, name: null },
 
         createdAt: itemDoc.createdAt || null,

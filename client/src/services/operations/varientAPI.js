@@ -1,6 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { varientEndpoints } from "services/apis";
-import { setCutters, setGrades, setThicknesses, setWidths } from "slices/varientSlice";
+import { setWarehouses, setGrades, setThicknesses, setWidths } from "slices/varientSlice";
 import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
 // 🧩 Get All Varients
@@ -24,7 +24,7 @@ export async function getAllVarients(dispatch) {
                 );
 
             dispatch(setGrades(sortByName(response.grades)));
-            dispatch(setCutters(sortByName(response.cutters)));
+            dispatch(setWarehouses(sortByName(response.warehouses)));
             dispatch(setThicknesses(sortByName(response.thickness)));
             dispatch(setWidths(sortByName(response.widths)));
 
@@ -49,7 +49,7 @@ export async function addVarient(type, value, dispatch, list) {
             const newList = [...list, response.value];
 
             if (type === "grade") dispatch(setGrades(newList));
-            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "warehouse") dispatch(setWarehouses(newList));
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 
@@ -76,7 +76,7 @@ export async function updateVarient(id, type, value, dispatch, list) {
             );
 
             if (type === "grade") dispatch(setGrades(newList));
-            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "warehouse") dispatch(setWarehouses(newList));
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 
@@ -102,7 +102,7 @@ export async function deleteVarient(id, type, dispatch, list) {
             const newList = list.filter((vari) => vari._id !== id);
 
             if (type === "grade") dispatch(setGrades(newList));
-            if (type === "cutter") dispatch(setCutters(newList));
+            if (type === "warehouse") dispatch(setWarehouses(newList));
             if (type === "thickness") dispatch(setThicknesses(newList));
             if (type === "width") dispatch(setWidths(newList));
 

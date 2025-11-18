@@ -20,7 +20,7 @@ const Party = () => {
         }
     }, [parties])
     return (
-        <div className={style.Cutter}>
+        <div className={style.Warehouse}>
             <h2>Manage Parties</h2>
             <div className={style.header}>
                 <div>
@@ -43,7 +43,7 @@ const Party = () => {
                         <tbody>
                             {parties.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className={style.noData}>No cutters found</td>
+                                    <td colSpan={6} className={style.noData}>No warehouses found</td>
                                 </tr>
                             ) : parties.map((c) => (
                                 <React.Fragment key={c._id}>

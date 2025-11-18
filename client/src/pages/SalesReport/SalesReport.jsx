@@ -34,7 +34,7 @@ const SalesReport = () => {
         type: "",
         width: "",
         thickness: "",
-        shipTo: "",
+        warehouse: "",
         formType: "",
         status: "Shipped",
         bookedBy: "",
@@ -198,7 +198,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                                     <th>Challan No</th>
                                     <th>Challan Date</th>
                                     <th>Wagon No</th>
-                                    <th>Ship To</th>
+                                    <th>Warehouse</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -213,7 +213,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                                             ? new Date(i.itemSnapshot.challan.challanDate).toLocaleDateString()
                                             : "-"}</td>
                                         <td>{i.itemSnapshot.wagonNumber || "-"}</td>
-                                        <td>{i.itemSnapshot.shipTo?.name || "-"}</td>
+                                        <td>{i.itemSnapshot.warehouse?.name || "-"}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -226,7 +226,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
 };
 
 const Filters = ({ setFilters, setAllBookings, setPagination }) => {
-    const { grades, thicknesses, cutters, widths } = useSelector(
+    const { grades, thicknesses, warehouses, widths } = useSelector(
         (state) => state.varient
     );
     const dispatch = useDispatch();
@@ -248,7 +248,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
             type: "",
             width: "",
             thickness: "",
-            shipTo: "",
+            warehouse: "",
             formType: "",
             bookedBy: "",
             fromDate: "",
@@ -263,7 +263,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
         if (data.type) filterPayload.type = data.type;
         if (data.width) filterPayload.width = data.width;
         if (data.thickness) filterPayload.thickness = data.thickness;
-        if (data.shipTo) filterPayload.shipTo = data.shipTo;
+        if (data.warehouse) filterPayload.warehouse = data.warehouse;
         if (data.formType) filterPayload.formType = data.formType;
         if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
         if (data.fromDate) filterPayload.fromDate = data.fromDate;
@@ -335,14 +335,14 @@ const Filters = ({ setFilters, setAllBookings, setPagination }) => {
                 </select>
             </div>
 
-            {/* Ship To */}
+            {/* Warehouse */}
             <div>
-                <label htmlFor="shipTo">Location:</label>
-                <select id="shipTo" {...register("shipTo")}>
+                <label htmlFor="warehouse">Location:</label>
+                <select id="warehouse" {...register("warehouse")}>
                     <option value="">All</option>
-                    {cutters?.map((cutter) => (
-                        <option key={cutter._id} value={cutter._id}>
-                            {cutter.name}
+                    {warehouses?.map((warehouse) => (
+                        <option key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
                         </option>
                     ))}
                 </select>

@@ -91,7 +91,7 @@ const Choices = () => {
                     {
                         allChoices?.map((items) => {
                             return <div onClick={() => selecting(items)} style={{ backgroundColor: selectChoices.includes(items) ? '#065675' : '#001f2b' }} className={style.singleItem}>
-                                <h4>{items.shipTo.name || 'Not Reached'}</h4> X
+                                <h4>{items.warehouse.name || 'Not Reached'}</h4> X
                                 <h4>{items.wagonNumber || 'Not Reached'}</h4> X
                                 <h4>{items.quantity}</h4>
                             </div>

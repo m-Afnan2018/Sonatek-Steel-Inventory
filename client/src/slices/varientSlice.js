@@ -4,7 +4,7 @@ const { createSlice } = require("@reduxjs/toolkit")
 const initialState = {
     grades: null,
     thicknesses: null,
-    cutters: null,
+    warehouses: null,
     widths: null
 }
 
@@ -18,8 +18,8 @@ const varientSlice = createSlice({
         setThicknesses(state, action) {
             state.thicknesses = action.payload;
         },
-        setCutters(state, action) {
-            state.cutters = action.payload;
+        setWarehouses(state, action) {
+            state.warehouses = action.payload;
         },
         setWidths(state, action) {
             state.widths = action.payload
@@ -27,5 +27,5 @@ const varientSlice = createSlice({
     }
 })
 
-export const { setGrades, setThicknesses, setCutters, setWidths } = varientSlice.actions;
+export const { setGrades, setThicknesses, setWarehouses, setWidths } = varientSlice.actions;
 export default varientSlice.reducer;

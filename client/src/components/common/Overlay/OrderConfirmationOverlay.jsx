@@ -5,7 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 
-const OrderConfirmationOverlay = ({ message, data = [], onAccept, close }) => {
+const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
     const [rows, setRows] = useState(
         data.map((item) => ({
             id: item._id,
@@ -13,6 +13,8 @@ const OrderConfirmationOverlay = ({ message, data = [], onAccept, close }) => {
             quantity: ''
         }))
     );
+
+    const [shipTo, setShipTo] = useState('');
 
 
     const { control, getValues } = useForm(); // ✅ Added getValues
@@ -143,6 +145,8 @@ const OrderConfirmationOverlay = ({ message, data = [], onAccept, close }) => {
                         />
                     )}
                 />
+
+                <input type='text' value={shipTo} onChange={(e) => setShipTo(e.target.value)} placeholder='Ship To' style={{ height: '2rem', borderRadius: '0.5rem' }} />
             </div>
 
             <div className={style.FullWidth} style={{ width: '100%' }}>

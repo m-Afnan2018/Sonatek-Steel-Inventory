@@ -6,7 +6,7 @@ import { addItem, updateItem } from 'services/operations/itemAPI'
 import { setSelectUpdate } from 'slices/itemSlice'
 
 const Form = ({ setShowForm, showForm }) => {
-    const { grades, widths, thicknesses, cutters } = useSelector(state => state.varient)
+    const { grades, widths, thicknesses, warehouses } = useSelector(state => state.varient)
     const { selectUpdate } = useSelector(state => state.item);
     const dispatch = useDispatch();
 
@@ -21,7 +21,7 @@ const Form = ({ setShowForm, showForm }) => {
             challanNumber: '',
             challanDate: '',
             quantity: '',
-            shipTo: '',
+            warehouse: '',
         }
     })
 
@@ -37,7 +37,7 @@ const Form = ({ setShowForm, showForm }) => {
                 challanNumber: selectUpdate.challan.challanNumber,
                 challanDate: selectUpdate.challan.challanDate,
                 quantity: selectUpdate.quantity,
-                shipTo: selectUpdate.shipTo._id,
+                warehouse: selectUpdate.warehouse._id,
             })
             setShowForm(true);
             dispatch(setSelectUpdate(null))
@@ -57,7 +57,7 @@ const Form = ({ setShowForm, showForm }) => {
                 challanNumber: data.challanNumber,
             },
             quantity: parseInt(data.quantity),
-            shipTo: data.shipTo,
+            warehouse: data.warehouse,
         }
 
         if (selectUpdate) {
@@ -197,19 +197,19 @@ const Form = ({ setShowForm, showForm }) => {
             </div>
 
             <div>
-                <label htmlFor='shipTo'>Ship To:</label>
+                <label htmlFor='warehouse'>Warehouse:</label>
                 <select
-                    id='shipTo'
-                    {...register('shipTo', { required: 'Ship To is required' })}
+                    id='warehouse'
+                    {...register('warehouse', { required: 'Warehouse is required' })}
                 >
-                    <option value=''>Select cutter</option>
-                    {cutters && cutters.map((cutter) => (
-                        <option key={cutter._id} value={cutter._id}>
-                            {cutter.name}
+                    <option value=''>Select warehouse</option>
+                    {warehouses && warehouses.map((warehouse) => (
+                        <option key={warehouse._id} value={warehouse._id}>
+                            {warehouse.name}
                         </option>
                     ))}
                 </select>
-                {errors.shipTo && <span className={style.error}>{errors.shipTo.message}</span>}
+                {errors.warehouse && <span className={style.error}>{errors.warehouse.message}</span>}
             </div>
 
             <div className={style.buttonGroup}>

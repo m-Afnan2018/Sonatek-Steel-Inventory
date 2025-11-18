@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Cutters = () => {
+const Warehouses = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const Cutters = () => {
     )
 }
 
-export default Cutters
+export default Warehouses

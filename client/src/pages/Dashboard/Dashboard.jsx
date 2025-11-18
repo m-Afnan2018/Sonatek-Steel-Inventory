@@ -22,7 +22,7 @@ const Dashboard = () => {
             <div>
                 <button className={selection === 'Upcoming' ? style.selected : ''} onClick={() => setSelection('Upcoming')}>Upcoming</button>
                 <button className={selection === 'Inventory' ? style.selected : ''} onClick={() => setSelection('Inventory')}>Inventory</button>
-                {/* <button onClick={() => setSelection('Cutter')}>Cutters</button> */}
+                {/* <button onClick={() => setSelection('Warehouse')}>Warehouses</button> */}
                 <button className={selection === 'Booking' ? style.selected : ''} onClick={() => setSelection('Booking')}>Bookings</button>
             </div>
             <div>

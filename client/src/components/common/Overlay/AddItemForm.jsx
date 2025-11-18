@@ -6,7 +6,7 @@ import { setSelectUpdate } from 'slices/itemSlice';
 import { addItem, updateItem } from 'services/operations/itemAPI';
 
 const AddItemForm = ({ close }) => {
-    const { grades, widths, thicknesses, cutters } = useSelector(state => state.varient)
+    const { grades, widths, thicknesses, warehouses } = useSelector(state => state.varient)
     const { selectUpdate } = useSelector(state => state.item);
     // const [wagonNumber, setWagonNumber] = useState('');
     // const [editWagonNumber, setEditWagonNumber] = useState('');
@@ -25,7 +25,7 @@ const AddItemForm = ({ close }) => {
             challanNumber: '',
             challanDate: '',
             quantity: '',
-            shipTo: '',
+            warehouse: '',
         }
     })
 
@@ -41,7 +41,7 @@ const AddItemForm = ({ close }) => {
                 challanNumber: selectUpdate.challan.challanNumber,
                 challanDate: new Date(selectUpdate.challan.challanDate).toISOString().split('T')[0],
                 quantity: selectUpdate.quantity,
-                shipTo: selectUpdate.shipTo._id,
+                warehouse: selectUpdate.warehouse._id,
             })
             setUpdate(selectUpdate._id);
             dispatch(setSelectUpdate(null));
@@ -62,7 +62,7 @@ const AddItemForm = ({ close }) => {
             width: data.width,
             thickness: data.thickness,
             quantity: data.quantity,
-            shipTo: data.shipTo,
+            warehouse: data.warehouse,
         }
 
         if (update) {
@@ -176,19 +176,19 @@ const AddItemForm = ({ close }) => {
                 </div>
 
                 <div>
-                    <label htmlFor='shipTo'>Ship To:</label>
+                    <label htmlFor='warehouse'>Warehouse:</label>
                     <select
-                        id='shipTo'
-                        {...register('shipTo')}
+                        id='warehouse'
+                        {...register('warehouse')}
                     >
-                        <option value=''>Select cutter</option>
-                        {cutters && cutters.map((cutter) => (
-                            <option key={cutter._id} value={cutter._id}>
-                                {cutter.name}
+                        <option value=''>Select warehouse</option>
+                        {warehouses && warehouses.map((warehouse) => (
+                            <option key={warehouse._id} value={warehouse._id}>
+                                {warehouse.name}
                             </option>
                         ))}
                     </select>
-                    {errors.shipTo && <span className={style.error}>{errors.shipTo.message}</span>}
+                    {errors.warehouse && <span className={style.error}>{errors.warehouse.message}</span>}
                 </div>
 
                 <div className={style.buttonGroup}>

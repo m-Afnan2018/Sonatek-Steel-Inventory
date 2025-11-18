@@ -3,10 +3,13 @@ import style from './Upcoming.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/itemAPI';
 import AddForm from 'components/core/Upcoming/AddForm';
-import { IoTrashOutline } from "react-icons/io5";
+import { IoTrashOutline, IoBookmarkOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
 import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
+import { useOverlay } from 'hooks/useOverlay';
+import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
+import { bookingItems } from 'services/operations/bookingAPI';
 
 const Upcoming = () => {
     const [loading, setLoading] = useState(true);
@@ -77,7 +80,7 @@ const Upcoming = () => {
             />
             <h3 className={style.heading}>
                 Add Upcoming
-                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={handleUpload} style={{ marginLeft: 'auto', fontSize: '0.875rem', background: '#11386c', padding: '0.5rem 1.5rem', borderRadius: '0.25rem', color: 'white' }}>{uploading ? "Uploading..." : "Import"}</span>}
+                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={handleUpload} style={{ marginLeft: 'auto', fontSize: '0.875rem', background: 'rgb(124 150 185)', padding: '0.25rem 1rem', borderRadius: '0.25rem', color: 'white' }}>{uploading ? "Uploading..." : "Import"}</span>}
                 {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={downloadTemplate} style={{ fontSize: '0.875rem', textDecoration: 'underline' }}>Template</span>}
             </h3>
             <AddForm />
@@ -100,14 +103,14 @@ const Upcoming = () => {
                                     <th style={{ minWidth: "5rem", width: "5rem" }}>Wagon</th>
                                     <th style={{ minWidth: "4rem", width: "4rem" }}>Challan date</th>
                                     <th style={{ minWidth: "6rem", width: "6rem" }}>Challan No.</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Ship To</th>
+                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Warehouse</th>
                                     <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Remarks</th>
                                     <th style={{ minWidth: "4rem", width: "4rem" }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.shipTo?._id === i.shipToId)} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem color={colors.find(i => item.warehouse?._id === i.warehouseId)} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                             <tfoot>
@@ -131,7 +134,7 @@ const SingleItem = ({ color, item, setView, view }) => {
     // const challanDate = item.challanDate
     //     ? new Date(item.challanDate).toLocaleDateString()
     //     : '-';
-    const { grades, thicknesses, widths, cutters } = useSelector(state => state.varient);
+    const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [itemDetail, setItemDetail] = useState(item);
@@ -144,13 +147,15 @@ const SingleItem = ({ color, item, setView, view }) => {
         // setValue(item[type]);
     };
 
+    const { showOverlay } = useOverlay();
+
     const handleSave = (e) => {
         e.stopPropagation();
         const grade = itemDetail.grade._id;
         const thickness = itemDetail.thickness._id;
         const width = itemDetail.width._id;
-        const cutter = itemDetail.shipTo?._id;
-        let Item = { ...itemDetail, grade, thickness, width, shipTo: cutter };
+        const warehouse = itemDetail.warehouse?._id;
+        let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
         // let updatedItem = { ...Item };
         updateItem(Item, dispatch);
         setSelect('');
@@ -165,6 +170,39 @@ const SingleItem = ({ color, item, setView, view }) => {
     const handleDelete = (e) => {
         e.stopPropagation();
         deleteItem({ itemId: item._id }, dispatch)
+    }
+
+    const handleOrder = () => {
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: Number(data.currentQuantity),
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt
+            };
+        }
+
+        // Usage:
+        const output = convertItem(item);
+
+        showOverlay(OrderConfirmationOverlay, {
+            range: { min: 0, max: output.quantity.toFixed(3) },
+            data: [output],
+            onAccept: (data, party) => {
+                bookingItems({ items: data, party }, dispatch, ()=>{})
+            }
+        })
     }
 
     useEffect(() => setItemDetail(item), [item])
@@ -290,16 +328,16 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : itemDetail.challanNumber || '-'}
             </td>
 
-            {/* Ship To */}
-            <td onClick={() => clickHandler('shipTo')} style={{ display: 'flex' }}>
-                {select === 'shipTo' ? (
-                    <div onClick={() => clickHandler('shipTo')}>
-                        {select === 'shipTo'
-                            ? renderDropdownField('shipTo', cutters)
-                            : <span>{itemDetail?.shipTo?.name}</span>}
+            {/* Warehouse */}
+            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
+                {select === 'warehouse' ? (
+                    <div onClick={() => clickHandler('warehouse')}>
+                        {select === 'warehouse'
+                            ? renderDropdownField('warehouse', warehouses)
+                            : <span>{itemDetail?.warehouse?.name}</span>}
                     </div>
                 ) : (
-                    itemDetail.shipTo === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.shipTo.name.toLowerCase()}</p>
+                    itemDetail.warehouse === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.warehouse.name.toLowerCase()}</p>
                 )}
             </td>
 
@@ -312,7 +350,10 @@ const SingleItem = ({ color, item, setView, view }) => {
 
 
             <td>
-                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <IoTrashOutline style={{ color: 'red' }} onClick={handleDelete} /> : <div>
+                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <div>
+                    <IoBookmarkOutline style={{ color: 'blue' }} onClick={handleOrder} />
+                    <IoTrashOutline style={{ color: 'red' }} onClick={handleDelete} />
+                </div> : <div>
                     <RxCheck style={{ color: 'green' }} onClick={handleSave} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleCancel} />
                 </div>}
