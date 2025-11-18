@@ -60,8 +60,13 @@ const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
             return;
         }
 
+        if(shipTo.length === 0){
+            toast.error("Please enter the Ship To");
+            return;
+        }
+
         try {
-            const res = onAccept && onAccept(validRows, party);
+            const res = onAccept && onAccept(validRows, party, shipTo);
             if (res && typeof res.then === 'function') await res;
             close && close();
         } catch (err) {
@@ -153,6 +158,7 @@ const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
                 <table>
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Wagon</th>
                             <th>Type</th>
                             <th>Description</th>
@@ -164,6 +170,7 @@ const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
                     <tbody>
                         {data.map((it, index) => (
                             <tr key={it._id || index}>
+                                <td>{it?.item_id || 'N/A'}</td>
                                 <td>{it?.wagonNumber || 'N/A'}</td>
                                 <td>{it?.type}</td>
                                 <td>{`${it?.thickness?.name} X ${it?.width?.name} X ${it?.grade?.name}`}</td>
@@ -199,7 +206,7 @@ const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colSpan="6">
+                            <td colSpan="7">
                                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                                     <button type="button" onClick={close}>
                                         Close

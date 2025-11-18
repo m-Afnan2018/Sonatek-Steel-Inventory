@@ -3,7 +3,7 @@ import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getAllItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
-import { bookingItems, searchOptions } from 'services/operations/bookingAPI';
+import { bookingItems, getAllPartyDetails, searchOptions } from 'services/operations/bookingAPI';
 import { FaCheckSquare, FaSquare } from "react-icons/fa";
 import { useOverlay } from 'hooks/useOverlay';
 import { generateShipToColors } from 'utils/colorHandler';
@@ -17,6 +17,8 @@ const Items = () => {
     const [colors, setColors] = useState(null)
 
     const { showOverlay } = useOverlay()
+
+
 
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
@@ -59,11 +61,15 @@ const Items = () => {
             message: "Enter requirement and form type",
             range: { min: mini.toFixed(3), max: maxi.toFixed(3) },
             data: selection,
-            onAccept: (data, party) => {
-                bookingItems({ items: data, party }, dispatch, () => { setSelection([]); setItems(null) })
+            onAccept: (data, party, shipTo) => {
+                bookingItems({ items: data, party, shipTo }, dispatch, () => { setSelection([]); setItems(null) })
             }
         })
     }
+
+    useEffect(() => {
+        getAllPartyDetails(dispatch)
+    }, [dispatch])
 
     return (
         <div className={style.staffContainer}>
@@ -81,6 +87,7 @@ const Items = () => {
                             <thead>
                                 <tr>
                                     <th>Select</th>
+                                    <th>ID</th>
                                     <th>Wagon No.</th>
                                     <th>Status</th>
                                     <th>Type</th>
@@ -134,6 +141,7 @@ const SingleItem = ({ color, setSelection, item, view }) => {
             onClick={handleSelect}
         >
             <td>{select ? <FaCheckSquare style={{ color: '#1D54D9', background: 'white', borderRadius: '0.4rem' }} /> : <FaSquare style={{ color: 'white', background: '#1D54D9', borderRadius: '0.25rem' }} />}</td>
+            <td>{item.item_id || "-"}</td>
             <td>{item.wagonNumber || "-"}</td>
             <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.challanNumber ? 'In Inventory' : "Arriving"}</td>
             <td>

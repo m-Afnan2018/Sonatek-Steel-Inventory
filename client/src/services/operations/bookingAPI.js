@@ -158,9 +158,9 @@ export async function updateRemark(params, dispatch, setter) {
 
         const response = (await apiConnector('POST', bookingEndpoints.UPDATE_REMARK, params)).data;
 
-        if (response.success) {
-            dispatch(updateBookingStatus({ bookingId: params.bookingId, remark: params.remark }));
-        }
+        // if (response.success) {
+        //     dispatch(updateBookingStatus({ bookingId: params.bookingId, remark: params.remark }));
+        // }
 
         setter((prev) => prev.map(i => {
             if (i._id === params.bookingId) {

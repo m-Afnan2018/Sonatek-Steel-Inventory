@@ -1002,6 +1002,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             status: b.status,
             vehicleNumber: b.vehicleNumber,
             remark: b.description || "-",
+            shipTo: b.shipTo || "-",
             party: b.partySnapshot?.name || "-",
         }));
 

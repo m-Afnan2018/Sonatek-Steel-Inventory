@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import style from './Booking.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { getAllBookingsTable } from 'services/operations/bookingAPI';
+import { getAllBookingsTable, updateRemark } from 'services/operations/bookingAPI';
 import { LuDownload } from "react-icons/lu";
 
 const Items = () => {
@@ -93,7 +93,7 @@ const Items = () => {
         <div className={style.staffContainer}>
             {/* <h3 className={style.heading}>Order Report</h3> */}
             <h3 className={style.heading}>Inventory Items
-                <span style={{marginLeft: 'auto', cursor: 'pointer'}}><LuDownload onClick={onDownload} /></span>
+                <span style={{ marginLeft: 'auto', cursor: 'pointer' }}><LuDownload onClick={onDownload} /></span>
             </h3>
             <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
             {allBookings !== null && <div className={style.card}>
@@ -114,12 +114,13 @@ const Items = () => {
                                     <th style={{ width: '8rem' }}>Items</th>
                                     <th style={{ width: '8rem' }}>Status</th>
                                     <th style={{ width: '8rem' }}>Vehicle Number</th>
+                                    <th style={{ width: '8rem' }}>Ship To</th>
                                     <th style={{ width: '8rem' }}>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {allBookings?.map((item) => (
-                                    <SingleItem allowed={allowed} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem setAllBookings={setAllBookings} allowed={allowed} key={item._id} item={item} view={view} setView={setView} />
                                 ))}
                             </tbody>
                         </table>
@@ -152,10 +153,12 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ item, view, setView, allowed }) => {
+const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const bookingDate = item.bookingDate
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
+
+    const dispatch = useDispatch();
 
     const status = {
         'Pending': { background: '#FFF4E5', foreground: '#D97706' },
@@ -166,6 +169,36 @@ const SingleItem = ({ item, view, setView, allowed }) => {
     };
 
     const isOpen = view === item._id;
+
+    const [value, setValue] = useState('');
+    const [edit, setEdit] = useState(false);
+
+    const handleSave = (e) => {
+        updateRemark({ bookingId: item._id, remark: value }, dispatch, setAllBookings)
+        setEdit(false);
+    };
+
+    const handleCancel = (e) => {
+        e.stopPropagation();
+        setEdit(false);
+        setValue(item.remark);
+    };
+
+    const renderEditableField = (inputType = 'text') => (
+        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+            <input
+                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                type={inputType}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                autoFocus
+            />
+            <div className={style.inlineButtons}>
+                <button style={{ fontSize: '0.6rem' }} type="button" onClick={handleSave}>Save</button>
+                <button style={{ fontSize: '0.6rem' }} type="button" onClick={handleCancel}>Cancel</button>
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -192,7 +225,8 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                     </p>
                 </td>
                 <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
-                <td>{item.remark ?? "-"}</td>
+                <td>{item.shipTo ?? "-"}</td>
+                {edit ? renderEditableField() : <td onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{item.remark ?? "-"}</td>}
             </tr>
 
             {isOpen && (
