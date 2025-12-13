@@ -56,7 +56,7 @@ const itemSnapshotSchema = new mongoose.Schema({
     takenQuantity: {
         type: Number
     },
-    warehouse: { 
+    warehouse: {
         _id: {
             type: mongoose.Schema.Types.ObjectId
         },
@@ -114,7 +114,6 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         enum: ['Hot Rolled', 'Cold Rolled']
     },
-
     items: [{
         item: {
             type: mongoose.Schema.Types.ObjectId,

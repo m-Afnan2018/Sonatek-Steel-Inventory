@@ -37,14 +37,20 @@ form label {
 
 form input,
 form select {
+    height: 2rem;
+    border-radius: 0.5rem;
     width: 100%;
     padding: 0.25rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
+    border: 1px solid #11386c;
     background: #fff;
     font-size: 0.75rem;
     transition: border-color 0.2s ease;
     font-weight: 400;
+}
+
+form input:focus,
+form select:focus {
+    border: 2px solid #11386c;
 }
 
 table {
@@ -52,6 +58,9 @@ table {
     border-collapse: collapse;
     table-layout: fixed;
     background: white;
+    height: fit-content;
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
 table th {
@@ -67,9 +76,8 @@ table td {
     justify-content: center;
     align-items: center;
     font-weight: 400;
-    height: 2rem;
     font-size: 0.75rem;
-    height: 3rem;
+    height: 3.25rem;
     color: #667085;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -162,6 +170,36 @@ table tr:hover {
     cursor: pointer;
 }
 
-.crossButton:hover{
+.crossButton:hover {
     box-shadow: 0px 0px 4px 2px black;
+}
+
+.btn {
+    width: 8rem;
+    height: 2.25rem;
+    border-radius: 8px;
+    border: none;
+    color: #f0fbff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn:hover {
+    box-shadow: 0px 2px 8px 4px rgba(0, 0, 0, 0.25);
+}
+
+.success {
+    background-color: #115C38;
+}
+
+.error {
+    background-color: #6C1111;
+}
+
+.default {
+    background-color: #11386C;
+}
+
+.waiting {
+    background-color: #6C5C11;
 }

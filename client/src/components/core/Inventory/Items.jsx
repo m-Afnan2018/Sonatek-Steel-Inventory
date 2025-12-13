@@ -5,21 +5,25 @@ import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 import { LuDownload } from "react-icons/lu";
+import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { IoCartOutline } from 'react-icons/io5';
+import { MdExpandMore, MdExpandLess } from 'react-icons/md';
+import { getAllBookingByItem } from 'services/operations/bookingAPI';
+import { useOverlay } from 'hooks/useOverlay';
+import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 
 const Items = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(null);
+    const [expandedRow, setExpandedRow] = useState(null);
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState('desc');
     const [sortType, setSortType] = useState(null)
-    // eslint-disable-next-line no-unused-vars
-    // const [pagination, setPagination] = useState(null);
     const { listViewList, totalQuantity, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
     const [colors, setColors] = useState(null)
 
-    // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
         type: '',
         grade: '',
@@ -36,7 +40,6 @@ const Items = () => {
 
     const onSearch = (e) => {
         e.preventDefault();
-        // Implement search functionality
         getAllItem({ search: search }, dispatch);
     }
 
@@ -53,7 +56,6 @@ const Items = () => {
             });
             const blob = await response.blob();
 
-            // Create download link
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -67,7 +69,6 @@ const Items = () => {
         }
     };
 
-    // Fetch all items
     useEffect(() => {
         if (listViewList) {
             setItems(listViewList);
@@ -114,58 +115,51 @@ const Items = () => {
                     <div className={style.empty}>No items found</div>
                 ) : (
                     <div className={style.tableWrapper}>
-
                         <table className={style.table}>
                             <thead>
                                 <tr>
                                     <th onClick={() => sortBy('item_id')}>ID</th>
-                                    <th onClick={() => sortBy('wagonNumber')}>Wagon No.</th>
                                     <th onClick={() => sortBy('challan.challanDate')}>Challan date</th>
-                                    <th onClick={() => sortBy('challan.challanNumber')}>Challan No.</th>
-                                    {/* <th onClick={() => sortBy('type')}>Type</th> */}
                                     <th onClick={() => sortBy('materialDescription')}>Material Description</th>
                                     <th onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th onClick={() => sortBy('available')}>Available</th>
                                     <th onClick={() => sortBy('warehouse')}>Warehouse</th>
-                                    <th onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
-                                    <th onClick={() => sortBy('transport.loader')}>Loader</th>
-                                    <th onClick={() => sortBy('transport.transporterName')}>Transport</th>
                                     <th onClick={() => sortBy('remark')}>Remark</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {items.map((item) => (
-                                    <SingleItem color={colors.find(i => item.warehouse?._id === i.warehouseId)} key={item._id} item={item} view={view} setView={setView} />
+                                    <SingleItem
+                                        key={item._id}
+                                        color={colors.find(i => item.warehouse?._id === i.warehouseId)}
+                                        item={item}
+                                        view={view}
+                                        setView={setView}
+                                        expandedRow={expandedRow}
+                                        setExpandedRow={setExpandedRow}
+                                    />
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 )}
-
-
-                {/* Pagination controls */}
             </div>
 
-            {/* Top controls: Search and pagination info */}
             <div className={style.controlsRow}>
                 <div className={style.paginationControls}>
-                    {pagination?.page > 1 && <button onClick={prevPage}>
-                        Prev
-                    </button>}
+                    {pagination?.page > 1 && <button onClick={prevPage}>Prev</button>}
                     <div className={style.paginationInfo}>
                         Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
-                    {pagination?.page < (pagination?.totalPages || 1) && <button
-                        onClick={nextPage}
-                    >
-                        Next
-                    </button>}
+                    {pagination?.page < (pagination?.totalPages || 1) && <button onClick={nextPage}>Next</button>}
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
-const SingleItem = ({ color, item, setView, view }) => {
+const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow }) => {
     const challanDate = item.challanDate
         ? new Date(item.challanDate).toLocaleDateString()
         : '-';
@@ -175,6 +169,9 @@ const SingleItem = ({ color, item, setView, view }) => {
 
     const [select, setSelect] = useState('');
     const [value, setValue] = useState('');
+    const [bookingList, setBookingList] = useState(null);
+    const [loadingBookings, setLoadingBookings] = useState(false);
+    const { showOverlay } = useOverlay();
 
     const clickHandler = (type) => {
         setSelect(type);
@@ -197,6 +194,87 @@ const SingleItem = ({ color, item, setView, view }) => {
         e.stopPropagation();
         setValue(item[select]);
         setSelect('');
+    };
+
+    const toggleSubtable = async (e) => {
+        e.stopPropagation();
+        if (expandedRow === item._id) {
+            setExpandedRow(null);
+            setBookingList(null);
+        } else {
+            setExpandedRow(item._id);
+            setLoadingBookings(true);
+            await getAllBookingByItem({ item: item._id }, dispatch, setBookingList);
+            setLoadingBookings(false);
+        }
+    };
+
+    const handlePreview = () => {
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                item_id: data.id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: data.remaining,
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt,
+                marking: data.marking,
+            };
+        }
+
+        const output = convertItem(item);
+
+        showOverlay(InventoryOptions, {
+            type: 'logs',
+            data: output,
+            onAccept: (data, party) => {
+                console.log(data);
+            }
+        })
+    };
+
+    const handleOrder = () => {
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                item_id: data.id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: data.remaining,
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt,
+                marking: data.marking,
+            };
+        }
+
+        const output = convertItem(item);
+
+        showOverlay(InventoryOptions, {
+            type: 'booking',
+            data: output,
+            onAccept: (data, party) => {
+                console.log(data);
+            }
+        })
     };
 
     const renderEditableField = (type, inputType = 'text') => (
@@ -238,132 +316,157 @@ const SingleItem = ({ color, item, setView, view }) => {
     );
 
     return (
-        <tr
-            className={`${view === item._id ? style.activeRow : ''}`}
-            onClick={() => setView(item._id)}
-        >
-            {/* Item */}
-            <td onClick={() => clickHandler('item_id')}>
-                {item.item_id || '-'}
-            </td>
+        <>
+            <tr
+                className={`${view === item._id ? style.activeRow : ''}`}
+                onClick={() => setView(item._id)}
+            >
+                <td onClick={() => clickHandler('item_id')}>
+                    {item.item_id || '-'}
+                </td>
 
-            {/* Wagon Number */}
-            <td onClick={() => clickHandler('wagonNumber')}>
-                {select === 'wagonNumber'
-                    ? renderEditableField('wagonNumber')
-                    : item.wagonNumber || '-'}
-            </td>
+                <td onClick={() => clickHandler('challanDate')}>
+                    {select === 'challanDate'
+                        ? renderEditableField('challanDate', 'date')
+                        : challanDate || '-'}
+                </td>
 
-            {/* Challan Date */}
-            <td onClick={() => clickHandler('challanDate')}>
-                {select === 'challanDate'
-                    ? renderEditableField('challanDate', 'date')
-                    : challanDate || '-'}
-            </td>
+                <td style={{ display: 'flex', gap: '5px' }}>
+                    <div onClick={() => clickHandler('thickness')}>
+                        {select === 'thickness'
+                            ? renderDropdownField('thickness', thicknesses)
+                            : <span>{item.thickness?.name || '-'}</span>}
+                    </div>
+                    X
+                    <div onClick={() => clickHandler('width')}>
+                        {select === 'width'
+                            ? renderDropdownField('width', widths)
+                            : <span>{item.width?.name || '-'}</span>}
+                    </div>
+                    X
+                    <div onClick={() => clickHandler('grade')}>
+                        {select === 'grade'
+                            ? renderDropdownField('grade', grades)
+                            : <span>{item.grade?.name || '-'}</span>}
+                    </div>
+                </td>
 
-            {/* Challan Number */}
-            <td onClick={() => clickHandler('challanNumber')}>
-                {select === 'challanNumber'
-                    ? renderEditableField('challanNumber')
-                    : item.challanNumber || '-'}
-            </td>
+                <td onClick={() => clickHandler('originalQuantity')}>
+                    {select === 'originalQuantity'
+                        ? renderEditableField('originalQuantity', 'number')
+                        : item.originalQuantity}
+                </td>
 
-            {/* Type */}
-            {/* <td onClick={() => clickHandler('type')}>
-                {select === 'type' ? (
-                    <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-                        <select
-                            value={value}
-                            onChange={(e) => setValue(e.target.value)}
-                            autoFocus
-                            style={{ padding: '0rem', width: '3rem' }}
-                        >
-                            <option value="">Select</option>
-                            <option value="Hot Rolled">Hot Rolled</option>
-                            <option value="Cold Rolled">Cold Rolled</option>
-                        </select>
-                        <div className={style.inlineButtons}>
-                            <button type="button" onClick={handleSave}>Save</button>
-                            <button type="button" onClick={handleCancel}>Cancel</button>
+                <td onClick={() => clickHandler('remaining')}>
+                    {select === 'remaining'
+                        ? renderEditableField('remaining', 'number')
+                        : item.remaining}
+                </td>
+
+                <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
+                    {select === 'warehouse' ? (
+                        <div onClick={() => clickHandler('warehouse')}>
+                            {select === 'warehouse'
+                                ? renderDropdownField('warehouse', warehouses)
+                                : <span>{item.warehouse?.name || '-'}</span>}
                         </div>
-                    </div>
-                ) : (
-                    item.type
-                )}
-            </td> */}
+                    ) : (
+                        item.warehouse === null ? "-" :
+                            <p className={style.coloredShipTo} style={{
+                                background: color.backgroundColor,
+                                color: color.foregroundColor,
+                                border: `1px solid ${color.foregroundColor}`
+                            }}>
+                                {item.warehouse.name.toLowerCase()}
+                            </p>
+                    )}
+                </td>
 
-            {/* Thickness x Width x Grade */}
-            <td style={{ display: 'flex', gap: '5px' }}>
-                {/* Thickness */}
-                <div onClick={() => clickHandler('thickness')}>
-                    {select === 'thickness'
-                        ? renderDropdownField('thickness', thicknesses)
-                        : <span>{item.thickness?.name || '-'}</span>}
-                </div>
-                X
-                {/* Width */}
-                <div onClick={() => clickHandler('width')}>
-                    {select === 'width'
-                        ? renderDropdownField('width', widths)
-                        : <span>{item.width?.name || '-'}</span>}
-                </div>
-                X
-                {/* Grade */}
-                <div onClick={() => clickHandler('grade')}>
-                    {select === 'grade'
-                        ? renderDropdownField('grade', grades)
-                        : <span>{item.grade?.name || '-'}</span>}
-                </div>
-            </td>
+                <td onClick={() => clickHandler('remark')}>
+                    {select === 'remark'
+                        ? renderEditableField('remark')
+                        : item.remark || '-'}
+                </td>
 
-            {/* Quantity */}
-            <td onClick={() => clickHandler('originalQuantity')}>
-                {select === 'originalQuantity'
-                    ? renderEditableField('originalQuantity', 'number')
-                    : item.originalQuantity}
-            </td>
+                <td style={{ display: 'flex', gap: '0.25rem' }}>
+                    <FiEye onClick={handlePreview} style={{ cursor: 'pointer' }} title="View Details & Place Order" />
+                    <IoCartOutline onClick={handleOrder} style={{ cursor: 'pointer' }} title="Quick Order" />
+                    {expandedRow === item._id ? (
+                        <MdExpandLess onClick={toggleSubtable} title="Hide Bookings" />
+                    ) : (
+                        <MdExpandMore onClick={toggleSubtable} title="Show Bookings" />
+                    )}
+                </td>
+            </tr>
 
-            {/* Warehouse */}
-            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
-                {select === 'warehouse' ? (
-                    <div onClick={() => clickHandler('warehouse')}>
-                        {select === 'warehouse'
-                            ? renderDropdownField('warehouse', warehouses)
-                            : <span>{item.warehouse?.name || '-'}</span>}
-                    </div>
-                ) : (
-                    item.warehouse === null ? "-" : <p className={style.coloredShipTo} style={{ background: color.backgroundColor, color: color.foregroundColor, border: `1px solid ${color.foregroundColor}` }}>{item.warehouse.name.toLowerCase()}</p>
-                )}
-            </td>
+            {expandedRow === item._id && (
+                <tr>
+                    <td colSpan="8" style={{ padding: 0, backgroundColor: '#f5f5f5' }}>
+                        <div style={{ padding: '1rem' }}>
+                            {loadingBookings ? (
+                                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading bookings...</div>
+                            ) : bookingList === null || bookingList.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                    No bookings found for this item
+                                </div>
+                            ) : (
+                                <BookingsSubtable bookings={bookingList} />
+                            )}
+                        </div>
+                    </td>
+                </tr>
+            )}
+        </>
+    );
+};
 
-            {/* Vehicle */}
-            <td onClick={() => clickHandler('vehicleNumber')}>
-                {select === 'vehicleNumber'
-                    ? renderEditableField('vehicleNumber')
-                    : item.vehicleNumber || '-'}
-            </td>
+const BookingsSubtable = ({ bookings }) => {
+    const bookingDate = (date) => {
+        return date ? new Date(date).toLocaleDateString() : "-";
+    };
 
-            {/* Warehouse */}
-            <td onClick={() => clickHandler('loader')}>
-                {select === 'loader'
-                    ? renderEditableField('loader')
-                    : item.loader || '-'}
-            </td>
-
-            {/* Warehouse */}
-            <td onClick={() => clickHandler('transporterName')}>
-                {select === 'transporterName'
-                    ? renderEditableField('transporterName')
-                    : item.transporterName || '-'}
-            </td>
-
-            {/* Remark */}
-            <td onClick={() => clickHandler('remark')}>
-                {select === 'remark'
-                    ? renderEditableField('remark')
-                    : item.remark || '-'}
-            </td>
-        </tr>
+    return (
+        <div style={{ overflowX: 'auto' }}>
+            <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.85rem',
+                backgroundColor: 'white'
+            }}>
+                <thead>
+                    <tr style={{ backgroundColor: '#e0e0e0' }}>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Order ID</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Form Type</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Quantity</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Party</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Booked By</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Booking Date</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Ship To</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Remarks</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Vehicle Number</th>
+                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {bookings.map((booking, index) => (
+                        <tr key={booking._id || index} style={{
+                            backgroundColor: index % 2 === 0 ? 'white' : '#f9f9f9'
+                        }}>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.order_id || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.formType || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.quantity || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.party || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.bookedBy || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{bookingDate(booking.bookingDate)}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.shipTo || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.remarks || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.vehicleNumber || '-'}</td>
+                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.status || '-'}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 };
 
@@ -417,7 +520,6 @@ const Filters = ({ setFilters }) => {
             {errors.grade && <span className={style.error}>{errors.remaining.message}</span>}
         </div>
 
-
         <div>
             <label htmlFor='type'>Type:</label>
             <select
@@ -430,7 +532,6 @@ const Filters = ({ setFilters }) => {
             </select>
             {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
         </div>
-
 
         <div>
             <label htmlFor='grade'>Grade:</label>
@@ -480,27 +581,6 @@ const Filters = ({ setFilters }) => {
             {errors.thickness && <span className={style.error}>{errors.thickness.message}</span>}
         </div>
 
-        {/* <div>
-            <label htmlFor='wagonNumber'>Wagon Number:</label>
-            <input
-                id='wagonNumber'
-                type='text'
-                placeholder='Enter wagon number'
-                {...register('wagonNumber')}
-            />
-            {errors.wagonNumber && <span className={style.error}>{errors.wagonNumber.message}</span>}
-        </div>
-
-        <div>
-            <label htmlFor='challanNumber'>Challan Number</label>
-            <input
-                id='challanNumber'
-                type='text'
-                placeholder='Enter challan number'
-                {...register('challanNumber')}
-            />
-            {errors.challanNumber && <span className={style.error}>{errors.challanNumber.message}</span>}
-        </div> */}
         <div>
             <label htmlFor='challanDate'>Challan Date</label>
             <input
@@ -539,7 +619,6 @@ const Filters = ({ setFilters }) => {
             {errors.warehouse && <span className={style.error}>{errors.warehouse.message}</span>}
         </div>
 
-        {/* 📅 Date Range Filter */}
         <div>
             <label>From Date:</label>
             <input type="date" {...register("fromDate")} />

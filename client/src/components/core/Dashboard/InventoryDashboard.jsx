@@ -5,6 +5,10 @@ import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 import { LuDownload } from "react-icons/lu";
+import { useOverlay } from 'hooks/useOverlay';
+import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
+import { IoBookmarkOutline } from "react-icons/io5";
+import { bookingItems } from 'services/operations/bookingAPI';
 
 const InventoryDashboard = () => {
     const [items, setItems] = useState([]);
@@ -124,11 +128,13 @@ const InventoryDashboard = () => {
                                     <th onClick={() => sortBy('type')}>Type</th>
                                     <th onClick={() => sortBy('materialDescription')}>Material Description</th>
                                     <th onClick={() => sortBy('quantity')}>Quantity</th>
+                                    <th onClick={() => sortBy('remaining')}>Available</th>
                                     <th onClick={() => sortBy('warehouse')}>Warehouse</th>
                                     <th onClick={() => sortBy('transport.vehicleNumber')}>Vehicle Number</th>
                                     <th onClick={() => sortBy('transport.loader')}>Loader</th>
                                     <th onClick={() => sortBy('transport.transporterName')}>Transport</th>
                                     <th onClick={() => sortBy('remark')}>Remark</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -174,6 +180,8 @@ const SingleItem = ({ color, item, setView, view }) => {
 
     const [select, setSelect] = useState('');
     const [value, setValue] = useState('');
+
+    const { showOverlay } = useOverlay();
 
     const clickHandler = (type) => {
         setSelect(type);
@@ -235,6 +243,39 @@ const SingleItem = ({ color, item, setView, view }) => {
             </div>
         </div>
     );
+
+    const handleOrder = () => {
+            function convertItem(data) {
+                return {
+                    _id: data._id,
+                    type: data.type,
+                    grade: data.grade,
+                    form: "Coil",
+                    width: data.width,
+                    thickness: data.thickness,
+                    wagonNumber: data.wagonNumber,
+                    currentStatus: "In Stock",
+                    originalQuantity: Number(data.originalQuantity),
+                    quantity: Number(data.currentQuantity),
+                    warehouse: data.warehouse,
+                    remark: data.remark,
+                    date: data.date,
+                    createdAt: data.createdAt,
+                    updatedAt: data.createdAt
+                };
+            }
+    
+            // Usage:
+            const output = convertItem(item);
+    
+            showOverlay(OrderConfirmationOverlay, {
+                range: { min: 0, max: output.quantity.toFixed(3) },
+                data: [output],
+                onAccept: (data, party) => {
+                    bookingItems({ items: data, party }, dispatch, ()=>{})
+                }
+            })
+        }
 
     return (
         <tr
@@ -317,6 +358,14 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : item.originalQuantity}
             </td>
 
+
+            {/* Available */}
+            <td onClick={() => clickHandler('remaining')}>
+                {select === 'remaining'
+                    ? renderEditableField('remaining', 'number')
+                    : item.remaining}
+            </td>
+
             {/* Warehouse */}
             <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
                 {select === 'warehouse' ? (
@@ -356,6 +405,12 @@ const SingleItem = ({ color, item, setView, view }) => {
                 {select === 'remark'
                     ? renderEditableField('remark')
                     : item.remark || '-'}
+            </td>
+
+            <td>
+                <div>
+                    <IoBookmarkOutline style={{ color: 'blue' }} onClick={handleOrder} />
+                </div> 
             </td>
         </tr>
     );

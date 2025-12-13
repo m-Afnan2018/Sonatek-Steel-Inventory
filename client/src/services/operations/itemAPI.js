@@ -1,5 +1,6 @@
 import { apiConnector } from "services/apiConnector";
 import { itemEndpoints } from "services/apis";
+import { setPendingBookings } from "slices/bookingSlice";
 import {
     addUpcomingItem,
     deleteFromUpcomingItem,
@@ -9,7 +10,8 @@ import {
     setSelectUpdate,
     setTotalQuantity,
     setUpcomingItem,
-    updateListViewList
+    updateListViewList,
+    updateUpcomingSaveForBooking
 } from "slices/itemSlice";
 import { addLoader, showError, showSuccess } from "slices/loaderSlice";
 
@@ -99,5 +101,65 @@ export async function getUpcomingItem(params, dispatch) {
         dispatch(showSuccess({ id: "getUpcomingItem", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "getUpcomingItem", message: err?.response?.data?.message || "Failed to get upcoming item" }));
+    }
+}
+
+export async function markForBooking(params, dispatch) {
+    try {
+        dispatch(addLoader("Moving"));
+        const response = (await apiConnector('POST', itemEndpoints.MARK_FOR_BOOKING, params)).data;
+
+        if (response.success) {
+            if (params.invoiceNumber.length > 0) {
+                dispatch(deleteFromUpcomingItem(response.item._id))
+            } else {
+                dispatch(updateUpcomingSaveForBooking({ ...response.item, ...params }));
+            }
+        }
+        dispatch(showSuccess({ id: "Moving", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "Moving", message: err?.response?.data?.message || "Failed to move item" }));
+    }
+}
+
+export async function unmarkForBooking(params, dispatch) {
+    try {
+        dispatch(addLoader("UnMoving"));
+        const response = (await apiConnector('POST', itemEndpoints.UNMARK_FOR_BOOKING, params)).data;
+
+        if (response.success) {
+            dispatch(updateUpcomingSaveForBooking(params));
+        }
+        dispatch(showSuccess({ id: "UnMoving", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "UnMoving", message: err?.response?.data?.message || "Failed to move item" }));
+    }
+}
+
+export async function moveToInventory(params, dispatch) {
+    try {
+        dispatch(addLoader("MoveToInventory"));
+        const response = (await apiConnector('POST', itemEndpoints.MOVE_TO_INVENTORY, params)).data;
+
+        if (response.success) {
+            dispatch(deleteFromUpcomingItem(response.listView._id));
+        }
+        dispatch(showSuccess({ id: "MoveToInventory", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "MoveToInventory", message: err?.response?.data?.message || "Failed to move item" }));
+    }
+}
+
+export async function getMarkedItem(dispatch) {
+    try {
+        dispatch(addLoader("GetMarkedItem"));
+        const response = (await apiConnector('POST', itemEndpoints.GET_MARKED_ITEM)).data;
+
+        if (response.success) {
+            dispatch(setPendingBookings(response.items))
+        }
+        dispatch(showSuccess({ id: "GetMarkedItem", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "GetMarkedItem", message: err?.response?.data?.message || "Failed to move item" }));
     }
 }

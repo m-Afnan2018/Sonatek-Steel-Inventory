@@ -114,6 +114,15 @@ const itemSlice = createSlice({
         },
         setTotalQuantity(state, action) {
             state.totalQuantity = action.payload;
+        },
+        updateUpcomingSaveForBooking(state, action) {
+            const detail = action.payload;
+            state.upcomingItem = state.upcomingItem.map((prev) => {
+                if (prev._id === detail.item) {
+                    return { ...prev, marking: detail.marking }
+                }
+                return prev;
+            })
         }
     },
 });
@@ -131,7 +140,8 @@ export const {
     updateListViewList,
     addUpcomingItem,
     deleteFromUpcomingItem,
-    setTotalQuantity
+    setTotalQuantity,
+    updateUpcomingSaveForBooking
 } = itemSlice.actions;
 
 export default itemSlice.reducer;

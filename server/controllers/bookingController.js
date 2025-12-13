@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const XLSX = require('xlsx');
 const { default: mongoose } = require("mongoose");
 const Party = require("../models/partyModel");
+const { Types } = require("mongoose");
 
 const createBooking = async (req, res) => {
     try {
@@ -14,6 +15,7 @@ const createBooking = async (req, res) => {
         const { items } = req.body;
         const { party, shipTo } = req.body;
 
+        if (!items?.length) throw customError("Please select items", 400);
         let selectedParty;
         if (party.type === 'id') {
             selectedParty = await Party.findById(party.val);
@@ -27,7 +29,6 @@ const createBooking = async (req, res) => {
             throw customError("Select the party first");
         }
 
-        if (!items?.length) throw customError("Please select items", 400);
 
         const allItemsId = items.map(i => i.id);
         const allItems = await Item.find({ _id: { $in: allItemsId } })
@@ -127,6 +128,289 @@ const createBooking = async (req, res) => {
             message: "Booking created successfully",
             booking: populatedBooking,
             item: payload,
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const createBookingFromUpcoming = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const {
+            item,
+            quantity,
+            party,
+            shipTo,
+            formType,
+            invoiceNumber,
+            invoiceDate,
+            vehicleNumber
+        } = req.body;
+
+        if (!item) throw customError("Item not found", 400);
+        if (!quantity || Number(quantity) <= 0)
+            throw customError("Invalid quantity", 400);
+
+        // PART 1: Get or create Party
+        let selectedParty;
+        if (party.type === "id") {
+            selectedParty = await Party.findById(party.val);
+        } else {
+            const tempParty = new Party({ name: party.val });
+            selectedParty = await tempParty.save();
+        }
+
+        if (!selectedParty) {
+            throw customError("Select the party first", 400);
+        }
+
+        // PART 2: Fetch item + validate stock
+        const itemDoc = await Item.findById(item).populate(
+            "thickness warehouse grade width"
+        );
+
+        if (!itemDoc) throw customError("Item not found", 404);
+
+        const qty = Number(quantity);
+        if (qty > itemDoc.quantity)
+            throw customError("Not enough stock available", 400);
+
+        // Reduce stock
+        itemDoc.quantity -= qty;
+        await itemDoc.save();
+
+        // PART 3: Prepare takenItems array
+        const takenItems = [
+            {
+                item: itemDoc._id,
+                quantity: qty,
+                formType: formType,
+                itemSnapshot: Booking.makeItemSnapshot(itemDoc),
+                invoiceNumber: invoiceNumber || null,
+                invoiceDate: invoiceDate || null,
+                vehicleNumber: vehicleNumber || null,
+                status: vehicleNumber && vehicleNumber.length > 0 ? 'Shipped' : 'Processing'
+            }
+        ];
+
+        // PART 4: User snapshot
+        const userDoc = await User.findById(userId).select(
+            "firstName lastName email phone role name fullName"
+        );
+
+        const bookedBySnapshot = Booking.makeBookedBySnapshot(
+            userDoc
+                ? {
+                    _id: userDoc._id,
+                    name:
+                        userDoc.name ||
+                        `${userDoc.firstName || ""} ${userDoc.lastName || ""}`.trim(),
+                    email: userDoc.email,
+                    phone: userDoc.phone,
+                    role: userDoc.role
+                }
+                : null
+        );
+
+        // PART 5: Save booking
+        const newBooking = await new Booking({
+            booking_id: uuidv4(),
+            items: takenItems,
+            quantity: qty,
+            bookedBy: userId,
+            bookedBySnapshot,
+            shipTo,
+            status: "Processing",
+            party: selectedParty._id,
+            partySnapshot: Booking.makePartySnapshot(selectedParty)
+        }).save();
+
+        // PART 6: Populate for response
+        const populatedBooking = await Booking.findById(newBooking._id)
+            .populate({
+                path: "items.item",
+                populate: [
+                    { path: "grade", select: "name" },
+                    { path: "thickness", select: "name" },
+                    { path: "width", select: "name" }
+                ]
+            })
+            .populate("bookedBy");
+
+        // Wagon details
+        const wagonInfo = populatedBooking.items.map((i) => {
+            const src = i.item || i.itemSnapshot || {};
+            return {
+                wagonNumber: src.wagonNumber || "N/A",
+                challanNumber:
+                    src.challan?.challanNumber || src.challanNumber || "N/A",
+                challanDate: src.challan?.challanDate || src.challanDate || "N/A",
+                quantityTaken: i.quantity,
+                formType: i.formType
+            };
+        });
+
+        const payload = {
+            _id: populatedBooking._id,
+            quantity: populatedBooking.quantity,
+            status: populatedBooking.status,
+            bookingDate: populatedBooking.bookingDate,
+            order_id: populatedBooking.order_id,
+            bookedBy:
+                (populatedBooking.bookedBy &&
+                    `${populatedBooking.bookedBy.firstName} ${populatedBooking.bookedBy.lastName}`) ||
+                populatedBooking.bookedBySnapshot?.name ||
+                "N/A",
+            wagons: wagonInfo
+        };
+
+        res.status(201).json({
+            success: true,
+            message: "Booking created successfully",
+            booking: populatedBooking,
+            item: payload
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const createBookingFromInventory = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const {
+            item,
+            quantity,
+            party,
+            shipTo,
+            formType,
+            invoiceNumber,
+            invoiceDate,
+            vehicleNumber
+        } = req.body;
+
+        if (!item) throw customError("Item not found", 400);
+        if (!quantity || Number(quantity) <= 0)
+            throw customError("Invalid quantity", 400);
+
+        // PART 1: Get or create Party
+        let selectedParty;
+        if (party.type === "id") {
+            selectedParty = await Party.findById(party.val);
+        } else {
+            const tempParty = new Party({ name: party.val });
+            selectedParty = await tempParty.save();
+        }
+
+        if (!selectedParty) {
+            throw customError("Select the party first", 400);
+        }
+
+        // PART 2: Fetch item + validate stock
+        const itemDoc = await Item.findById(item).populate(
+            "thickness warehouse grade width"
+        );
+
+        if (!itemDoc) throw customError("Item not found", 404);
+
+        const qty = Number(quantity);
+        if (qty > itemDoc.quantity)
+            throw customError("Not enough stock available", 400);
+
+        // Reduce stock
+        itemDoc.quantity -= qty;
+        await itemDoc.save();
+
+        // PART 3: Prepare takenItems array
+        const takenItems = [
+            {
+                item: itemDoc._id,
+                quantity: qty,
+                formType: formType,
+                itemSnapshot: Booking.makeItemSnapshot(itemDoc),
+                invoiceNumber: invoiceNumber || null,
+                invoiceDate: invoiceDate || null,
+                vehicleNumber: vehicleNumber || null
+            }
+        ];
+
+        // PART 4: User snapshot
+        const userDoc = await User.findById(userId).select(
+            "firstName lastName email phone role name fullName"
+        );
+
+        const bookedBySnapshot = Booking.makeBookedBySnapshot(
+            userDoc
+                ? {
+                    _id: userDoc._id,
+                    name:
+                        userDoc.name ||
+                        `${userDoc.firstName || ""} ${userDoc.lastName || ""}`.trim(),
+                    email: userDoc.email,
+                    phone: userDoc.phone,
+                    role: userDoc.role
+                }
+                : null
+        );
+
+        // PART 5: Save booking
+        const newBooking = await new Booking({
+            booking_id: uuidv4(),
+            items: takenItems,
+            quantity: qty,
+            bookedBy: userId,
+            bookedBySnapshot,
+            shipTo,
+            status: "Processing",
+            party: selectedParty._id,
+            partySnapshot: Booking.makePartySnapshot(selectedParty)
+        }).save();
+
+        // PART 6: Populate for response
+        const populatedBooking = await Booking.findById(newBooking._id)
+            .populate({
+                path: "items.item",
+                populate: [
+                    { path: "grade", select: "name" },
+                    { path: "thickness", select: "name" },
+                    { path: "width", select: "name" }
+                ]
+            })
+            .populate("bookedBy");
+
+        // Wagon details
+        const wagonInfo = populatedBooking.items.map((i) => {
+            const src = i.item || i.itemSnapshot || {};
+            return {
+                wagonNumber: src.wagonNumber || "N/A",
+                challanNumber:
+                    src.challan?.challanNumber || src.challanNumber || "N/A",
+                challanDate: src.challan?.challanDate || src.challanDate || "N/A",
+                quantityTaken: i.quantity,
+                formType: i.formType
+            };
+        });
+
+        const payload = {
+            _id: populatedBooking._id,
+            quantity: populatedBooking.quantity,
+            status: populatedBooking.status,
+            bookingDate: populatedBooking.bookingDate,
+            order_id: populatedBooking.order_id,
+            bookedBy:
+                (populatedBooking.bookedBy &&
+                    `${populatedBooking.bookedBy.firstName} ${populatedBooking.bookedBy.lastName}`) ||
+                populatedBooking.bookedBySnapshot?.name ||
+                "N/A",
+            wagons: wagonInfo
+        };
+
+        res.status(201).json({
+            success: true,
+            message: "Booking created successfully",
+            booking: populatedBooking,
+            item: payload
         });
     } catch (err) {
         errorResponse(res, err);
@@ -1294,10 +1578,67 @@ const getAllPartyDetails = async (req, res) => {
     }
 };
 
+const getAllBookingsByItem = async (req, res) => {
+    try {
+        const { item } = req.body;
 
+        if (!item) {
+            throw customError("Item ID is required", 400);
+        }
+
+        const itemId = Types.ObjectId.createFromHexString(item);
+
+        // Find bookings where this item exists inside items array
+        const bookings = await Booking.find(
+            { "items.item": itemId },
+
+            // Projection: return ONLY required fields
+            {
+                order_id: 1,
+                "items.formType": 1,
+                "items.quantity": 1,
+                "partySnapshot.name": 1,
+                "bookedBySnapshot.name": 1,
+                bookingDate: 1,
+                shipTo: 1,
+                description: 1,   // remarks
+                status: 1,
+                vehicleNumber: 1
+            }
+        ).sort({ bookingDate: -1 });
+
+        // Transform output to be easier for frontend
+        const response = bookings.map(b => {
+            return {
+                _id: b._id,
+                order_id: b.order_id,
+                formType: b.items?.[0]?.formType || null,
+                quantity: b.items?.[0]?.quantity || null,
+                party: b.partySnapshot?.name || null,
+                bookedBy: b.bookedBySnapshot?.name || null,
+                bookingDate: b.bookingDate,
+                shipTo: b.shipTo || "",
+                status: b.status || null,
+                remarks: b.description || "",
+                vehicleNumber: b.vehicleNumber || ""
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            count: response.length,
+            data: response
+        });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
 
 module.exports = {
     createBooking,
+    createBookingFromUpcoming,
+    createBookingFromInventory,
     updateBooking,
     updateRemark,
     deleteBooking,
@@ -1316,5 +1657,6 @@ module.exports = {
     getAllIncompleteBookingsDetails,
     getAllParty,
     deleteParty,
-    getAllPartyDetails
+    getAllPartyDetails,
+    getAllBookingsByItem
 }

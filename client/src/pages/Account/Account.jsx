@@ -60,6 +60,7 @@ const Account = () => {
                             required: 'First name is required',
                             minLength: { value: 2, message: 'Minimum 2 characters required' }
                         })}
+                        style={{backgroundColor: editted ? 'white' : 'rgba(196, 196, 196, 1)'}}
                         disabled={!editted}
                     />
                     {errors.firstName && <span className={style.error}>{errors.firstName.message}</span>}
@@ -73,6 +74,7 @@ const Account = () => {
                             required: 'Last name is required',
                             minLength: { value: 2, message: 'Minimum 2 characters required' }
                         })}
+                        style={{backgroundColor: editted ? 'white' : 'rgba(196, 196, 196, 1)'}}
                         disabled={!editted}
                     />
                     {errors.lastName && <span className={style.error}>{errors.lastName.message}</span>}
@@ -89,6 +91,7 @@ const Account = () => {
                                 message: 'Please enter a valid 10-digit phone number'
                             }
                         })}
+                        style={{backgroundColor: editted ? 'white' : 'rgba(196, 196, 196, 1)'}}
                         disabled={!editted}
                     />
                     {errors.phoneNumber && <span className={style.error}>{errors.phoneNumber.message}</span>}

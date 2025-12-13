@@ -10,6 +10,7 @@ const initialState = {
     options: null,
     bookings: null,
     incompleteBookings: null,
+    pendingBookings: null,
     loader: false,
     parties: [],
 }
@@ -112,6 +113,18 @@ const bookingSlice = createSlice({
                     state.bookings = [item];
                 }
             }
+        },
+        setPendingBookings(state, action) {
+            state.pendingBookings = action.payload;
+        },
+        addPendingBooking(state, action) {
+            state.pendingBookings = [...state.pendingBookings, action.payload];
+        },
+        removePendingBooking(state, action) {
+            state.pendingBookings = state.pendingBookings.filter((item) => item._id === action.payload);
+        },
+        updatePendingBooking(state, action) {
+
         }
     }
 })
@@ -131,7 +144,11 @@ export const {
     addIncompleteBookings,
     removeIncompleteBookings,
     setIncompleteBookings,
-    addBooking
+    addBooking,
+    setPendingBookings,
+    addPendingBooking,
+    removePendingBooking,
+    updatePendingBooking
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer

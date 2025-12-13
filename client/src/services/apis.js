@@ -34,15 +34,22 @@ export const itemEndpoints = {
     UPDATE_ITEM: `${BASE_URL}/item/updateItem`,
     GET_ITEM: `${BASE_URL}/item/getItem`,
     DELETE_ITEM: `${BASE_URL}/item/deleteItem`,
-    GET_UPCOMING_ITEM: `${BASE_URL}/item/getUpcomingItems`
+    GET_UPCOMING_ITEM: `${BASE_URL}/item/getUpcomingItems`,
+    MARK_FOR_BOOKING: `${BASE_URL}/item/markForBooking`,
+    UNMARK_FOR_BOOKING: `${BASE_URL}/item/unmarkForBooking`,
+    MOVE_TO_INVENTORY: `${BASE_URL}/item/moveToInventory`,
+    GET_MARKED_ITEM: `${BASE_URL}/item/getMarkedItem`
 }
 
 export const bookingEndpoints = {
     SEARCH_OPTIONS: `${BASE_URL}/booking/searchOptions`,
     PLACE_BOOKING: `${BASE_URL}/booking/createBooking`,
+    PLACE_BOOKING_FROM_UPCOMING: `${BASE_URL}/booking/createBookingFromUpcoming`,
+    PLACE_BOOKING_FROM_INVENTORY: `${BASE_URL}/booking/createBookingFromInventory`,
     GET_MY_BOOKING: `${BASE_URL}/booking/getMyBookings`,
     GET_BOOKING: `${BASE_URL}/booking/getBooking`,
     GET_ALL_BOOKING: `${BASE_URL}/booking/getAllBookings`,
+    GET_BOOKINGS_BY_ITEM: `${BASE_URL}/booking/getAllBookingsByItem`,
     UPDATE_BOOKING: `${BASE_URL}/booking/updateBooking`,
     UPDATE_REMARK: `${BASE_URL}/booking/updateRemark`,
     CONFIRM_BOOKING: `${BASE_URL}/booking/confirmBooking`,

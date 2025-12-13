@@ -5,6 +5,7 @@ const Thickness = require('../models/thicknessModel')
 const Warehouse = require('../models/warehouseModel')
 const Grade = require('../models/gradeModel')
 const Width = require('../models/widthModel')
+const Party = require("../models/partyModel");
 
 const addItem = async (req, res) => {
     try {
@@ -84,12 +85,14 @@ const addItem = async (req, res) => {
 
         const formattedItems = {
             _id: item._id,
+            id: item.item_id,
             name: `${item.wagonNumber} - ${item.type}`,
             type: item.type,
             item_id: item.item_id,
             grade: gradeChecker,
             width: widthChecker,
             originalQuantity: item.originalQuantity,
+            currentQuantity: String(item.quantity),
             wagonNumber: item.wagonNumber,
             challanNumber: item.challan?.challanNumber,
             challanDate: item.challan?.challanDate,
@@ -152,7 +155,8 @@ const updateItem = async (req, res) => {
 
         const formattedItems = {
             _id: updatedItem._id,
-            item_id: updatedItem.item_id,
+            id: updatedItem.item_id,
+            currentQuantity: String(updatedItem.quantity),
             name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
             type: updatedItem.type,
             grade: updatedItem.grade,
@@ -634,8 +638,8 @@ const deleteVarient = async (req, res) => {
 
 const getUpcomingItem = async (req, res) => {
     try {
-        const items = await Item.find({ 'challan.challanNumber': null })
-            .populate("grade width thickness warehouse challan")
+        const items = await Item.find({ 'challan.challanNumber': null, 'invoice.invoiceNumber': null })
+            .populate("grade width thickness warehouse challan markedForBooking.party markedForBooking.markedBy")
             .sort({ wagonNumber: 1 })
 
         let listView = [];
@@ -643,6 +647,7 @@ const getUpcomingItem = async (req, res) => {
         items.forEach((item) => {
             const formattedItems = {
                 _id: item._id,
+                id: item.item_id,
                 wagonNumber: item.wagonNumber,
                 challanNumber: item?.challan?.challanNumber,
                 challanDate: item?.challan?.challanDate,
@@ -655,6 +660,266 @@ const getUpcomingItem = async (req, res) => {
                 createdAt: item.createdAt,
                 warehouse: item.warehouse,
                 date: item.date,
+                remark: item.remark,
+                marking: item.markedForBooking
+            };
+
+            listView.push(formattedItems);
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully fetched the upcoming item",
+            items: listView
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const markForBooking = async (req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.user;
+        const { item, quantity, party, shipTo, formType, invoiceNumber, invoiceDate } = req.body;
+
+        // Validation
+        if (!item) {
+            throw customError("Please select the item first", 404);
+        }
+
+        // Party handle
+        let selectedParty = null;
+        if (party && party.type === "id") {
+            selectedParty = await Party.findById(party.val);
+        } else if (party && party.val) {
+            const tempParty = new Party({ name: party.val });
+            selectedParty = await tempParty.save();
+        }
+
+        if (selectedParty == null) {
+            throw customError("Please enter Party to Mark for Booking", 404)
+        }
+
+        // Fetch item in DB
+        const dbItem = await Item.findById(item).populate('grade thickness width');
+        if (!dbItem) {
+            throw customError(`Item not found: ${item}`, 404);
+        }
+
+        if (dbItem.quantity < quantity) {
+            throw customError(`Not enough stock for item ${item}`, 400);
+        }
+
+        // Reduce qty
+        // dbItem.quantity -= quantity;
+
+        // Push marking log
+        dbItem.markedForBooking = {
+            quantity,
+            party: selectedParty._id,
+            dateOfMarking: new Date(),
+            formType,
+            markedBy: userId,
+            shipTo
+        };
+
+        if (invoiceNumber && invoiceNumber.length > 0) {
+            dbItem.invoice = {
+                invoiceNumber,
+                invoiceDate
+            }
+        }
+
+        dbItem.updatedAt = new Date();
+        await dbItem.save();
+
+        const saved = await Item.findById(item).populate('grade thickness width markedForBooking.party markedForBooking.markedBy');
+
+        const formattedItems = {
+            _id: saved._id,
+            id: saved.item_id,
+            wagonNumber: saved.wagonNumber,
+            invoiceNumber: saved?.invoice?.invoiceNumber,
+            invoiceDate: saved?.invoice?.invoiceDate,
+            type: saved.type,
+            grade: saved.grade,
+            width: saved.width,
+            originalQuantity: String(saved.originalQuantity),
+            currentQuantity: String(saved.quantity),
+            thickness: saved.thickness,
+            createdAt: saved.createdAt,
+            warehouse: saved.warehouse,
+            date: saved.date,
+            marking: saved.markedForBooking,
+            remark: saved.remark,
+        };
+
+        // Response
+        res.status(200).json({
+            success: true,
+            message: "Item marked for booking successfully",
+            party: selectedParty,
+            shipTo,
+            item: formattedItems
+        });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const unmarkForBooking = async (req, res) => {
+    try {
+        // Fetching
+        const { userId } = req.user;
+        const { item } = req.body;
+
+        // Validation
+        const dbItem = await Item.findById(item).populate('markedForBooking.markedBy');
+        if (!item) {
+            throw customError("Please select the item first", 404);
+        }
+        if (userId !== (dbItem.markedForBooking.markedBy._id).toString()) {
+            throw customError("You didn't booked so you can't cancel");
+        }
+
+
+        // Push marking log
+        dbItem.markedForBooking = null;
+
+        dbItem.updatedAt = new Date();
+        await dbItem.save();
+
+        const saved = await Item.findById(item).populate('grade thickness width');
+
+        const formattedItems = {
+            _id: saved._id,
+            id: saved.item_id,
+            wagonNumber: saved.wagonNumber,
+            invoiceNumber: saved?.invoice?.invoiceNumber,
+            invoiceDate: saved?.invoice?.invoiceDate,
+            type: saved.type,
+            grade: saved.grade,
+            width: saved.width,
+            originalQuantity: String(saved.originalQuantity),
+            currentQuantity: String(saved.quantity),
+            thickness: saved.thickness,
+            createdAt: saved.createdAt,
+            warehouse: saved.warehouse,
+            date: saved.date,
+            marking: saved.markedForBooking,
+            remark: saved.remark,
+        };
+
+        console.log("Successed")
+        // Response
+        res.status(200).json({
+            success: true,
+            message: "Item marked for booking successfully",
+            item: formattedItems
+        });
+
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const moveToInventory = async (req, res) => {
+    try {
+        const { item, challanDate, challanNumber, vehicleNumber, loader, transport, warehouse } = req.body;
+
+        console.log(req.body);
+
+        const updateData = await Item.findById(item).populate('challan transport');
+
+        console.log(updateData);
+
+        if (warehouse?.trim() === "") {
+            updateData.warehouse = null;
+        }
+
+        // If challan fields are present, nest them
+        if (challanNumber || challanDate) {
+            updateData.challan = {
+                challanNumber: challanNumber,
+                challanDate: challanDate
+            };
+        }
+
+        // If transport fields are present, nest them
+        if (vehicleNumber || loader || transport) {
+            updateData.transport = {
+                vehicleNumber: vehicleNumber,
+                loader: loader,
+                transporterName: transport
+            };
+        }
+
+        updateData.updatedAt = Date.now();
+
+        const updatedItem = await Item.findByIdAndUpdate(item, updateData, { new: true })
+            .populate("grade width thickness warehouse challan transport");
+        if (!updatedItem) throw customError('Item not found', 404);
+
+        const formattedItems = {
+            _id: updatedItem._id,
+            id: updatedItem.item_id,
+            currentQuantity: String(updatedItem.quantity),
+            name: `${updatedItem.wagonNumber} - ${updatedItem.type}`,
+            type: updatedItem.type,
+            grade: updatedItem.grade,
+            width: updatedItem.width,
+            remaining: updatedItem.remaining,
+            thickness: updatedItem.thickness,
+            createdAt: updatedItem.createdAt,
+            wagonNumber: updatedItem.wagonNumber,
+            challanNumber: updatedItem?.challan?.challanNumber,
+            challanDate: updatedItem?.challan?.challanDate,
+            warehouse: updatedItem?.warehouse,
+            originalQuantity: updatedItem.originalQuantity,
+            vehicleNumber: updatedItem?.transport?.vehicleNumber,
+            loader: updatedItem?.transport?.loader,
+            transporterName: updatedItem?.transport?.transporterName,
+            remark: updatedItem?.remark,
+            date: updatedItem.date
+        };
+
+        res.status(200).json({
+            success: true,
+            message: "Item updated successfully",
+            listView: formattedItems
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const getMarkedItem = async (req, res) => {
+    try {
+        const items = await Item.find({ 'invoice.invoiceNumber': { $ne: null } })
+            .populate("grade width thickness warehouse invoice markedForBooking.markedBy")
+            .sort({ wagonNumber: 1 })
+
+        let listView = [];
+
+        items.forEach((item) => {
+            const formattedItems = {
+                _id: item._id,
+                id: item.item_id,
+                wagonNumber: item.wagonNumber,
+                invoiceNumber: item?.invoice?.invoiceNumber,
+                invoiceDate: item?.invoice?.invoiceDate,
+                type: item.type,
+                grade: item.grade,
+                width: item.width,
+                originalQuantity: String(item.originalQuantity),
+                currentQuantity: String(item.quantity),
+                thickness: item.thickness,
+                createdAt: item.createdAt,
+                warehouse: item.warehouse,
+                date: item.date,
+                marking: item.markedForBooking,
                 remark: item.remark,
             };
 
@@ -1054,4 +1319,8 @@ module.exports = {
     uploadCSV,
     downloadTemplate,
     getExcelItem,
+    markForBooking,
+    unmarkForBooking,
+    getMarkedItem,
+    moveToInventory,
 }

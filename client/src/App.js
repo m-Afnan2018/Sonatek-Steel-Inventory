@@ -23,6 +23,8 @@ import Warehouse from 'pages/Warehouse/Warehouse';
 import SalesReport from 'pages/SalesReport/SalesReport';
 import Upcoming from 'pages/Upcoming/Upcoming';
 import Party from 'pages/Party/Party';
+import Create from 'pages/Booking/Create';
+import Pending from 'pages/Booking/Pending';
 
 function App() {
     //  If User Logged in
@@ -84,6 +86,10 @@ function App() {
                 <OverlayProvider>
                     <Routes>
                         <Route path='/' element={<Dashboard />} />
+                        <Route path='/booking'>
+                            <Route path='create' element={<Create />} />
+                            <Route path='pending' element={<Pending />} />
+                        </Route>
                         <Route path='/manage-varient' element={<Varient />} />
                         <Route path='/manage-inventory' element={<Inventory />} />
                         <Route path='/manage-upcoming' element={<Upcoming />} />

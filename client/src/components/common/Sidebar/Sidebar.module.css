@@ -1,84 +1,97 @@
 .Sidebar {
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
     flex-direction: column;
     width: 256px;
     background: white;
     overflow: hidden;
     border-right: 1px solid #F1F3F5;
     padding: 0.25rem;
+    transition: width 0.3s ease-in-out;
 }
 
 .Sidebar>div {
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
     flex-direction: column;
-    width: 256px;
-    background: white;
+    width: 100%;
 }
 
+/* MAIN LINK */
 .navlinks {
     all: unset;
     padding: 0.75rem 1rem;
-    background-color: white;
     font-size: 0.875rem;
     font-weight: 400;
-    width: calc(100% - 2rem);
-    cursor: pointer;
     color: #767575;
+    cursor: pointer;
     display: flex;
-    justify-content: flex-start;
     align-items: center;
     gap: 0.5rem;
+    width: calc(100% - 2rem);
+    border-radius: 0.25rem;
+    transition: background-color 0.25s ease;
 }
 
-.navlinks>svg {
+.navlinks svg {
     font-size: 1.25rem;
 }
 
 .navlinks:hover {
     background-color: #F1F3F5;
-    border-radius: 0.25rem;
 }
 
+/* ACTIVE */
 .activeLink {
-    border-radius: 0.25rem;
     background: #F1F3F5;
-    color: black;
+    color: #000;
     font-weight: 500;
-
+    border-radius: 0.25rem;
 }
 
-.Sidebar>div:nth-child(1) {
-    height: calc(100% - 27px);
-    width: 100%;
+/* SUBMENU */
+.subLink {
+    all: unset;
+    height: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    color: #6b6b6b;
+    width: calc(100% - 2.5rem);
+    border-radius: 0.25rem;
+    transition: background-color 0.25s ease, padding-left 0.2s ease;
 }
 
-/* .Sidebar>div:nth-child(2) {
-    height: 10%;
-} */
+.subLink:hover {
+    background-color: #F1F3F5;
+    color: #000;
+}
 
+.subLinkActive {
+    background-color: #E5E7EB;
+    font-weight: 500;
+    color: #000;
+}
+
+/* Logout Button */
 .Sidebar button {
     all: unset;
-    padding: 0.25rem 1rem;
+    padding: 0.4rem 1rem;
     background-color: #11386C;
-    font-weight: 400;
     font-size: 0.875rem;
+    color: white;
     width: calc(100% - 2rem);
     cursor: pointer;
-    color: white;
     text-align: center;
-    /* height: 10%; */
     border-radius: 0.25rem;
-    transition: all 200ms;
-    /* border: 1px solid grey; */
-    box-shadow: 0px 0px 0px 1px #808080;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    box-shadow: 0px 0px 0px 1px #808080;
+    transition: background-color 200ms ease;
 }
 
 .Sidebar button>svg {
@@ -86,5 +99,37 @@
 }
 
 .Sidebar button:hover {
-    background-color: #cccccc;
+    background-color: #0e2f5c;
+}
+
+/* Wrapper for main area */
+.Sidebar>div:nth-child(1) {
+    height: calc(100% - 45px);
+    overflow-y: auto;
+}
+
+.submenuWrapper {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.35s ease-in-out;
+    margin-left: 0.5rem;
+}
+
+.subLink {
+    all: unset;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    font-size: 0.8rem;
+    color: #6b6b6b;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    width: 100%;
+    display: flex;
+    text-align: left;
+    transition: background-color 0.25s ease, padding-left 0.2s ease;
+}
+
+.subLink:hover {
+    background-color: #F1F3F5;
+    color: #000;
 }

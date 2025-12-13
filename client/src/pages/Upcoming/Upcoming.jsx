@@ -3,13 +3,20 @@ import style from './Upcoming.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/itemAPI';
 import AddForm from 'components/core/Upcoming/AddForm';
-import { IoTrashOutline, IoBookmarkOutline } from "react-icons/io5";
+// import { IoTrashOutline, IoBookmarkOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
 import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 import { useOverlay } from 'hooks/useOverlay';
-import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
-import { bookingItems } from 'services/operations/bookingAPI';
+// import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
+// import { bookingItems } from 'services/operations/bookingAPI';
+import { MdOutlineMoveToInbox, MdDeleteOutline, MdBookmarkBorder } from "react-icons/md";
+import UpcomingOptions from 'components/common/Overlay/UpcomingOptions';
+import { getAllPartyDetails } from 'services/operations/bookingAPI';
+import { FaRegTrashCan } from "react-icons/fa6";
+import { FiEye } from 'react-icons/fi';
+import { MdOutlineWarehouse } from 'react-icons/md';
+import { IoCartOutline } from 'react-icons/io5';
 
 const Upcoming = () => {
     const [loading, setLoading] = useState(true);
@@ -58,6 +65,7 @@ const Upcoming = () => {
 
     useEffect(() => {
         getUpcomingItem({}, dispatch);
+        getAllPartyDetails(dispatch)
     }, [dispatch])
 
     return (
@@ -97,15 +105,16 @@ const Upcoming = () => {
                             <thead>
                                 <tr>
                                     {/* <th>Type</th> */}
-                                    <th style={{ minWidth: "8rem", width: "8rem" }}>Date</th>
-                                    <th style={{ minWidth: "8rem", width: "8rem", textAlign: "center" }}>Description</th>
-                                    <th style={{ minWidth: "3rem", width: "3rem" }}>Quantity</th>
-                                    <th style={{ minWidth: "5rem", width: "5rem" }}>Wagon</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem" }}>Challan date</th>
-                                    <th style={{ minWidth: "6rem", width: "6rem" }}>Challan No.</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Warehouse</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem", textAlign: "center" }}>Remarks</th>
-                                    <th style={{ minWidth: "4rem", width: "4rem" }}>Action</th>
+                                    <th style={{ width: "6px" }}></th>
+                                    <th style={{ width: "5%" }}>S.ID</th>
+                                    <th style={{ width: "15%" }}>Date</th>
+                                    <th style={{ width: "20%", textAlign: "center" }}>Description</th>
+                                    <th style={{ width: "10%" }}>Quantity</th>
+                                    <th style={{ width: "10%" }}>Wagon</th>
+                                    <th style={{ width: "10%", textAlign: "center" }}>Warehouse</th>
+                                    <th style={{ width: "20%", textAlign: "center" }}>Party</th>
+                                    <th style={{ width: "20%", textAlign: "center" }}>Remarks</th>
+                                    <th style={{ width: "10%" }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,6 +124,7 @@ const Upcoming = () => {
                             </tbody>
                             <tfoot>
                                 <tr style={{ borderBottom: 'none' }}>
+                                    <td></td>
                                     <td></td>
                                     <td style={{ fontWeight: '600', color: 'black' }}>Total quantity:</td>
                                     <td style={{ fontWeight: '600', color: 'black' }}>{count.toFixed(3)}</td>
@@ -176,6 +186,7 @@ const SingleItem = ({ color, item, setView, view }) => {
         function convertItem(data) {
             return {
                 _id: data._id,
+                item_id: data.id,
                 type: data.type,
                 grade: data.grade,
                 form: "Coil",
@@ -189,18 +200,58 @@ const SingleItem = ({ color, item, setView, view }) => {
                 remark: data.remark,
                 date: data.date,
                 createdAt: data.createdAt,
-                updatedAt: data.createdAt
+                updatedAt: data.createdAt,
+                marking: data.marking,
             };
         }
 
         // Usage:
         const output = convertItem(item);
 
-        showOverlay(OrderConfirmationOverlay, {
-            range: { min: 0, max: output.quantity.toFixed(3) },
-            data: [output],
+
+        showOverlay(UpcomingOptions, {
+            type: 'party',
+            data: output,
             onAccept: (data, party) => {
-                bookingItems({ items: data, party }, dispatch, ()=>{})
+                console.log(data);
+            }
+        })
+    }
+
+    const handleInventory = () => {
+        if (item.marking) {
+            return;
+        }
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                item_id: data.id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: Number(data.currentQuantity),
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt,
+                marking: data.marking,
+            };
+        }
+
+        // Usage:
+        const output = convertItem(item);
+
+        showOverlay(UpcomingOptions, {
+            type: 'inventory',
+            data: output,
+            onAccept: (data, party) => {
+                console.log('Testing', data);
             }
         })
     }
@@ -268,8 +319,19 @@ const SingleItem = ({ color, item, setView, view }) => {
         <tr
             className={`${view === item._id ? style.activeRow : ''}`}
             onClick={() => setView(item._id)}
+            style={{ position: 'relative' }}
         >
-            {/* Challan Date */}
+            <div style={{
+                position: 'absolute',
+                width: '6px',
+                height: '100%',
+                backgroundColor: item.marking ? 'green' : '',
+            }}></div>
+            {/* Serial Number */}
+            <td>
+                {itemDetail.id}
+            </td>
+            {/* Date */}
             <td onClick={() => clickHandler('date')}>
                 {select === 'date'
                     ? renderEditableField('date', 'date')
@@ -314,20 +376,6 @@ const SingleItem = ({ color, item, setView, view }) => {
                     : itemDetail.wagonNumber || '-'}
             </td>
 
-            {/* Challan Date */}
-            <td onClick={() => clickHandler('challanDate')}>
-                {select === 'challanDate'
-                    ? renderEditableField('challanDate', 'date', '4rem')
-                    : itemDetail.challanDate?.slice(0, 10) || '-'}
-            </td>
-
-            {/* Challan Number */}
-            <td onClick={() => clickHandler('challanNumber')}>
-                {select === 'challanNumber'
-                    ? renderEditableField('challanNumber', '4rem')
-                    : itemDetail.challanNumber || '-'}
-            </td>
-
             {/* Warehouse */}
             <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
                 {select === 'warehouse' ? (
@@ -341,6 +389,10 @@ const SingleItem = ({ color, item, setView, view }) => {
                 )}
             </td>
 
+            <td>
+                {item.marking ? item?.marking?.party?.name : 'Inventory'}
+            </td>
+
             {/* Remark */}
             <td onClick={() => clickHandler('remark')}>
                 {select === 'remark'
@@ -350,15 +402,17 @@ const SingleItem = ({ color, item, setView, view }) => {
 
 
             <td>
-                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <div>
-                    <IoBookmarkOutline style={{ color: 'blue' }} onClick={handleOrder} />
-                    <IoTrashOutline style={{ color: 'red' }} onClick={handleDelete} />
+                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <div style={{ gap: '0.25rem' }}>
+                    <FiEye onClick={item.marking ? handleOrder : handleInventory} />
+                    <MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} onClick={handleInventory} />
+                    <IoCartOutline onClick={handleOrder} />
+                    <FaRegTrashCan style={{ color: 'red' }} onClick={handleDelete} />
                 </div> : <div>
                     <RxCheck style={{ color: 'green' }} onClick={handleSave} />
                     <RxCross2 style={{ color: 'red' }} onClick={handleCancel} />
                 </div>}
             </td>
-        </tr>
+        </tr >
     );
 };
 

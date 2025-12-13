@@ -1,10 +1,12 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
-const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark, getAllPartyDetails } = require('../controllers/bookingController')
+const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark, getAllPartyDetails, createBookingFromUpcoming, getAllBookingsByItem, createBookingFromInventory } = require('../controllers/bookingController')
 const { inventoryAccess, agentAccess, accountantAccess, directorAccess } = require('../middlewares/authorization');
 const router = express.Router();
 
 router.post('/createBooking', authentication, agentAccess, createBooking)
+router.post('/createBookingFromUpcoming', authentication, agentAccess, createBookingFromUpcoming)
+router.post('/createBookingFromInventory', authentication, agentAccess, createBookingFromInventory)
 router.post('/updateBooking', authentication, accountantAccess, updateBooking);
 router.post('/updateRemark', authentication, accountantAccess, updateRemark);
 router.post('/getAllBookings', authentication, accountantAccess, getAllBookings)
@@ -21,6 +23,7 @@ router.post('/getAllBookingsDetailsTablewise', authentication, getAllBookingDeta
 router.get('/getAllIncompleteBookingsDetails', authentication, getAllIncompleteBookingsDetails);
 router.post('/getExcelTablewiseBooking', getExcelTablewiseBooking)
 router.get('/getExcelBooking', getExcelBooking);
+router.post('/getAllBookingsByItem', authentication, getAllBookingsByItem)
 
 // Party Route
 router.get('/getAllParty', authentication, getAllParty);

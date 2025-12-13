@@ -13,7 +13,7 @@ import {
     setParty,
     updateBookingStatus
 } from "slices/bookingSlice";
-import { setPagination } from "slices/itemSlice";
+import { deleteFromUpcomingItem, setPagination } from "slices/itemSlice";
 import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
 
 export async function searchOptions(params, dispatch, setter) {
@@ -54,6 +54,38 @@ export async function bookingItems(params, dispatch, reset) {
     } catch (err) {
         dispatch(showError({ id: "bookingItems", message: err?.response?.data?.message || "Booking failed" }));
         reset();
+    }
+}
+
+export async function createBookingFromUpcoming(params, dispatch) {
+    try {
+        dispatch(addLoader("createBookingFromUpcoming"));
+
+        const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_UPCOMING, params)).data;
+
+        if (response.success) {
+            dispatch(deleteFromUpcomingItem(response.listView._id));
+        }
+
+        dispatch(showSuccess({ id: "createBookingFromUpcoming", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "createBookingFromUpcoming", message: err?.response?.data?.message || "Booking failed" }));
+    }
+}
+
+export async function createBookingFromInventory(params, dispatch) {
+    try {
+        dispatch(addLoader("createBookingFromInventory"));
+
+        const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_UPCOMING, params)).data;
+
+        if (response.success) {
+            dispatch(deleteFromUpcomingItem(response.listView._id));
+        }
+
+        dispatch(showSuccess({ id: "createBookingFromInventory", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "createBookingFromInventory", message: err?.response?.data?.message || "Booking failed" }));
     }
 }
 
@@ -233,6 +265,18 @@ export async function getAllBookingsDetails(setBookings, setLoading, dispatch) {
         dispatch(removeLoader("getAllBookingsDetails"));
         dispatch(showError({ id: "getAllBookingsDetails", message: err?.response?.data?.message || "Failed to get all bookings" }));
         setLoading(false);
+    }
+}
+
+export async function getAllBookingByItem(params, dispatch, setter) {
+    try {
+        const response = (await apiConnector('POST', bookingEndpoints.GET_BOOKINGS_BY_ITEM, params)).data;
+
+        if (response.success) {
+            setter(response.data);
+        }
+    } catch (err) {
+        dispatch(showError({ id: "getAllBookingByItem", message: err?.response?.data?.message || "Failed to get all bookings" }));
     }
 }
 

@@ -11,6 +11,40 @@ const challanSchema = new mongoose.Schema({
     },
 });
 
+const invoiceSchema = new mongoose.Schema({
+    invoiceDate: {
+        type: Date,
+    },
+    invoiceNumber: {
+        type: String,
+    },
+});
+
+const markedSchema = new mongoose.Schema({
+    markedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    quantity: {
+        type: Number,
+        required: true,
+    },
+    party: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Party'
+    },
+    dateOfMarking: {
+        type: Date,
+        default: Date.now
+    },
+    shipTo: {
+        type: String
+    },
+    formType: {
+        type: String,
+    }
+})
+
 const transportSchema = new mongoose.Schema({
     vehicleNumber: {
         type: String,
@@ -59,6 +93,12 @@ const itemSchema = new mongoose.Schema({
     },
     challan: {
         type: challanSchema,
+    },
+    invoice: {
+        type: invoiceSchema,
+    },
+    markedForBooking: {
+        type: markedSchema,
     },
     currentStatus: {
         type: String,
