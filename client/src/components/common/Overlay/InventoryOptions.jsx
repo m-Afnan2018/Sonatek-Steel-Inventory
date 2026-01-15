@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from 'react-redux';
 import { RxCrossCircled } from "react-icons/rx";
-import { cancelBooking, createBookingFromInventory, getAllBookingByItem, shipBooking } from 'services/operations/bookingAPI';
+import { cancelBooking, createBookingFromInventory, getAllBookingByItem, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
@@ -20,7 +20,7 @@ const customStyles = {
         height: "24px",
         fontSize: "12px",
         borderRadius: "6px",
-        width: '12rem'
+        width: '100%'
     }),
     valueContainer: (provided) => ({
         ...provided,
@@ -62,20 +62,26 @@ const InventoryOptions = ({ data, close, type }) => {
         <div
             className={`${style.UpcomingOptions} ${style.InventoryOptions}`}
             onClick={(e) => e.stopPropagation()}
+            style={{ width: type === 'booking' || type === 'increaseQuantity' ? '444px' : '90%' }}
         >
             <RxCrossCircled onClick={close} />
-            {/* <div>
-                <h1>Item Action</h1>
+            <div>
+                <h1>{type === 'booking' ? 'Place Order' : type === 'increaseQuantity' ? 'Update Quantity' : 'Order Overview'}</h1>
             </div>
 
-            <div style={{ width: '100%', height: '1px', backgroundColor: 'black' }}></div> */}
+            {/* <div style={{ width: '100%', height: '1px', backgroundColor: 'black' }}></div> */}
 
-            <div>
+            <div style={{
+                flexDirection: type === 'booking' || type === 'increaseQuantity' ? 'column' : 'row'
+            }}>
                 <section style={{
                     height: 'fit-content',
                     padding: '1rem',
-                    background: '#0000ff0f',
-                    gap: '0.5rem'
+                    // background: '#0000ff0f',
+                    gap: '0.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: '1px solid #bcbcbc'
                 }}>
                     {tableData({ name: 'ID', value: data.item_id })}
                     {tableData({ name: 'Date', value: data.date?.slice(0, 10) })}
@@ -89,10 +95,99 @@ const InventoryOptions = ({ data, close, type }) => {
                     data={data}
                     close={close}
                 />}
+                {type === 'increaseQuantity' && <IncreaseQuantity
+                    data={data}
+                    close={close}
+                />}
             </div>
 
             {type === 'logs' && <TableView data={data} />}
         </div >
+    );
+};
+
+const IncreaseQuantity = ({ data, close }) => {
+    const dispatch = useDispatch();
+
+    const [fillUpData, setFillUpData] = useState({
+        item: data._id,
+        original: data.originalQuantity,
+        available: data.quantity,
+        updatedQuantity: 0
+    })
+
+    const [validationError, setValidationError] = useState('');
+
+    const handleChange = (field, e) => {
+        setFillUpData((prev) => ({
+            ...prev,
+            [field]: e.target.value
+        }));
+        if (validationError) setValidationError('');
+    };
+
+    const validateForm = () => {
+        if (!fillUpData?.updatedQuantity) {
+            setValidationError('Please select updated Quantity');
+            return false;
+        }
+        return true;
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const handleUpdatedQuantitySubmit = async () => {
+        setValidationError('');
+
+        validateForm();
+
+        close();
+        increaseQuantity({ ...fillUpData }, dispatch);
+    };
+
+    return (
+        <section>
+            {validationError && (
+                <div style={{
+                    marginBottom: '15px',
+                    backgroundColor: 'rgb(255, 235, 238)',
+                    color: 'rgb(198, 40, 40)',
+                    borderRadius: '4px',
+                    border: '1px solid rgb(239, 83, 80)',
+                    position: 'absolute',
+                    fontSize: '0.75em',
+                    padding: '0.1rem',
+                    fontWeight: '800',
+                    left: '75%',
+                    transform: 'translateX(-50%)',
+                }}>
+                    {validationError}
+                </div>
+            )}
+
+            <div className={style.fillUpData}>
+                <div>
+                    <h2 style={{ width: '50%' }}>Total Quantity:</h2>
+                    <h3 style={{ width: '50%' }}>{fillUpData.original}</h3>
+                </div>
+                <div>
+                    <h2 style={{ width: '50%' }}>Available Quantity:</h2>
+                    <h3 style={{ width: '50%' }}>{fillUpData.available}</h3>
+                </div>
+                <div>
+                    <h2 style={{ width: '50%' }}>Updated Quantity:</h2>
+                    <input
+                        type="number"
+                        value={fillUpData?.updatedQuantity || ''}
+                        onChange={(e) => handleChange('updatedQuantity', e)}
+                    />
+                </div>
+
+            </div>
+            <div style={{ display: 'flex', width: '100%', marginTop: '1rem', justifyContent: 'center' }}>
+                {/* <button className="btn error" onClick={close}>Close</button> */}
+                <button onClick={handleUpdatedQuantitySubmit} className="btn success">Updated Quantity</button>
+            </div>
+        </section>
     );
 };
 
@@ -296,9 +391,9 @@ const MoveToBooking = ({ data, close }) => {
                     />
                 </div>
             </div>
-            <div style={{ display: 'flex', width: '100%', marginTop: '1rem', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', width: '100%', marginTop: '1rem', justifyContent: 'center' }}>
                 {/* <button className="btn error" onClick={close}>Close</button> */}
-                <button onClick={handleBookingSubmit} className="btn success">Place Order</button>
+                <button style={{ width: '9rem' }} onClick={handleBookingSubmit} className="btn success">Place Order</button>
             </div>
         </section>
     );
@@ -384,14 +479,14 @@ const TableView = ({ data }) => {
             <div>
                 <div className={style.toggle}>
                     <h3>{show}</h3>
-                    <div className={style.groupRadio}>
+                    <div className={style.groupRadio} style={{ display: 'flex', gap: '0.5rem' }}>
                         <button
                             onClick={() => setShow("Pending")}
                             style={{
-                                borderRadius: "100rem 0 0 100rem",
-                                color: show === "Pending" ? "white" : "#11386c",
+                                border: '1px solid #11386c',
+                                color: show === "Pending" ? "#f0f0ff" : "#11386c",
                                 backgroundColor:
-                                    show === "Pending" ? "#11386c" : "white",
+                                    show === "Pending" ? "#11386c" : "#f0f0ff",
                             }}
                         >
                             Pending
@@ -399,10 +494,10 @@ const TableView = ({ data }) => {
                         <button
                             onClick={() => setShow("Completed")}
                             style={{
-                                borderRadius: "0 100rem 100rem 0",
-                                color: show === "Pending" ? "#11386c" : "white",
+                                border: '1px solid #11386c',
+                                color: show === "Pending" ? "#11386c" : "#f0f0ff",
                                 backgroundColor:
-                                    show === "Pending" ? "white" : "#11386c",
+                                    show === "Pending" ? "#f0f0ff" : "#11386c",
                             }}
                         >
                             Completed
@@ -429,7 +524,7 @@ const TableView = ({ data }) => {
                 </thead>
 
                 <tbody>
-                    {showListing.map((item) => (
+                    {showListing.length > 0 ? showListing.map((item) => (
                         <tr key={item._id}>
                             <td>{item.order_id}</td>
                             <td>{item.formType}</td>
@@ -466,7 +561,7 @@ const TableView = ({ data }) => {
                                         }}
                                         style={{ cursor: "pointer" }}
                                     >
-                                        {item.remarks || "Click to add remark"}
+                                        {item.remarks || "Add remark"}
                                     </div>
                                 )}
                             </td>
@@ -501,7 +596,7 @@ const TableView = ({ data }) => {
                                 Cancelled
                             </td>}
                         </tr>
-                    ))}
+                    )) : <td colSpan={10} style={{ padding: '2rem' }}> No Booking Found </td>}
                 </tbody>
             </table>
         </section>

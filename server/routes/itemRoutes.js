@@ -1,7 +1,7 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
 const { inventoryAccess, directorAccess } = require('../middlewares/authorization');
-const { addItem, getItem, deleteItem, addVarient, getVarients, updateVarient, deleteVarient, getAllItem, getAllVarients, updateItem, getAllDetailVarient, getUpcomingItem, uploadCSV, downloadTemplate, getExcelItem, markForBooking, unmarkForBooking, getMarkedItem, moveToInventory } = require('../controllers/itemController');
+const { addItem, getItem, deleteItem, addVarient, getVarients, updateVarient, deleteVarient, getAllItem, getAllVarients, updateItem, getAllDetailVarient, getUpcomingItem, uploadCSV, downloadTemplate, getExcelItem, markForBooking, unmarkForBooking, getMarkedItem, moveToInventory, increaseQuantity } = require('../controllers/itemController');
 const { getAllWarehouseDetails } = require('../controllers/warehouseController');
 const router = express.Router();
 
@@ -20,6 +20,7 @@ router.post('/getMarkedItem', authentication, inventoryAccess, getMarkedItem);
 router.post('/uploadCSV', uploadCSV)
 router.get('/downloadTemplate', downloadTemplate);
 router.post('/getExcelItem', getExcelItem)
+router.post('/increaseQuantity', authentication, increaseQuantity)
 
 //  Varient Routes
 router.post('/addVarient', authentication, directorAccess, addVarient)

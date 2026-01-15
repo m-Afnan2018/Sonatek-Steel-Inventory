@@ -936,6 +936,43 @@ const getMarkedItem = async (req, res) => {
     }
 }
 
+const increaseQuantity = async (req, res) => {
+    try {
+        // Fetching
+        let { item, updatedQuantity } = req.body;
+
+        updatedQuantity = Number(updatedQuantity);
+
+        // Validation
+        if (!item || !updatedQuantity) {
+            throw customError("Please enter the correct details");
+        }
+
+        const itemDoc = await Item.findById(item);
+        let difference = 0;
+        console.log({ c: itemDoc.originalQuantity, u: updatedQuantity })
+        if (itemDoc.originalQuantity < updatedQuantity) {
+            difference = updatedQuantity - itemDoc.originalQuantity;
+        } else {
+            throw customError("Please enter quantity greater than Current")
+        }
+
+        // Performing Task
+        itemDoc.originalQuantity = updatedQuantity;
+        itemDoc.quantity = itemDoc.quantity + difference;
+
+        itemDoc.save();
+
+        // Returning Response
+        res.status(200).json({
+            success: true,
+            message: 'Successfully updated'
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
 // const xlsx = require('xlsx');
 const xlsx = require('xlsx');
 const getNextIndex = require("../utils/counerHandler");
@@ -1323,4 +1360,5 @@ module.exports = {
     unmarkForBooking,
     getMarkedItem,
     moveToInventory,
+    increaseQuantity
 }

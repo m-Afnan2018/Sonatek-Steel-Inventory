@@ -353,6 +353,8 @@ h4 {
 
 /* Items */
 .staffContainer {
+    min-width: calc(100% - 1rem);
+    width: fit-content;
     margin: 0.5rem;
     padding: 0.25rem;
     background: white;
@@ -409,6 +411,8 @@ h4 {
 }
 
 .card {
+    min-width: 100%;
+    width: fit-content;
     background: #fff;
     border-radius: 0 0 1rem 1rem;
     padding: 4px;
@@ -440,6 +444,11 @@ h4 {
     height: 100%;
     /* border-radius: 1rem; */
     /* overflow-x: auto; */
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .tableWrapper td>svg {
@@ -502,7 +511,8 @@ h4 {
 
 .formBlock {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    /* grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); */
+    grid-template-columns: repeat(auto-fit, calc(20% - 1rem));
     gap: 1rem;
     background: #f9fafb;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -650,4 +660,76 @@ h4 {
     text-transform: capitalize;
     line-height: 1.15;
     padding-top: 0.3rem;
+}
+
+
+.expandedCell {
+    background: #F8FAFC;
+    padding: 16px;
+    border-left: 3px solid #007A8A;
+}
+
+.statusPill {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.2;
+}
+
+.statusProcessing {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.statusShipped {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.statusCancelled {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.actionCell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actionIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background: #fff;
+}
+
+.actionIcon:hover {
+    background: #F0FBFF;
+    border-color: #007A8A;
+    color: #007A8A;
+}
+
+.numCell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.idCell {
+    color: #6B7280;
+    font-size: 0.75rem;
+}
+
+.actionIcon[data-expanded="true"] {
+    transform: rotate(180deg);
+    opacity: 0.8;
 }

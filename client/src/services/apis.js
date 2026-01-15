@@ -38,7 +38,8 @@ export const itemEndpoints = {
     MARK_FOR_BOOKING: `${BASE_URL}/item/markForBooking`,
     UNMARK_FOR_BOOKING: `${BASE_URL}/item/unmarkForBooking`,
     MOVE_TO_INVENTORY: `${BASE_URL}/item/moveToInventory`,
-    GET_MARKED_ITEM: `${BASE_URL}/item/getMarkedItem`
+    GET_MARKED_ITEM: `${BASE_URL}/item/getMarkedItem`,
+    INCREASE_QUANTITY: `${BASE_URL}/item/increaseQuantity`,
 }
 
 export const bookingEndpoints = {

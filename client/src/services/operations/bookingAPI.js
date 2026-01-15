@@ -1,5 +1,5 @@
 import { apiConnector } from "services/apiConnector";
-import { bookingEndpoints } from "services/apis";
+import { bookingEndpoints, itemEndpoints } from "services/apis";
 import {
     addBooking,
     addIncompleteBookings,
@@ -89,6 +89,18 @@ export async function createBookingFromInventory(params, dispatch) {
     }
 }
 
+export async function increaseQuantity(params, dispatch) {
+    try {
+        dispatch(addLoader("increaseQuantity"));
+
+        const response = (await apiConnector('POST', itemEndpoints.INCREASE_QUANTITY, params)).data;
+
+        dispatch(showSuccess({ id: "increaseQuantity", message: response.message }));
+    } catch (err) {
+        dispatch(showError({ id: "increaseQuantity", message: err?.response?.data?.message || "Booking failed" }));
+    }
+}
+
 export async function getAllBookings(dispatch) {
     try {
         dispatch(addLoader("getAllBookings"));
@@ -171,12 +183,14 @@ export async function shipBooking(params, dispatch, setter) {
             // dispatch(removeIncompleteBookings(params.bookingId))
         }
 
-        setter((prev) => prev.map(i => {
-            if (i._id === params.bookingId) {
-                return { ...i, status: 'Shipped' }
-            }
-            return i;
-        }));
+        if (setter) {
+            setter((prev) => prev.map(i => {
+                if (i._id === params.bookingId) {
+                    return { ...i, status: 'Shipped' }
+                }
+                return i;
+            }));
+        }
 
         dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
@@ -194,12 +208,14 @@ export async function updateRemark(params, dispatch, setter) {
         //     dispatch(updateBookingStatus({ bookingId: params.bookingId, remark: params.remark }));
         // }
 
-        setter((prev) => prev.map(i => {
-            if (i._id === params.bookingId) {
-                return { ...i, remark: params.remark }
-            }
-            return i;
-        }));
+        if (setter) {
+            setter((prev) => prev.map(i => {
+                if (i._id === params.bookingId) {
+                    return { ...i, remark: params.remark }
+                }
+                return i;
+            }));
+        }
 
         dispatch(showSuccess({ id: "updateRemark", message: response.message }));
     } catch (err) {

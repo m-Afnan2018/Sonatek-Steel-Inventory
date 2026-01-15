@@ -25,7 +25,7 @@
     color: darkslategrey;
     border: 1px solid grey;
     background: white;
-    width: 12rem;
+    width: 70%;
     padding: 2px;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .UpcomingOptions td {
-    background-color: #f1f3f5;
+    /* background-color: #f1f3f5; */
     text-align: center;
 }
 
@@ -82,7 +82,8 @@
     font-size: 0.75rem;
     font-weight: 800;
     color: black;
-    width: 7rem;
+    width: 30%;
+    padding-left: 1rem;
 }
 
 .fillUpData h3 {
@@ -95,17 +96,19 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    width: 100%;
 }
 
 .fillUpData>div>div {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 70%;
 }
 
 .UpcomingOptions h1 {
     width: 100%;
-    font-weight: 400;
+    font-weight: 600;
 }
 
 .UpcomingOptions .groupBtn {
@@ -153,14 +156,15 @@
     overflow: visible;
 }
 
-.InventoryOptions{
+.InventoryOptions {
     max-height: fit-content;
     height: auto;
+    border-radius: 1.125rem;
 }
 
 .InventoryOptions .tableView {
     flex-direction: column;
-    background: #f0f0ff;
+    /* background: #f0f0ff; */
     padding: 1rem;
     height: 100%;
     border-radius: 0.5rem;
@@ -176,8 +180,8 @@
 }
 
 .InventoryOptions section {
-    background: #f0f0ff;
-    padding: 1rem;
+    background: white;
+    padding: 0;
     height: 100%;
     border-radius: 0.5rem;
     width: 100%;
@@ -194,7 +198,7 @@
     height: fit-content;
     border-radius: 100rem;
     overflow: hidden;
-    background: #11386c;
+    /* background: #11386c; */
     width: fit-content;
 }
 
@@ -216,11 +220,11 @@
     position: absolute;
     font-size: 2rem;
     padding: 0.25rem;
-    background: #6C1111;
-    border-radius: 10rem 0 10rem 10rem;
+    background: #11386c;
+    border-radius: 10rem;
     color: white;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: 10px;
     cursor: pointer;
 }
 

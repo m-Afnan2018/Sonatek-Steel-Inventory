@@ -1,205 +1,231 @@
+/* =========================
+   App Layout
+========================= */
+
 .main-container {
     display: flex;
-    justify-content: center;
     height: calc(100vh - 64px);
-    position: relative;
 }
 
-.main-container>:nth-child(2) {
+.main-container> :nth-child(2) {
+    /* flex: 1; */
+    width: 100%;
     overflow-y: auto;
-    width: -webkit-fill-available;
-    background: #f3f3ff;
+    background: #F3F4FF;
 }
+
+/* =========================
+   Headings
+========================= */
 
 .main-heading {
-    background-color: #f3f3ff;
-    font-weight: 500;
-    color: grey;
-    font-size: 1rem;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    text-align: start;
-    margin-bottom: 0.5rem;
     display: flex;
-    justify-content: flex-start;
     align-items: center;
-    gap: 1rem;
+    gap: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6B7280;
+    background: #F3F4FF;
+    border-radius: 6px;
 }
+
+/* =========================
+   Forms (Global)
+========================= */
 
 form label {
     display: block;
+    margin-bottom: 4px;
     font-size: 0.75rem;
-    color: #374151;
     font-weight: 500;
+    color: #374151;
 }
 
 form input,
 form select {
-    height: 2rem;
-    border-radius: 0.5rem;
     width: 100%;
-    padding: 0.25rem;
-    border: 1px solid #11386c;
-    background: #fff;
+    height: 32px;
+    padding: 0 8px;
     font-size: 0.75rem;
-    transition: border-color 0.2s ease;
-    font-weight: 400;
+    border-radius: 6px;
+    border: 1px solid #D1D5DB;
+    background: #FFFFFF;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.simpleField {
+    width: 120px;
+    height: 2rem;
+    padding: 0px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid black;
+    background: #f9fafb;
 }
 
 form input:focus,
 form select:focus {
-    border: 2px solid #11386c;
+    outline: none;
+    border-color: #11386C;
+    box-shadow: 0 0 0 2px rgba(17, 56, 108, 0.15);
 }
+
+/* =========================
+   Tables (Global)
+========================= */
 
 table {
-    min-width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    background: white;
-    height: fit-content;
-    border-radius: 0.5rem;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #FFFFFF;
+    border-radius: 8px;
     overflow: hidden;
 }
 
-table th {
-    font-size: 0.75rem;
+/* Header */
+table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 8px 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6B7280;
+    background: #F9FAFB;
+    border-bottom: 1px solid #E5E7EB;
     text-align: center;
-    font-weight: 600;
 }
 
-table td {
-    padding: 0.5rem;
-    background-color: white;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    font-weight: 400;
+/* Body */
+table tbody td {
+    padding: 8px 10px;
     font-size: 0.75rem;
-    height: 3.25rem;
+    font-weight: 400;
     color: #667085;
+    text-align: center;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* ✅ Prevents breaking layout */
-    white-space: nowrap;
-    text-transform: capitalize;
-}
-
-table tr {
     border-bottom: 1px solid #EAECF0;
 }
 
+table tbody tr:hover {
+    background: #F9FAFB;
+}
+
+/* Icons inside table */
 table td svg {
     font-size: 1rem;
 }
 
+/* Inline badges / pills */
 table td p {
-    border-radius: 0.25rem;
-    width: fit-content;
-    padding: 0.15rem 0.25rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
     font-weight: 600;
+    line-height: 1.2;
     text-transform: capitalize;
-    line-height: 1.15;
-    padding-top: 0.3rem;
+    width: fit-content;
 }
 
-table th {
-    background-color: #F9FAFB;
-    font-weight: 400;
-    font-size: 0.75rem;
-    text-align: center;
-    padding: 0.5rem;
-    line-height: 1.125rem;
-    color: #667085;
-}
-
-table tr:hover {
-    background-color: #f9fafc;
-    cursor: pointer;
-}
+/* =========================
+   Nested Tables (Details)
+========================= */
 
 .nestedRow td {
-    background: #f9fafb;
-    padding: 0.5rem;
+    background: #F9FAFB;
 }
 
 .nestedTable {
     width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0 0 0 1rem;
+    background: #F8FAFC;
+    padding: 16px;
+    border-left: 3px solid #007A8A;
 }
 
-.nestedTable td {
-    border: 1px solid #e5e7eb;
-    padding: 0.5rem;
-    text-align: center;
-    font-size: 0.9rem;
-    background: #f9fafb;
-    height: auto;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #5d5c5c;
-}
-
-.nestedTable th {
-    background-color: #f3f4f6;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-align: center;
-    padding: 0.25rem;
-    height: auto;
+.nestedTable thead th {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: #F3F4F6;
     color: #667085;
+    border-bottom: 1px solid #E5E7EB;
 }
 
-.crossButton {
-    border-radius: 100rem;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.25rem;
-    padding: 0.25rem;
-    background: #6f2805;
-    border: none;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
+.nestedTable tbody td {
+    border-radius: 0;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #5D5C5C;
+    border-bottom: 1px solid #E5E7EB;
+    background: #F9FAFB;
 }
 
-.crossButton:hover {
-    box-shadow: 0px 0px 4px 2px black;
-}
+/* =========================
+   Buttons
+========================= */
 
 .btn {
     width: 8rem;
-    height: 2.25rem;
+    height: 36px;
     border-radius: 8px;
     border: none;
-    color: #f0fbff;
+    font-size: 0.75rem;
     font-weight: 600;
+    color: #FFFFFF;
     cursor: pointer;
+    transition: box-shadow 0.15s ease;
 }
 
 .btn:hover {
-    box-shadow: 0px 2px 8px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .success {
-    background-color: #115C38;
+    background: #115C38;
 }
 
 .error {
-    background-color: #6C1111;
+    background: #6C1111;
 }
 
 .default {
-    background-color: #11386C;
+    background: #11386C;
 }
 
 .waiting {
-    background-color: #6C5C11;
+    background: #6C5C11;
+}
+
+/* =========================
+   Icon Buttons
+========================= */
+
+.crossButton {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #6F2805;
+    color: #FFFFFF;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.crossButton:hover {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 }

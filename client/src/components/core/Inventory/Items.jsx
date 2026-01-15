@@ -5,10 +5,11 @@ import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 import { LuDownload } from "react-icons/lu";
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye } from 'react-icons/fi';
+import { FaPlus } from "react-icons/fa6";
 import { IoCartOutline } from 'react-icons/io5';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
-import { getAllBookingByItem } from 'services/operations/bookingAPI';
+import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 'services/operations/bookingAPI';
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 
@@ -23,6 +24,8 @@ const Items = () => {
     const { listViewList, totalQuantity, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
     const [colors, setColors] = useState(null)
+
+    const [showFilters, setShowFilters] = useState(null);
 
     const [filters, setFilters] = useState({
         type: '',
@@ -106,8 +109,9 @@ const Items = () => {
                     className={style.searchInput}
                 />
                 <button type="submit" className={style.searchButton}>Search</button>
+                <button onClick={(e) => { e.preventDefault(); setShowFilters(!showFilters) }} className={style.searchButton}>Filter</button>
             </form>
-            <Filters setFilters={setFilters} />
+            <Filters setFilters={setFilters} showFilters={showFilters} />
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -209,6 +213,37 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         }
     };
 
+    const handleUpdateQuantity = () => {
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                item_id: data.id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: data.remaining,
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt,
+                marking: data.marking,
+            };
+        }
+
+        const output = convertItem(item);
+
+        showOverlay(InventoryOptions, {
+            type: 'increaseQuantity',
+            data: output,
+        })
+    };
+
     const handlePreview = () => {
         function convertItem(data) {
             return {
@@ -237,9 +272,6 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         showOverlay(InventoryOptions, {
             type: 'logs',
             data: output,
-            onAccept: (data, party) => {
-                console.log(data);
-            }
         })
     };
 
@@ -317,79 +349,26 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
 
     return (
         <>
-            <tr
-                className={`${view === item._id ? style.activeRow : ''}`}
-                onClick={() => setView(item._id)}
-            >
-                <td onClick={() => clickHandler('item_id')}>
-                    {item.item_id || '-'}
-                </td>
-
-                <td onClick={() => clickHandler('challanDate')}>
-                    {select === 'challanDate'
-                        ? renderEditableField('challanDate', 'date')
-                        : challanDate || '-'}
-                </td>
-
-                <td style={{ display: 'flex', gap: '5px' }}>
-                    <div onClick={() => clickHandler('thickness')}>
-                        {select === 'thickness'
-                            ? renderDropdownField('thickness', thicknesses)
-                            : <span>{item.thickness?.name || '-'}</span>}
-                    </div>
-                    X
-                    <div onClick={() => clickHandler('width')}>
-                        {select === 'width'
-                            ? renderDropdownField('width', widths)
-                            : <span>{item.width?.name || '-'}</span>}
-                    </div>
-                    X
-                    <div onClick={() => clickHandler('grade')}>
-                        {select === 'grade'
-                            ? renderDropdownField('grade', grades)
-                            : <span>{item.grade?.name || '-'}</span>}
-                    </div>
-                </td>
-
-                <td onClick={() => clickHandler('originalQuantity')}>
-                    {select === 'originalQuantity'
-                        ? renderEditableField('originalQuantity', 'number')
-                        : item.originalQuantity}
-                </td>
-
-                <td onClick={() => clickHandler('remaining')}>
-                    {select === 'remaining'
-                        ? renderEditableField('remaining', 'number')
-                        : item.remaining}
-                </td>
-
-                <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
-                    {select === 'warehouse' ? (
-                        <div onClick={() => clickHandler('warehouse')}>
-                            {select === 'warehouse'
-                                ? renderDropdownField('warehouse', warehouses)
-                                : <span>{item.warehouse?.name || '-'}</span>}
-                        </div>
-                    ) : (
-                        item.warehouse === null ? "-" :
-                            <p className={style.coloredShipTo} style={{
-                                background: color.backgroundColor,
-                                color: color.foregroundColor,
-                                border: `1px solid ${color.foregroundColor}`
-                            }}>
-                                {item.warehouse.name.toLowerCase()}
-                            </p>
-                    )}
-                </td>
-
+            <tr>
+                <td className={style.idCell}>{item.item_id}</td>
+                <td>{challanDate || '-'}</td>
+                <td>{`${item.thickness?.name} X ${item.width?.name} X ${item.grade?.name}`}</td>
+                <td className={style.numCell}>{item.originalQuantity}</td>
+                <td className={style.numCell}>{item.remaining}</td>
+                <td>{item.warehouse?.name || '-'}</td>
                 <td onClick={() => clickHandler('remark')}>
                     {select === 'remark'
                         ? renderEditableField('remark')
                         : item.remark || '-'}
                 </td>
 
-                <td style={{ display: 'flex', gap: '0.25rem' }}>
-                    <FiEye onClick={handlePreview} style={{ cursor: 'pointer' }} title="View Details & Place Order" />
+                <td className={style.actionCell}>
+                    <span className={style.actionIcon} onClick={handlePreview} title="View details">
+                        <FiEye />
+                    </span>
+                    <span className={style.actionIcon} onClick={handleUpdateQuantity} title="View details">
+                        <FaPlus />
+                    </span>
                     <IoCartOutline onClick={handleOrder} style={{ cursor: 'pointer' }} title="Quick Order" />
                     {expandedRow === item._id ? (
                         <MdExpandLess onClick={toggleSubtable} title="Hide Bookings" />
@@ -401,18 +380,16 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
 
             {expandedRow === item._id && (
                 <tr>
-                    <td colSpan="8" style={{ padding: 0, backgroundColor: '#f5f5f5' }}>
-                        <div style={{ padding: '1rem' }}>
-                            {loadingBookings ? (
-                                <div style={{ textAlign: 'center', padding: '2rem' }}>Loading bookings...</div>
-                            ) : bookingList === null || bookingList.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                                    No bookings found for this item
-                                </div>
-                            ) : (
-                                <BookingsSubtable bookings={bookingList} />
-                            )}
-                        </div>
+                    <td colSpan="8" style={{ padding: 0 }}>
+                        {loadingBookings ? (
+                            <div style={{ textAlign: 'center', padding: '2rem' }}>Loading bookings...</div>
+                        ) : bookingList === null || bookingList.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                No bookings found for this item
+                            </div>
+                        ) : (
+                            <BookingsSubtable bookings={bookingList} />
+                        )}
                     </td>
                 </tr>
             )}
@@ -425,52 +402,199 @@ const BookingsSubtable = ({ bookings }) => {
         return date ? new Date(date).toLocaleDateString() : "-";
     };
 
+    const [editRemark, setEditRemark] = useState(null);
+
+    const [list, setList] = useState(bookings);
+
+    const dispatch = useDispatch();
+
+    // Handle action buttons
+    const handleAction = (id, status) => {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, status } : b
+        );
+        setList(updated);
+
+        const vNum = (list.filter((i) => i._id === id))[0];
+
+        if (status === 'Shipped') {
+            shipBooking({ bookingId: id, fieldValue: vNum.vehicleNumber }, dispatch, setList);
+        }
+
+        if (status === 'Cancelled') {
+            cancelBooking({ bookingId: id, reason: vNum.vehicleNumber }, dispatch, setList)
+        }
+
+
+        // CALL API HERE
+        // updateBooking({ id, status }, dispatch);
+    };
+
+    // Handle action buttons
+    const handleUpdateRemark = (id) => {
+        const vNum = (list.filter((i) => i._id === id))[0];
+
+        // updateRemark(id, vNum.remark);
+        updateRemark({bookingId: id, remark: vNum.remarks}, dispatch);
+        setEditRemark(null)
+    };
+
+    const updateVehicle = (id, value) => {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, vehicleNumber: value } : b
+        );
+        setList(updated);
+    };
+
+    const changeRemark = (id, value) => {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, remarks: value } : b
+        );
+        setList(updated);
+    };
+
+    const cancelRemark = (id) => {
+        let oldRemark = null;
+        setEditRemark(null);
+        bookings.forEach(item => {
+            if (item._id === id) {
+                oldRemark = item.remark;
+            }
+        });
+
+        setList((prev) => {
+            if (prev._id === id) {
+                prev.remark = oldRemark;
+            }
+            return prev;
+        })
+    }
+
+    const thStyle = {
+        padding: '0.5rem',
+        textAlign: 'center',
+        fontSize: '0.7rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.04em',
+        color: '#6B7280',
+        borderBottom: '1px solid #E5E7EB'
+    }
+
+    const tdStyle = {
+        padding: '0',
+        borderBottom: '1px solid #F1F5F9'
+    }
+
+    const status = {
+        cancelled: {
+            padding: 0,
+            background: '#FEE2E2',
+            color: '#991B1B',
+        },
+        shipped: {
+            padding: 0,
+            background: '#DCFCE7',
+            color: '#166534',
+        },
+        processing: {
+            padding: 0,
+            background: '#FEF3C7',
+            color: '#92400E',
+        }
+    }
+
+    const getStatus = (booking) => {
+        const s = booking.status;
+        if (s === 'Shipped')
+            return status.shipped;
+        if (s === 'Processing')
+            return status.processing;
+        if (s === 'Cancelled')
+            return status.cancelled;
+    }
+
     return (
-        <div style={{ overflowX: 'auto' }}>
-            <table style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontSize: '0.85rem',
-                backgroundColor: 'white'
-            }}>
-                <thead>
-                    <tr style={{ backgroundColor: '#e0e0e0' }}>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Order ID</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Form Type</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Quantity</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Party</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Booked By</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Booking Date</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Ship To</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Remarks</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Vehicle Number</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc', textAlign: 'left' }}>Status</th>
+        <table className='nestedTable' >
+            <thead>
+                <tr style={{ backgroundColor: '#e0e0e0' }}>
+                    <th style={thStyle}>Order ID</th>
+                    <th style={thStyle}>Form Type</th>
+                    <th style={thStyle}>Quantity</th>
+                    <th style={thStyle}>Party</th>
+                    <th style={thStyle}>Booked By</th>
+                    <th style={thStyle}>Booking Date</th>
+                    <th style={thStyle}>Ship To</th>
+                    <th style={thStyle}>Remarks</th>
+                    <th style={thStyle}>Vehicle Number</th>
+                    <th style={thStyle}>Status</th>
+                    <th style={thStyle}>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {list.map((booking, index) => (
+                    <tr key={booking._id || index}>
+                        <td style={tdStyle}>{booking.order_id || '-'}</td>
+                        <td style={tdStyle}>{booking.formType || '-'}</td>
+                        <td style={tdStyle}>{booking.quantity || '-'}</td>
+                        <td style={tdStyle}>{booking.party || '-'}</td>
+                        <td style={tdStyle}>{booking.bookedBy || '-'}</td>
+                        <td style={tdStyle}>{bookingDate(booking.bookingDate)}</td>
+                        <td style={tdStyle}>{booking.shipTo || '-'}</td>
+                        {/* <td style={tdStyle}>{booking.remarks || '-'}</td> */}
+                        <td onClick={() => setEditRemark(booking._id)} style={{overflow: 'visible'}}> {editRemark === booking._id ?
+                            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+                                <input
+                                    style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                                    type={'text'}
+                                    value={booking.remarks}
+                                    onChange={(e) => changeRemark(booking._id, e.target.value)}
+                                    autoFocus
+                                />
+                                <div className={style.inlineButtons}>
+                                    <button type="button" onClick={() => handleUpdateRemark(booking._id,)}>Save</button>
+                                    <button type="button" onClick={() => cancelRemark(booking._id)}>Cancel</button>
+                                </div>
+                            </div>
+                            : booking.remarks || '-'}
+
+                        </td>
+                        {
+                            booking.status === 'Processing' ? <td style={tdStyle}>
+                                <input
+                                    className='simpleField'
+                                    type="text"
+                                    placeholder={'Vehicle Number'}
+                                    value={booking.vehicleNumber || ""}
+                                    onChange={(e) =>
+                                        updateVehicle(booking._id, e.target.value)
+                                    }
+                                    style={{ width: "120px", height: '2rem', padding: '0' }}
+                                /></td> : <td style={tdStyle}>{booking.vehicleNumber || '-'}</td>
+                        }
+
+                        <td className={`${style.statusPill}`} style={getStatus(booking)}>
+                            {booking.status || '-'}
+                        </td>
+                        {/* <td className={`${style.statusPill} ${booking.status === 'Processing'
+                            ? style.statusProcessing
+                            : booking.status === 'Shipped'
+                                ? style.statusShipped
+                                : booking.status === 'Cancelled'
+                                    ? style.statusCancelled
+                                    : ''
+                            }`}>{booking.status || '-'}</td> */}
+                        {booking.status === 'Processing' && <td style={{ padding: '0' }}><button style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
+                            booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
+                        }}>{booking.vehicleNumber.length > 0 ? 'Shipped' : 'Cancelled'}</button></td>}
                     </tr>
-                </thead>
-                <tbody>
-                    {bookings.map((booking, index) => (
-                        <tr key={booking._id || index} style={{
-                            backgroundColor: index % 2 === 0 ? 'white' : '#f9f9f9'
-                        }}>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.order_id || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.formType || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.quantity || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.party || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.bookedBy || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{bookingDate(booking.bookingDate)}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.shipTo || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.remarks || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.vehicleNumber || '-'}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ddd' }}>{booking.status || '-'}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                ))
+                }
+            </tbody >
+        </table >
     );
 };
 
-const Filters = ({ setFilters }) => {
+const Filters = ({ setFilters, showFilters }) => {
     const { grades, thicknesses, warehouses, widths } = useSelector(state => state.varient)
     const dispatch = useDispatch();
     const [currentType, setCurrentType] = useState('Both');
@@ -506,7 +630,7 @@ const Filters = ({ setFilters }) => {
         getAllItem({}, dispatch);
     }
 
-    return <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
+    return <form className={style.formBlock} onChange={handleSubmit(onSubmit)} style={{ height: showFilters ? '12rem' : '0', padding: showFilters ? '1rem' : '0' }}>
         <div>
             <label htmlFor='remaining'>Availibility:</label>
             <select
