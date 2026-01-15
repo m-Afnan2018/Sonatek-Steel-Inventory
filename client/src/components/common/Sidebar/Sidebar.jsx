@@ -63,11 +63,6 @@ const Sidebar = ({ sidebar }) => {
         },
         {
             to: '/manage-varient', label: 'Varients', icon: <TbCodeVariablePlus />, roles: ['admin'],
-            children: [
-                { to: '/thickness', label: 'Thickness' },
-                { to: '/width', label: 'Width' },
-                { to: '/grade', label: 'Grade' },
-            ]
         },
         // { to: '/manage-varient', label: 'Varients', icon: <TbCodeVariablePlus />, roles: ['admin'] },
         { to: '/manage-warehouses', label: 'Warehouse', icon: <IoLocationOutline />, roles: ['admin'] },

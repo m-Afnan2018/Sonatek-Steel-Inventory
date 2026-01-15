@@ -57,6 +57,7 @@ const AddForm = () => {
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") => {
+        console.log(arr)
         return arr?.map((i) => ({
             label: i[labelField] || i.value,
             value: i[valueField] || i.label,
