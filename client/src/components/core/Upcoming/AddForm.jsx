@@ -221,7 +221,7 @@ const AddForm = () => {
 
                             }}
                             {...field}
-                            options={toOptions(thicknesses?.filter(t => t.type === type))}
+                            options={toOptions(thicknesses?.filter(t => t.type === type || t.type === 'Both'))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, 'date', "width")}
@@ -241,7 +241,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(widths?.filter(w => w.type === type))}
+                            options={toOptions(widths?.filter(w => w.type === type || w.type === 'Both'))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, widths, "thickness", "grade")}
@@ -261,7 +261,7 @@ const AddForm = () => {
                     render={({ field }) => (
                         <Select
                             {...field}
-                            options={toOptions(grades?.filter(g => g.type === type))}
+                            options={toOptions(grades?.filter(g => g.type === type || g.type === 'Both'))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
                             onKeyDown={(e) => handleSelectEnter(e, field, grades, "width", "quantity")}
