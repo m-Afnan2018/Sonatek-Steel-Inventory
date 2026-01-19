@@ -1,0 +1,310 @@
+{
+  "App.css": [],
+  "App.js": [
+    "App.css",
+    "components/common/Navbar/Navbar.jsx",
+    "components/common/Sidebar/Sidebar.jsx",
+    "hooks/useOverlay.jsx",
+    "pages/Account/Account.jsx",
+    "pages/Auth/Auth.jsx",
+    "pages/Booking/Booking.jsx",
+    "pages/Booking/Create.jsx",
+    "pages/Booking/Pending.jsx",
+    "pages/Dashboard/Dashboard.jsx",
+    "pages/Error/Error.jsx",
+    "pages/Inventory/Inventory.jsx",
+    "pages/NotVerified/NotVerified.jsx",
+    "pages/Party/Party.jsx",
+    "pages/SalesReport/SalesReport.jsx",
+    "pages/Upcoming/Upcoming.jsx",
+    "pages/User/User.jsx",
+    "pages/Varient/Varient.jsx",
+    "pages/Warehouse/Warehouse.jsx",
+    "services/operations/authAPI.js",
+    "services/operations/varientAPI.js",
+    "slices/authSlice.js",
+    "slices/loaderSlice.js"
+  ],
+  "assets/images/logo.svg": [],
+  "components/common/Navbar/Navbar.jsx": [
+    "assets/images/logo.svg",
+    "components/common/Navbar/Navbar.module.css"
+  ],
+  "components/common/Navbar/Navbar.module.css": [],
+  "components/common/Overlay/AddItemForm.jsx": [
+    "components/common/Overlay/Overlay.module.css",
+    "services/operations/itemAPI.js",
+    "slices/itemSlice.js"
+  ],
+  "components/common/Overlay/ConfirmationOverlay.jsx": [
+    "components/common/Overlay/Overlay.module.css"
+  ],
+  "components/common/Overlay/CreateAndConfirmationOverlay.jsx": [
+    "components/common/Overlay/Overlay.module.css"
+  ],
+  "components/common/Overlay/InventoryOptions.jsx": [
+    "components/common/Overlay/Overlayv2.module.css",
+    "services/operations/bookingAPI.js"
+  ],
+  "components/common/Overlay/OrderConfirmationOverlay.jsx": [
+    "components/common/Overlay/Overlay.module.css"
+  ],
+  "components/common/Overlay/Overlay.module.css": [],
+  "components/common/Overlay/Overlayv2.module.css": [],
+  "components/common/Overlay/UpcomingOptions.jsx": [
+    "components/common/Overlay/Overlayv2.module.css",
+    "services/operations/itemAPI.js"
+  ],
+  "components/common/Overlay/ViewIncompleteBookingDetail.jsx": [
+    "components/common/Overlay/Overlay.module.css"
+  ],
+  "components/common/Sidebar/Sidebar.jsx": [
+    "components/common/Sidebar/Sidebar.module.css",
+    "services/operations/authAPI.js"
+  ],
+  "components/common/Sidebar/Sidebar.module.css": [],
+  "components/core/Auth/Auth.module.css": [],
+  "components/core/Auth/ForgetPassword.jsx": [
+    "components/core/Auth/Auth.module.css",
+    "services/operations/authAPI.js"
+  ],
+  "components/core/Auth/Login.jsx": [
+    "components/core/Auth/Auth.module.css",
+    "services/operations/authAPI.js",
+    "slices/authSlice.js"
+  ],
+  "components/core/Auth/ResetPassword.jsx": [
+    "components/core/Auth/Auth.module.css",
+    "services/operations/authAPI.js"
+  ],
+  "components/core/Auth/Signup.jsx": [
+    "components/core/Auth/Auth.module.css",
+    "services/operations/authAPI.js"
+  ],
+  "components/core/Booking/Booking.module.css": [],
+  "components/core/Booking/Items.jsx": [
+    "components/common/Overlay/OrderConfirmationOverlay.jsx",
+    "components/core/Booking/Booking.module.css",
+    "hooks/useOverlay.jsx",
+    "services/operations/bookingAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "components/core/Booking/ViewIncompleteBooking.jsx": [
+    "components/common/Overlay/ViewIncompleteBookingDetail.jsx",
+    "components/core/Booking/Booking.module.css",
+    "hooks/useOverlay.jsx",
+    "services/operations/bookingAPI.js",
+    "utils/dateHandler.js"
+  ],
+  "components/core/Booking/ViewTablewise.jsx": [
+    "components/core/Booking/Booking.module.css",
+    "services/operations/bookingAPI.js"
+  ],
+  "components/core/Dashboard/BookingDashboard.jsx": [
+    "components/core/Dashboard/Dashboard.module.css",
+    "services/operations/bookingAPI.js"
+  ],
+  "components/core/Dashboard/Dashboard.module.css": [],
+  "components/core/Dashboard/InventoryDashboard.jsx": [
+    "components/common/Overlay/OrderConfirmationOverlay.jsx",
+    "components/core/Dashboard/Dashboard.module.css",
+    "hooks/useOverlay.jsx",
+    "services/operations/bookingAPI.js",
+    "services/operations/itemAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "components/core/Dashboard/UpcomingDashboard.jsx": [
+    "components/core/Dashboard/Dashboard.module.css",
+    "services/operations/itemAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "components/core/Inventory/Inventory.module.css": [],
+  "components/core/Inventory/Items.jsx": [
+    "components/common/Overlay/InventoryOptions.jsx",
+    "components/core/Inventory/Inventory.module.css",
+    "hooks/useOverlay.jsx",
+    "services/operations/bookingAPI.js",
+    "services/operations/itemAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "components/core/Upcoming/AddForm.jsx": [
+    "components/common/Overlay/CreateAndConfirmationOverlay.jsx",
+    "components/core/Upcoming/Upcoming.module.css",
+    "hooks/useOverlay.jsx",
+    "services/operations/bookingAPI.js",
+    "services/operations/itemAPI.js"
+  ],
+  "components/core/Upcoming/Upcoming.module.css": [],
+  "components/core/Users/Staff.jsx": ["components/core/Users/Users.module.css"],
+  "components/core/Users/Users.module.css": [],
+  "components/core/Varient/SingleBlock.jsx": [
+    "components/core/Varient/SingleVarient.jsx",
+    "components/core/Varient/Varient.module.css",
+    "services/operations/varientAPI.js"
+  ],
+  "components/core/Varient/SingleVarient.jsx": [
+    "components/core/Varient/Varient.module.css"
+  ],
+  "components/core/Varient/Varient.module.css": [],
+  "hooks/useOverlay.jsx": [],
+  "index.css": [],
+  "index.js": ["App.js", "index.css", "reducers/store.js"],
+  "pages/Account/Account.jsx": [
+    "pages/Account/Account.module.css",
+    "services/operations/userAPI.js"
+  ],
+  "pages/Account/Account.module.css": [],
+  "pages/Auth/Auth.jsx": [
+    "assets/images/logo.svg",
+    "components/core/Auth/ForgetPassword.jsx",
+    "components/core/Auth/Login.jsx",
+    "components/core/Auth/ResetPassword.jsx",
+    "components/core/Auth/Signup.jsx",
+    "pages/Auth/Auth.module.css"
+  ],
+  "pages/Auth/Auth.module.css": [],
+  "pages/Booking/Booking.jsx": [
+    "components/core/Booking/Items.jsx",
+    "components/core/Booking/ViewIncompleteBooking.jsx",
+    "components/core/Booking/ViewTablewise.jsx",
+    "pages/Booking/Booking.module.css"
+  ],
+  "pages/Booking/Booking.module.css": [],
+  "pages/Booking/Create.jsx": [
+    "components/common/Overlay/OrderConfirmationOverlay.jsx",
+    "hooks/useOverlay.jsx",
+    "pages/Booking/Booking.module.css",
+    "services/operations/bookingAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "pages/Booking/Pending.jsx": [
+    "hooks/useOverlay.jsx",
+    "pages/Booking/Booking.module.css",
+    "services/operations/itemAPI.js",
+    "utils/dateHandler.js"
+  ],
+  "pages/Dashboard/Dashboard.jsx": [
+    "components/core/Dashboard/BookingDashboard.jsx",
+    "components/core/Dashboard/InventoryDashboard.jsx",
+    "components/core/Dashboard/UpcomingDashboard.jsx",
+    "pages/Dashboard/Dashboard.module.css",
+    "services/operations/itemAPI.js",
+    "services/operations/userAPI.js"
+  ],
+  "pages/Dashboard/Dashboard.module.css": [],
+  "pages/Error/Error.jsx": [],
+  "pages/Inventory/Inventory.jsx": [
+    "components/common/Overlay/AddItemForm.jsx",
+    "components/core/Inventory/Items.jsx",
+    "hooks/useOverlay.jsx",
+    "pages/Inventory/Inventory.module.css",
+    "services/operations/itemAPI.js"
+  ],
+  "pages/Inventory/Inventory.module.css": [],
+  "pages/NotVerified/NotVerified.jsx": [
+    "assets/images/logo.svg",
+    "pages/NotVerified/NotVerified.module.css",
+    "services/operations/authAPI.js"
+  ],
+  "pages/NotVerified/NotVerified.module.css": [],
+  "pages/Party/Party.jsx": [
+    "pages/Party/Party.module.css",
+    "services/operations/bookingAPI.js"
+  ],
+  "pages/Party/Party.module.css": [],
+  "pages/SalesReport/SalesReport.jsx": [
+    "pages/SalesReport/SalesReport.module.css",
+    "services/operations/bookingAPI.js",
+    "services/operations/itemAPI.js"
+  ],
+  "pages/SalesReport/SalesReport.module.css": [],
+  "pages/Upcoming/Upcoming.jsx": [
+    "components/common/Overlay/UpcomingOptions.jsx",
+    "components/core/Upcoming/AddForm.jsx",
+    "hooks/useOverlay.jsx",
+    "pages/Upcoming/Upcoming.module.css",
+    "services/operations/bookingAPI.js",
+    "services/operations/itemAPI.js",
+    "services/operations/utilAPI.js",
+    "utils/colorHandler.js"
+  ],
+  "pages/Upcoming/Upcoming.module.css": [],
+  "pages/User/User.jsx": [
+    "components/common/Overlay/ConfirmationOverlay.jsx",
+    "components/core/Users/Staff.jsx",
+    "hooks/useOverlay.jsx",
+    "pages/User/User.module.css",
+    "services/operations/userAPI.js",
+    "utils/dateHandler.js"
+  ],
+  "pages/User/User.module.css": [],
+  "pages/Varient/Varient.jsx": [
+    "components/core/Varient/SingleBlock.jsx",
+    "pages/Varient/Varient.module.css"
+  ],
+  "pages/Varient/Varient.module.css": [],
+  "pages/Warehouse/Warehouse.jsx": [
+    "pages/Warehouse/Warehouse.module.css",
+    "services/operations/warehouseAPI.js"
+  ],
+  "pages/Warehouse/Warehouse.module.css": [],
+  "reducers/store.js": [
+    "slices/authSlice.js",
+    "slices/bookingSlice.js",
+    "slices/itemSlice.js",
+    "slices/loaderSlice.js",
+    "slices/userSlice.js",
+    "slices/varientSlice.js"
+  ],
+  "services/apiConnector.js": [],
+  "services/apis.js": [],
+  "services/operations/authAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/authSlice.js",
+    "slices/loaderSlice.js"
+  ],
+  "services/operations/bookingAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/bookingSlice.js",
+    "slices/itemSlice.js",
+    "slices/loaderSlice.js"
+  ],
+  "services/operations/itemAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/bookingSlice.js",
+    "slices/itemSlice.js",
+    "slices/loaderSlice.js"
+  ],
+  "services/operations/reportAPI.js": [],
+  "services/operations/userAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/authSlice.js",
+    "slices/loaderSlice.js",
+    "slices/userSlice.js"
+  ],
+  "services/operations/utilAPI.js": ["services/apis.js"],
+  "services/operations/varientAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/loaderSlice.js",
+    "slices/varientSlice.js"
+  ],
+  "services/operations/warehouseAPI.js": [
+    "services/apiConnector.js",
+    "services/apis.js",
+    "slices/loaderSlice.js",
+    "slices/varientSlice.js"
+  ],
+  "slices/authSlice.js": [],
+  "slices/bookingSlice.js": [],
+  "slices/itemSlice.js": [],
+  "slices/loaderSlice.js": [],
+  "slices/userSlice.js": [],
+  "slices/varientSlice.js": [],
+  "utils/colorHandler.js": [],
+  "utils/dateHandler.js": []
+}

@@ -3,14 +3,10 @@ import style from './Upcoming.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/itemAPI';
 import AddForm from 'components/core/Upcoming/AddForm';
-// import { IoTrashOutline, IoBookmarkOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
 import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 import { useOverlay } from 'hooks/useOverlay';
-// import OrderConfirmationOverlay from 'components/common/Overlay/OrderConfirmationOverlay';
-// import { bookingItems } from 'services/operations/bookingAPI';
-import { MdOutlineMoveToInbox, MdDeleteOutline, MdBookmarkBorder } from "react-icons/md";
 import UpcomingOptions from 'components/common/Overlay/UpcomingOptions';
 import { getAllPartyDetails } from 'services/operations/bookingAPI';
 import { FaRegTrashCan } from "react-icons/fa6";
