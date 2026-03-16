@@ -2,6 +2,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
+:root {
+    --bg-app: #eef2ff;
+    --surface-base: #ffffff;
+    --surface-elevated: #f8fafc;
+    --surface-nav: #11386C;
+    --surface-hover: #f3f4f6;
+    --text-primary: #0f172a;
+    --text-secondary: #667085;
+    --text-muted: #6b7280;
+    --text-inverse: #ffffff;
+    --border-subtle: #e2e8f0;
+    --input-border: #cbd5e1;
+    --focus-ring: rgba(17, 56, 108, 0.22);
+}
+
+[data-theme='dark'] {
+    --bg-app: #0f172a;
+    --surface-base: #111827;
+    --surface-elevated: #1f2937;
+    --surface-nav: #020617;
+    --surface-hover: #334155;
+    --text-primary: #e2e8f0;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-inverse: #f8fafc;
+    --border-subtle: #334155;
+    --input-border: #475569;
+    --focus-ring: rgba(59, 130, 246, 0.35);
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -21,8 +51,9 @@ select {
     font-weight: 400;
     border-radius: 0.25rem;
     border-style: solid;
-    color: darkslategrey;
-    border: 1px solid grey;
+    color: var(--text-primary);
+    border: 1px solid var(--input-border);
+    background: var(--surface-base);
     /* padding: 0.5rem;
     font-weight: 700;
     border-radius: 0.25rem;
@@ -30,7 +61,7 @@ select {
 }
 
 input::placeholder {
-    color: #b7b7b7;
+    color: var(--text-muted);
 }
 
 textarea:focus,
@@ -44,6 +75,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
     overflow: hidden;
+    background: var(--bg-app);
+    color: var(--text-primary);
 }
 
 /* clears the 'X' from Internet Explorer */

@@ -57,7 +57,18 @@ function App() {
     // Local State
     // =======================
     const [sidebar, setSidebar] = useState(false);
+    const [theme, setTheme] = useState(() => {
+        const savedTheme = localStorage.getItem('app-theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    });
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('app-theme', theme);
+    }, [theme]);
 
     // =======================
     // Loader Toast Handling
@@ -120,12 +131,16 @@ function App() {
         setSidebar(!sidebar);
     };
 
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    };
+
     // =======================
     // Main Render
     // =======================
     return (
         <div className="App">
-            <Navbar triggerSidebar={triggerSidebar} />
+            <Navbar triggerSidebar={triggerSidebar} theme={theme} toggleTheme={toggleTheme} />
 
             <div className="main-container">
                 <Sidebar sidebar={sidebar} />
