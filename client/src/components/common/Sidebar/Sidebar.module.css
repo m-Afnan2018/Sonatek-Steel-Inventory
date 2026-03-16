@@ -2,9 +2,9 @@
     display: flex;
     flex-direction: column;
     width: 256px;
-    background: white;
+    background: var(--surface-base);
     overflow: hidden;
-    border-right: 1px solid #F1F3F5;
+    border-right: 1px solid var(--border-subtle);
     padding: 0.25rem;
     transition: width 0.3s ease-in-out;
 }
@@ -21,7 +21,7 @@
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
     font-weight: 400;
-    color: #767575;
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -36,13 +36,13 @@
 }
 
 .navlinks:hover {
-    background-color: #F1F3F5;
+    background-color: var(--surface-hover);
 }
 
 /* ACTIVE */
 .activeLink {
-    background: #F1F3F5;
-    color: #000;
+    background: var(--surface-hover);
+    color: var(--text-primary);
     font-weight: 500;
     border-radius: 0.25rem;
 }
@@ -58,28 +58,28 @@
     font-weight: 400;
     cursor: pointer;
     display: flex;
-    color: #6b6b6b;
+    color: var(--text-secondary);
     width: calc(100% - 2.5rem);
     border-radius: 0.25rem;
     transition: background-color 0.25s ease, padding-left 0.2s ease;
 }
 
 .subLink:hover {
-    background-color: #F1F3F5;
-    color: #000;
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 .subLinkActive {
-    background-color: #E5E7EB;
+    background-color: var(--surface-hover);
     font-weight: 500;
-    color: #000;
+    color: var(--text-primary);
 }
 
 /* Logout Button */
 .Sidebar button {
     all: unset;
     padding: 0.4rem 1rem;
-    background-color: #11386C;
+    background-color: var(--surface-nav);
     font-size: 0.875rem;
     color: white;
     width: calc(100% - 2rem);
@@ -90,7 +90,7 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
-    box-shadow: 0px 0px 0px 1px #808080;
+    box-shadow: 0px 0px 0px 1px var(--border-subtle);
     transition: background-color 200ms ease;
 }
 
@@ -99,7 +99,7 @@
 }
 
 .Sidebar button:hover {
-    background-color: #0e2f5c;
+    filter: brightness(1.1);
 }
 
 /* Wrapper for main area */
@@ -120,7 +120,7 @@
     all: unset;
     padding: 0.5rem 1rem 0.5rem 2rem;
     font-size: 0.8rem;
-    color: #6b6b6b;
+    color: var(--text-secondary);
     cursor: pointer;
     border-radius: 0.25rem;
     width: 100%;
@@ -130,6 +130,6 @@
 }
 
 .subLink:hover {
-    background-color: #F1F3F5;
-    color: #000;
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
 }

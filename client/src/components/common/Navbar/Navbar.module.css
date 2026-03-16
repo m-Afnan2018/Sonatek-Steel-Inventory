@@ -1,11 +1,12 @@
 .Navbar {
-    background: #11386C;
+    background: var(--surface-nav);
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 64px;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     position: relative;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .Navbar>img {
@@ -15,13 +16,46 @@
 .Navbar>svg {
     /* position: absolute;
     left: 1rem; */
-    color: #ffffff;
+    color: var(--text-inverse);
     font-size: 2rem;
     cursor: pointer;
 }
 
-.Navbar>div>h2 {
-    color: white;
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.themeButton {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    color: var(--text-inverse);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+}
+
+.themeButton:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.themeButton svg {
+    font-size: 1rem;
+}
+
+.themeButton span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.userDetail h2 {
+    color: var(--text-inverse);
     font-size: 0.75rem;
     font-weight: 700;
     text-align: right;

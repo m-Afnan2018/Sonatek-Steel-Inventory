@@ -11,7 +11,8 @@
     /* flex: 1; */
     width: 100%;
     overflow-y: auto;
-    background: #F3F4FF;
+    background: var(--bg-app);
+    color: var(--text-primary);
 }
 
 /* =========================
@@ -26,8 +27,8 @@
     margin-bottom: 8px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #6B7280;
-    background: #F3F4FF;
+    color: var(--text-muted);
+    background: var(--surface-elevated);
     border-radius: 6px;
 }
 
@@ -40,7 +41,7 @@ form label {
     margin-bottom: 4px;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-secondary);
 }
 
 form input,
@@ -50,8 +51,9 @@ form select {
     padding: 0 8px;
     font-size: 0.75rem;
     border-radius: 6px;
-    border: 1px solid #D1D5DB;
-    background: #FFFFFF;
+    border: 1px solid var(--input-border);
+    background: var(--surface-base);
+    color: var(--text-primary);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -61,15 +63,15 @@ form select {
     padding: 0px;
     border-radius: 0;
     border: none;
-    border-bottom: 1px solid black;
-    background: #f9fafb;
+    border-bottom: 1px solid var(--input-border);
+    background: var(--surface-elevated);
 }
 
 form input:focus,
 form select:focus {
     outline: none;
     border-color: #11386C;
-    box-shadow: 0 0 0 2px rgba(17, 56, 108, 0.15);
+    box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 /* =========================
@@ -80,7 +82,7 @@ table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #FFFFFF;
+    background: var(--surface-base);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -95,9 +97,9 @@ table thead th {
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #6B7280;
-    background: #F9FAFB;
-    border-bottom: 1px solid #E5E7EB;
+    color: var(--text-muted);
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-subtle);
     text-align: center;
 }
 
@@ -106,16 +108,16 @@ table tbody td {
     padding: 8px 10px;
     font-size: 0.75rem;
     font-weight: 400;
-    color: #667085;
+    color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    border-bottom: 1px solid #EAECF0;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 table tbody tr:hover {
-    background: #F9FAFB;
+    background: var(--surface-hover);
 }
 
 /* Icons inside table */
@@ -139,7 +141,7 @@ table td p {
 ========================= */
 
 .nestedRow td {
-    background: #F9FAFB;
+    background: var(--surface-elevated);
 }
 
 .nestedTable {
@@ -147,7 +149,7 @@ table td p {
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 0 0 0 1rem;
-    background: #F8FAFC;
+    background: var(--surface-elevated);
     padding: 16px;
     border-left: 3px solid #007A8A;
 }
@@ -156,9 +158,9 @@ table td p {
     padding: 6px 8px;
     font-size: 0.7rem;
     font-weight: 500;
-    background: #F3F4F6;
-    color: #667085;
-    border-bottom: 1px solid #E5E7EB;
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .nestedTable tbody td {
@@ -166,9 +168,9 @@ table td p {
     padding: 6px 8px;
     font-size: 0.7rem;
     font-weight: 500;
-    color: #5D5C5C;
-    border-bottom: 1px solid #E5E7EB;
-    background: #F9FAFB;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-elevated);
 }
 
 /* =========================
