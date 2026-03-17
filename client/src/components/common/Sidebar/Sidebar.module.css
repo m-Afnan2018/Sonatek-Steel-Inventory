@@ -1,135 +1,80 @@
 .Sidebar {
     display: flex;
     flex-direction: column;
-    width: 256px;
+    justify-content: space-between;
+    width: 250px;
     background: var(--surface-base);
-    overflow: hidden;
-    border-right: 1px solid var(--border-subtle);
-    padding: 0.25rem;
-    transition: width 0.3s ease-in-out;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    margin: 0.3rem;
+    padding: 0.55rem;
+    box-shadow: var(--shadow-soft);
+    transition: width 0.25s ease;
 }
 
-.Sidebar>div {
+.collapsed {
+    width: 74px;
+}
+
+.Sidebar nav {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 0.2rem;
+    overflow-y: auto;
 }
 
-/* MAIN LINK */
 .navlinks {
     all: unset;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 400;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.84rem;
+    font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    width: calc(100% - 2rem);
-    border-radius: 0.25rem;
-    transition: background-color 0.25s ease;
+    gap: 0.55rem;
+    border-radius: 0.6rem;
+    border: 1px solid transparent;
 }
 
-.navlinks svg {
-    font-size: 1.25rem;
+.icon {
+    min-width: 1.6rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
 }
 
 .navlinks:hover {
     background-color: var(--surface-hover);
 }
 
-/* ACTIVE */
 .activeLink {
-    background: var(--surface-hover);
-    color: var(--text-primary);
-    font-weight: 500;
-    border-radius: 0.25rem;
+    color: var(--brand-600);
+    background: color-mix(in srgb, var(--brand-500) 12%, var(--surface-elevated));
+    border-color: color-mix(in srgb, var(--brand-500) 30%, transparent);
 }
 
-/* SUBMENU */
-.subLink {
+.logoutButton {
     all: unset;
-    height: 1rem;
-    justify-content: flex-start;
+    margin-top: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    background-color: var(--surface-soft);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.6rem;
+    cursor: pointer;
+    display: flex;
     align-items: center;
-    padding: 0.5rem 1rem 0.5rem 2.5rem;
-    font-size: 0.8rem;
-    font-weight: 400;
-    cursor: pointer;
-    display: flex;
-    color: var(--text-secondary);
-    width: calc(100% - 2.5rem);
-    border-radius: 0.25rem;
-    transition: background-color 0.25s ease, padding-left 0.2s ease;
-}
-
-.subLink:hover {
-    background-color: var(--surface-hover);
-    color: var(--text-primary);
-}
-
-.subLinkActive {
-    background-color: var(--surface-hover);
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-/* Logout Button */
-.Sidebar button {
-    all: unset;
-    padding: 0.4rem 1rem;
-    background-color: var(--surface-nav);
-    font-size: 0.875rem;
-    color: white;
-    width: calc(100% - 2rem);
-    cursor: pointer;
-    text-align: center;
-    border-radius: 0.25rem;
-    display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0px 0px 0px 1px var(--border-subtle);
-    transition: background-color 200ms ease;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    font-weight: 600;
 }
 
-.Sidebar button>svg {
-    font-size: 1.25rem;
+.logoutButton:hover {
+    background: var(--surface-hover);
 }
 
-.Sidebar button:hover {
-    filter: brightness(1.1);
-}
-
-/* Wrapper for main area */
-.Sidebar>div:nth-child(1) {
-    height: calc(100% - 45px);
-    overflow-y: auto;
-}
-
-.submenuWrapper {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: max-height 0.35s ease-in-out;
-    margin-left: 0.5rem;
-}
-
-.subLink {
-    all: unset;
-    padding: 0.5rem 1rem 0.5rem 2rem;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-radius: 0.25rem;
-    width: 100%;
-    display: flex;
-    text-align: left;
-    transition: background-color 0.25s ease, padding-left 0.2s ease;
-}
-
-.subLink:hover {
-    background-color: var(--surface-hover);
-    color: var(--text-primary);
+.logoutButton svg {
+    font-size: 1.1rem;
 }

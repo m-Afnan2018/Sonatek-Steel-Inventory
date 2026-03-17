@@ -1,37 +1,64 @@
-import React, { useEffect, useState } from 'react'
-import style from './Dashboard.module.css'
-import { getAllUsers } from 'services/operations/userAPI'
-import { useDispatch } from 'react-redux'
-import { getAllItem } from 'services/operations/itemAPI'
-import UpcomingDashboard from 'components/core/Dashboard/UpcomingDashboard'
-import InventoryDashboard from 'components/core/Dashboard/InventoryDashboard'
-import BookingDashboard from 'components/core/Dashboard/BookingDashboard'
+import React, { useEffect, useMemo, useState } from 'react';
+import style from './Dashboard.module.css';
+import { getAllUsers } from 'services/operations/userAPI';
+import { useDispatch } from 'react-redux';
+import { getAllItem } from 'services/operations/itemAPI';
+import UpcomingDashboard from 'components/core/Dashboard/UpcomingDashboard';
+import InventoryDashboard from 'components/core/Dashboard/InventoryDashboard';
+import BookingDashboard from 'components/core/Dashboard/BookingDashboard';
+import { MdOutlineDashboard } from 'react-icons/md';
+
+const DASHBOARD_TABS = ['Upcoming', 'Inventory', 'Booking'];
 
 const Dashboard = () => {
     const dispatch = useDispatch();
 
-    const [selection, setSelection] = useState('Upcoming');
+    const [selection, setSelection] = useState(() => localStorage.getItem('dashboard-tab') || 'Upcoming');
 
     useEffect(() => {
         getAllUsers(dispatch);
-        getAllItem({ search: '' }, dispatch)
-    }, [dispatch])
+        getAllItem({ search: '' }, dispatch);
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (DASHBOARD_TABS.includes(selection)) {
+            localStorage.setItem('dashboard-tab', selection);
+        }
+    }, [selection]);
+
+    const selectedView = useMemo(() => {
+        if (selection === 'Inventory') return <InventoryDashboard />;
+        if (selection === 'Booking') return <BookingDashboard />;
+        return <UpcomingDashboard />;
+    }, [selection]);
 
     return (
-        <div className={style.Dashboard}>
-            <div>
-                <button className={selection === 'Upcoming' ? style.selected : ''} onClick={() => setSelection('Upcoming')}>Upcoming</button>
-                <button className={selection === 'Inventory' ? style.selected : ''} onClick={() => setSelection('Inventory')}>Inventory</button>
-                {/* <button onClick={() => setSelection('Warehouse')}>Warehouses</button> */}
-                <button className={selection === 'Booking' ? style.selected : ''} onClick={() => setSelection('Booking')}>Bookings</button>
+        <section className={style.Dashboard}>
+            <div className={style.dashboardHeader}>
+                <h1>
+                    <MdOutlineDashboard /> Operations Dashboard
+                </h1>
+                <p>Monitor inventory, upcoming stock, and booking movement with live insights.</p>
             </div>
-            <div>
-                {selection === 'Upcoming' && <UpcomingDashboard />}
-                {selection === 'Inventory' && <InventoryDashboard />}
-                {selection === 'Booking' && <BookingDashboard />}
-            </div>
-        </div>
-    )
-}
 
-export default Dashboard
+            <div className={style.tabContainer} role='tablist' aria-label='Dashboard sections'>
+                {DASHBOARD_TABS.map((tabItem) => (
+                    <button
+                        key={tabItem}
+                        role='tab'
+                        aria-selected={selection === tabItem}
+                        className={selection === tabItem ? style.selected : ''}
+                        onClick={() => setSelection(tabItem)}
+                        type='button'
+                    >
+                        {tabItem}
+                    </button>
+                ))}
+            </div>
+
+            <div className={style.contentCard}>{selectedView}</div>
+        </section>
+    );
+};
+
+export default Dashboard;
