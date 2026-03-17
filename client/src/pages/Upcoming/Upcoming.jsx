@@ -84,8 +84,8 @@ const Upcoming = () => {
             />
             <h3 className={style.heading}>
                 Add Upcoming
-                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={handleUpload} style={{ marginLeft: 'auto', fontSize: '0.875rem', background: 'rgb(124 150 185)', padding: '0.25rem 1rem', borderRadius: '0.25rem', color: 'white' }}>{uploading ? "Uploading..." : "Import"}</span>}
-                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={downloadTemplate} style={{ fontSize: '0.875rem', textDecoration: 'underline' }}>Template</span>}
+                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <button type='button' className={style.importButton} onClick={handleUpload}>{uploading ? "Uploading..." : "Import"}</button>}
+                {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span className={style.templateLink} onClick={downloadTemplate}>Template</span>}
             </h3>
             <AddForm />
             <h3 className={style.heading}>Upcoming Items</h3>

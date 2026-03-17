@@ -1,20 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 :root {
-    --bg-app: #eef2ff;
-    --bg-accent: radial-gradient(circle at top right, #dbeafe 0%, #eef2ff 40%, #f8fafc 100%);
-    --surface-base: rgba(255, 255, 255, 0.9);
+    color-scheme: light;
+    --bg-app: #f4f7fb;
+    --bg-accent: radial-gradient(circle at top right, #dbeafe 0%, #f8fafc 58%, #eef2ff 100%);
+    --surface-base: rgba(255, 255, 255, 0.88);
     --surface-elevated: #ffffff;
-    --surface-soft: #f8fafc;
-    --surface-nav: #0f274e;
-    --surface-hover: #eef2ff;
+    --surface-soft: #f1f5f9;
+    --surface-nav: rgba(15, 23, 42, 0.9);
+    --surface-hover: #e2e8f0;
     --text-primary: #0f172a;
-    --text-secondary: #475569;
+    --text-secondary: #334155;
     --text-muted: #64748b;
     --text-inverse: #f8fafc;
-    --border-subtle: #dbe4f0;
+    --border-subtle: rgba(148, 163, 184, 0.35);
     --input-border: #cbd5e1;
-    --focus-ring: rgba(59, 130, 246, 0.28);
+    --focus-ring: rgba(37, 99, 235, 0.28);
     --brand-500: #2563eb;
     --brand-600: #1d4ed8;
     --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
@@ -40,19 +39,8 @@
     --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.32);
 }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-html,
-body,
-#root {
-    height: 100%;
-}
-
+* { padding: 0; margin: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+html, body, #root { height: 100%; }
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -62,35 +50,35 @@ body {
     color: var(--text-primary);
 }
 
-button,
-a,
-input,
-select,
-textarea {
-    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+button, a, input, select, textarea {
+    transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-input,
-select,
-textarea {
+button {
+    border: 1px solid color-mix(in srgb, var(--brand-500) 20%, transparent);
+    border-radius: 10px;
+    background: linear-gradient(120deg, var(--brand-500), var(--brand-600));
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--brand-600) 22%, transparent);
+}
+
+button:hover { transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+
+input, select, textarea {
     padding: 0.25rem;
     font-weight: 400;
-    border-radius: 0.4rem;
+    border-radius: 0.55rem;
     border: 1px solid var(--input-border);
     color: var(--text-primary);
     background: var(--surface-elevated);
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-muted);
-}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
-textarea:focus,
-input:focus,
-select:focus,
-button:focus-visible,
-a:focus-visible {
+textarea:focus, input:focus, select:focus, button:focus-visible, a:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--focus-ring);
 }
@@ -100,23 +88,7 @@ input[type=search]::-ms-reveal,
 input[type='search']::-webkit-search-decoration,
 input[type='search']::-webkit-search-cancel-button,
 input[type='search']::-webkit-search-results-button,
-input[type='search']::-webkit-search-results-decoration {
-    display: none;
-}
+input[type='search']::-webkit-search-results-decoration { display: none; }
 
-.loader {
-    width: 50px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(farthest-side, var(--brand-600) 94%, #0000) top / 8px 8px no-repeat,
-        conic-gradient(#0000 30%, var(--brand-500));
-    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
-    mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
-    animation: spinLoader 1s infinite linear;
-}
-
-@keyframes spinLoader {
-    100% {
-        transform: rotate(1turn);
-    }
-}
+.loader { width: 50px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(farthest-side, var(--brand-600) 94%, #0000) top / 8px 8px no-repeat, conic-gradient(#0000 30%, var(--brand-500)); -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0); mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0); animation: spinLoader 1s infinite linear; }
+@keyframes spinLoader { 100% { transform: rotate(1turn); } }
