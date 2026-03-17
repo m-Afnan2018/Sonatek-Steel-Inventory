@@ -168,7 +168,6 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         ? new Date(item.challanDate).toLocaleDateString()
         : '-';
 
-    const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [select, setSelect] = useState('');
@@ -309,7 +308,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         })
     };
 
-    const renderEditableField = (type, inputType = 'text') => (
+    const renderEditableField = (inputType = 'text') => (
         <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
             <input
                 style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
@@ -318,28 +317,6 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                 onChange={(e) => setValue(e.target.value)}
                 autoFocus
             />
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div>
-        </div>
-    );
-
-    const renderDropdownField = (type, options) => (
-        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-            <select
-                style={{ padding: '0rem', width: '3rem' }}
-                value={value?._id}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            >
-                <option value="">Select</option>
-                {options.map((opt) => (
-                    <option key={opt._id} value={opt._id}>
-                        {opt.name || opt.value}
-                    </option>
-                ))}
-            </select>
             <div className={style.inlineButtons}>
                 <button type="button" onClick={handleSave}>Save</button>
                 <button type="button" onClick={handleCancel}>Cancel</button>
@@ -358,7 +335,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                 <td>{item.warehouse?.name || '-'}</td>
                 <td onClick={() => clickHandler('remark')}>
                     {select === 'remark'
-                        ? renderEditableField('remark')
+                        ? renderEditableField()
                         : item.remark || '-'}
                 </td>
 

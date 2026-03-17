@@ -19,3 +19,93 @@
     font-weight: 700;
     margin: 0.75rem;
 }
+
+.pendingContainer {
+    margin-top: 0.8rem;
+    border: 1px solid var(--border-subtle);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--surface-base) 84%, var(--brand-500)), var(--surface-base));
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+.pendingHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 0.9rem;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.pendingHeader h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.pendingHeader p {
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+}
+
+.searchFieldLabel {
+    display: grid;
+    gap: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: min(330px, 100%);
+}
+
+.searchFieldLabel input {
+    width: 100%;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
+    padding: 0 0.7rem;
+    background: var(--surface-base);
+    color: var(--text-primary);
+}
+
+.pendingTableWrapper {
+    padding: 0.8rem;
+    overflow-x: auto;
+}
+
+.table {
+    min-width: 760px;
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.notFound {
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+}
+
+@media (max-width: 860px) {
+    .pendingHeader {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .searchFieldLabel {
+        min-width: 100%;
+    }
+}
