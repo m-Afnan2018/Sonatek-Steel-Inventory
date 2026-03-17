@@ -1,35 +1,39 @@
 .Auth {
     height: 100dvh;
     width: 100dvw;
-    /* background: radial-gradient(50.00% 50.00% at 50% 50%, rgba(8, 81, 109, 1), #11386C 100%); */
-    background: radial-gradient(50% 50% at 50% 50%, rgba(0, 31, 43, 1), #11386C 100%);
+    background:
+        radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--brand-500) 35%, transparent), transparent 55%),
+        radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--brand-600) 40%, transparent), transparent 40%),
+        var(--bg-accent);
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 1rem;
 }
 
 .container {
-    width: 60dvw;
+    width: min(92dvw, 520px);
     max-width: 500px;
-    background-color: rgb(145, 182, 214);
-    border-radius: 6px;
-    box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 1);
-    background: rgba(255, 255, 255, 1);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-soft);
+    background: color-mix(in srgb, var(--surface-base) 96%, transparent);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
 }
 
 .heading {
-    /* background: #11386C; */
-    background: #11386C;
-    height: 64px;
+    background: linear-gradient(120deg, var(--brand-500), var(--brand-600));
+    min-height: 74px;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0.65rem;
 }
 
 .heading>img {
     width: auto;
-    height: 90%;
+    height: 46px;
 }
 
 .loaderContainer {
@@ -37,10 +41,4 @@
     justify-content: center;
     align-items: center;
     padding: 6rem;
-}
-
-@media (max-width: 500px) {
-    .container {
-        width: 90dvw;
-    }
 }

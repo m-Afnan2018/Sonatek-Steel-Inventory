@@ -6,7 +6,7 @@
     align-items: center;
     height: 64px;
     padding: 0.5rem 1rem;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
     box-shadow: var(--shadow-soft);
 }
 
@@ -96,4 +96,17 @@
     font-size: 0.7rem;
     text-transform: capitalize;
     font-weight: 500;
+}
+
+
+@media (max-width: 700px) {
+    .brandSection p,
+    .themeButton span,
+    .userDetail h3 {
+        display: none;
+    }
+
+    .Navbar {
+        padding: 0.45rem 0.65rem;
+    }
 }

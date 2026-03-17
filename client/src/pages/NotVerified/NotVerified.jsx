@@ -16,8 +16,9 @@ const NotVerified = () => {
                     <img src={logo} alt='SONATEK STEELS LOGO' />
                 </div>
                 <div className={style.loaderContainer}>
-                    <h3>Please wait while admin verifying you</h3>
-                    <button onClick={logout}>Logout</button>
+                    <h3>Your account is pending verification.</h3>
+                    <p>Once the admin approves your profile, you'll get full access to inventory, bookings, and reporting tools.</p>
+                    <button type='button' onClick={logout}>Logout</button>
                 </div>
 
             </div>
