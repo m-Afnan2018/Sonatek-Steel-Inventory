@@ -1,6 +1,7 @@
-/* =========================
-   App Layout
-========================= */
+.App {
+    min-height: 100vh;
+    background: transparent;
+}
 
 .main-container {
     display: flex;
@@ -8,33 +9,27 @@
 }
 
 .main-container> :nth-child(2) {
-    /* flex: 1; */
     width: 100%;
     overflow-y: auto;
-    background: var(--bg-app);
+    padding: 0.25rem;
+    background: transparent;
     color: var(--text-primary);
 }
-
-/* =========================
-   Headings
-========================= */
 
 .main-heading {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
-    margin-bottom: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-muted);
-    background: var(--surface-elevated);
-    border-radius: 6px;
+    background: var(--surface-base);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    box-shadow: var(--shadow-soft);
 }
-
-/* =========================
-   Forms (Global)
-========================= */
 
 form label {
     display: block;
@@ -47,66 +42,49 @@ form label {
 form input,
 form select {
     width: 100%;
-    height: 32px;
+    height: 34px;
     padding: 0 8px;
-    font-size: 0.75rem;
-    border-radius: 6px;
-    border: 1px solid var(--input-border);
-    background: var(--surface-base);
-    color: var(--text-primary);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-size: 0.8rem;
 }
 
 .simpleField {
     width: 120px;
     height: 2rem;
-    padding: 0px;
-    border-radius: 0;
+    padding: 0;
     border: none;
     border-bottom: 1px solid var(--input-border);
-    background: var(--surface-elevated);
+    border-radius: 0;
+    background: transparent;
 }
-
-form input:focus,
-form select:focus {
-    outline: none;
-    border-color: #11386C;
-    box-shadow: 0 0 0 2px var(--focus-ring);
-}
-
-/* =========================
-   Tables (Global)
-========================= */
 
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     background: var(--surface-base);
-    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
     overflow: hidden;
 }
 
-/* Header */
 table thead th {
     position: sticky;
     top: 0;
     z-index: 2;
-    padding: 8px 10px;
+    padding: 10px;
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     color: var(--text-muted);
-    background: var(--surface-elevated);
+    background: var(--surface-soft);
     border-bottom: 1px solid var(--border-subtle);
     text-align: center;
 }
 
-/* Body */
 table tbody td {
     padding: 8px 10px;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 400;
     color: var(--text-secondary);
     text-align: center;
@@ -120,12 +98,10 @@ table tbody tr:hover {
     background: var(--surface-hover);
 }
 
-/* Icons inside table */
 table td svg {
     font-size: 1rem;
 }
 
-/* Inline badges / pills */
 table td p {
     padding: 2px 6px;
     border-radius: 4px;
@@ -136,12 +112,8 @@ table td p {
     width: fit-content;
 }
 
-/* =========================
-   Nested Tables (Details)
-========================= */
-
 .nestedRow td {
-    background: var(--surface-elevated);
+    background: var(--surface-soft);
 }
 
 .nestedTable {
@@ -149,33 +121,16 @@ table td p {
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 0 0 0 1rem;
-    background: var(--surface-elevated);
+    background: var(--surface-soft);
     padding: 16px;
-    border-left: 3px solid #007A8A;
+    border-left: 3px solid var(--brand-500);
 }
 
-.nestedTable thead th {
-    padding: 6px 8px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    background: var(--surface-hover);
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-subtle);
-}
-
+.nestedTable thead th,
 .nestedTable tbody td {
-    border-radius: 0;
-    padding: 6px 8px;
-    font-size: 0.7rem;
-    font-weight: 500;
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border-subtle);
-    background: var(--surface-elevated);
 }
-
-/* =========================
-   Buttons
-========================= */
 
 .btn {
     width: 8rem;
@@ -184,41 +139,36 @@ table td p {
     border: none;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #FFFFFF;
+    color: #fff;
     cursor: pointer;
-    transition: box-shadow 0.15s ease;
 }
 
 .btn:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-soft);
 }
 
 .success {
-    background: #115C38;
+    background: #166534;
 }
 
 .error {
-    background: #6C1111;
+    background: #991b1b;
 }
 
 .default {
-    background: #11386C;
+    background: var(--brand-600);
 }
 
 .waiting {
-    background: #6C5C11;
+    background: #a16207;
 }
-
-/* =========================
-   Icon Buttons
-========================= */
 
 .crossButton {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #6F2805;
-    color: #FFFFFF;
+    background: #b45309;
+    color: #fff;
     border: none;
     font-size: 1rem;
     font-weight: 700;
@@ -226,8 +176,4 @@ table td p {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.crossButton:hover {
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 }

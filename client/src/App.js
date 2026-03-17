@@ -70,6 +70,20 @@ function App() {
         localStorage.setItem('app-theme', theme);
     }, [theme]);
 
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const savedTheme = localStorage.getItem('app-theme');
+
+        if (savedTheme === 'light' || savedTheme === 'dark') return;
+
+        const updateTheme = (event) => {
+            setTheme(event.matches ? 'dark' : 'light');
+        };
+
+        mediaQuery.addEventListener('change', updateTheme);
+        return () => mediaQuery.removeEventListener('change', updateTheme);
+    }, []);
+
     // =======================
     // Loader Toast Handling
     // =======================
@@ -128,7 +142,7 @@ function App() {
     // UI Handlers
     // =======================
     const triggerSidebar = () => {
-        setSidebar(!sidebar);
+        setSidebar((prev) => !prev);
     };
 
     const toggleTheme = () => {
