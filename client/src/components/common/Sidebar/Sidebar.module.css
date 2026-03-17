@@ -9,11 +9,39 @@
     margin: 0.3rem;
     padding: 0.55rem;
     box-shadow: var(--shadow-soft);
-    transition: width 0.25s ease;
+    transition: width 0.25s ease, transform 0.25s ease;
+    z-index: 30;
+}
+
+.profileBadge {
+    padding: 0.7rem;
+    margin-bottom: 0.45rem;
+    border-radius: 0.7rem;
+    background: linear-gradient(130deg, color-mix(in srgb, var(--brand-500) 16%, var(--surface-elevated)), var(--surface-elevated));
+    border: 1px solid color-mix(in srgb, var(--brand-500) 20%, var(--border-subtle));
+}
+
+.profileBadge h2 {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profileBadge p {
+    margin-top: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: capitalize;
 }
 
 .collapsed {
     width: 74px;
+}
+
+.collapsed .profileBadge {
+    display: none;
 }
 
 .Sidebar nav {
@@ -77,4 +105,25 @@
 
 .logoutButton svg {
     font-size: 1.1rem;
+}
+
+@media (max-width: 900px) {
+    .mobileSidebar {
+        position: fixed;
+        top: 68px;
+        left: 0.4rem;
+        bottom: 0.4rem;
+        transform: translateX(-115%);
+        width: min(280px, calc(100vw - 1rem));
+        margin: 0;
+        max-height: calc(100vh - 72px);
+    }
+
+    .mobileSidebar nav {
+        padding-right: 0.15rem;
+    }
+
+    .mobileOpen {
+        transform: translateX(0);
+    }
 }

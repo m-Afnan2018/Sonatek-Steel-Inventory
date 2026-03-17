@@ -1,12 +1,12 @@
 .Navbar {
-    background: var(--surface-nav);
-    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--surface-nav) 88%, transparent);
+    backdrop-filter: blur(12px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 64px;
     padding: 0.5rem 1rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 60%, transparent);
     box-shadow: var(--shadow-soft);
 }
 
@@ -42,7 +42,7 @@
 .brandSection p {
     color: var(--text-inverse);
     opacity: 0.9;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -59,7 +59,7 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.35rem 0.6rem;
+    padding: 0.4rem 0.65rem;
     border-radius: 999px;
     color: var(--text-inverse);
     border: 1px solid rgba(148, 163, 184, 0.45);
@@ -82,6 +82,10 @@
 
 .userDetail {
     text-align: right;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    background: rgba(148, 163, 184, 0.08);
 }
 
 .userDetail h2 {
