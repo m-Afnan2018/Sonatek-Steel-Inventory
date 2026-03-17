@@ -47,7 +47,7 @@ const Dashboard = () => {
     );
 
     return (
-        <section className={style.Dashboard}>
+        <section className={`page-shell ${style.Dashboard}`}>
             <div className={style.dashboardHeader}>
                 <h1>
                     <MdOutlineDashboard /> Operations Dashboard

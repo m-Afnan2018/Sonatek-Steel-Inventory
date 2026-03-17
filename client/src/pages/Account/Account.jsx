@@ -83,7 +83,7 @@ const Account = () => {
     // Render
     // =======================
     return (
-        <div className={style.Account}>
+        <div className={`page-shell ${style.Account}`}>
             <h2 className='main-heading'>Manage Account</h2>
 
             <form onSubmit={handleSubmit(onSubmit)}>

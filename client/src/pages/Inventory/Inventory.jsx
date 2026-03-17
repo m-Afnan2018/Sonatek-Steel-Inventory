@@ -63,7 +63,7 @@ const Inventory = () => {
     // Render
     // =======================
     return (
-        <div className={style.Inventory}>
+        <div className={`page-shell ${style.Inventory}`}>
             <Items />
         </div>
     );

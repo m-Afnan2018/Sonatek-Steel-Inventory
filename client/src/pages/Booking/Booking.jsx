@@ -20,7 +20,7 @@ const Booking = () => {
 
 
     return (
-        <div className={style.Booking}>
+        <div className={`page-shell ${style.Booking}`}>
             <Items />
 
             {/* Create Booking Form */}

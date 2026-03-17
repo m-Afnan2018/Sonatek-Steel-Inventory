@@ -65,7 +65,7 @@ const Upcoming = () => {
     }, [dispatch])
 
     return (
-        <div className={style.Upcoming}>
+        <div className={`page-shell ${style.Upcoming}`}>
             {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <div className={style.addNew}>
                 {/* <button onClick={() => showOverlay(AddItemForm, { showForm, setShowForm })}>Add new Item</button> */}
                 {/* <button onClick={handleUpload} >

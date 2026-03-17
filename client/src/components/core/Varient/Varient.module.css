@@ -1,68 +1,72 @@
 .Varient {
-    margin: 0.25rem;
-    background: white;
-    padding: 0.25rem;
-    border-radius: 0.5rem;
+    margin: 0;
+    background: var(--surface-base);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    padding: 0.6rem;
+    border-radius: 0.8rem;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
+    gap: 0.5rem;
 }
 
-.Varient>h3 {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+.Varient > h3 {
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    background-color: #f3f3ff;
-    font-weight: 500;
+    background: var(--surface-soft);
+    font-weight: 700;
     text-align: center;
-    color: grey;
-    font-size: 1rem;
-    margin-bottom: 0;
+    color: var(--text-primary);
+    font-size: 0.98rem;
+    margin: 0;
     width: 100%;
-    margin: 0 auto;
 }
 
-.Varient>div {
+.Varient > div {
     overflow: hidden;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
+    gap: 0.5rem;
 }
 
-.Varient>div>button {
-    width: 3rem;
+.Varient > div > button {
+    width: 3.5rem;
+    min-height: 2rem;
 }
 
 .Varient form {
     overflow: hidden;
-    gap: 1rem;
+    gap: 0.7rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
 }
 
-.Varient form>div {
+.Varient form > div {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 0.4rem;
 }
 
-
 .SingleVarient {
-    background: white;
-    color: black;
-    border-bottom: 1px solid #80808038;
+    background: transparent;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-subtle);
     padding: 0;
     border-radius: 0;
 }
 
-.SingleVarient>div {
+.SingleVarient > div {
     display: flex;
     justify-content: center;
     align-items: center;

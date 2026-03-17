@@ -80,10 +80,10 @@ const SingleBlock = ({ list, name }) => {
         <div className={style.Varient}>
             <h3>{name}</h3>
             <div style={{ height: showForm ? '0' : '40px', opacity: showForm ? '0' : '1' }}>
-                <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && 'rgb(0 122 138)', color: type === 'ALL' && '#f0fbff' }}>All</button>
-                <button onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && 'rgb(0 122 138)', color: type === 'HR' && '#f0fbff' }}>HR</button>
-                <button onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && 'rgb(0 122 138)', color: type === 'CR' && '#f0fbff' }}>CR</button>
-                <button onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '4rem'}}>Add</button>
+                <button type='button' onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && 'rgb(0 122 138)', color: type === 'ALL' && '#f0fbff' }}>All</button>
+                <button type='button' onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && 'rgb(0 122 138)', color: type === 'HR' && '#f0fbff' }}>HR</button>
+                <button type='button' onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && 'rgb(0 122 138)', color: type === 'CR' && '#f0fbff' }}>CR</button>
+                <button type='button' onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '4rem'}}>Add</button>
             </div>
             <form style={{ height: showForm ? '40px' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
                 <div>
@@ -101,7 +101,7 @@ const SingleBlock = ({ list, name }) => {
                 <input type='text' value={varient} onChange={(e) => setVarient(e.target.value)} placeholder={`Name of ${name}`} style={{ width: '100%' }} />
                 <div>
                     <button type='submit'>Add</button>
-                    <button type='reset' onClick={() => setShowForm(false)}>Cancle</button>
+                    <button type='reset' onClick={() => setShowForm(false)}>Cancel</button>
                 </div>
             </form>
             {show && show.length > 0 &&
@@ -115,7 +115,7 @@ const SingleBlock = ({ list, name }) => {
                     </thead>
                     <tbody>
                         {show.map((value) => {
-                            return <SingleVarient onUpdate={onUpdate} onDelete={onDelete} value={value} />
+                            return <SingleVarient key={value._id} onUpdate={onUpdate} onDelete={onDelete} value={value} />
                         })}
                     </tbody>
                 </table>

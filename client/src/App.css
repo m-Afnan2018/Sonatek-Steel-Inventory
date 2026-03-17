@@ -14,11 +14,23 @@
 
 .main-container> :nth-child(2) {
     width: 100%;
-    overflow-y: auto;
     padding: 0.55rem;
     background: transparent;
     color: var(--text-primary);
 }
+
+
+.route-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    background: color-mix(in srgb, var(--surface-base) 86%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+}
+
 
 .sidebar-backdrop {
     position: fixed;
@@ -200,5 +212,10 @@ table td p {
 
     .main-container> :nth-child(2) {
         padding: 0.45rem;
+    }
+
+    .route-container {
+        border-radius: 0;
+        border: none;
     }
 }

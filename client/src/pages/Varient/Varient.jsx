@@ -7,7 +7,7 @@ const Varient = () => {
     const { grades, thicknesses, widths } = useSelector(state => state.varient);
 
     return (
-        <div className={style.Varient}>
+        <div className={`page-shell ${style.Varient}`}>
             {/* Block for Grades */}
             <SingleBlock list={thicknesses} name={'Thickness'} />
             <SingleBlock list={widths} name={'Width'} />

@@ -186,6 +186,7 @@ function App() {
                     />
                 )}
 
+                <main className="route-container" aria-live='polite'>
                 <OverlayProvider>
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
@@ -208,6 +209,7 @@ function App() {
                         <Route path="*" element={<Error />} />
                     </Routes>
                 </OverlayProvider>
+                </main>
             </div>
         </div>
     );

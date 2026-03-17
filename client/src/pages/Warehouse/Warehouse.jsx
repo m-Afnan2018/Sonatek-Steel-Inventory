@@ -104,7 +104,7 @@ const Warehouse = () => {
     }
 
     return (
-        <div className={style.Warehouse}>
+        <div className={`page-shell ${style.Warehouse}`}>
             <h2>Manage Warehouses</h2>
             <div className={style.header}>
                 <div>

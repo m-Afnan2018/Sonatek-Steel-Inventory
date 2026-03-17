@@ -106,7 +106,7 @@ const User = () => {
     }
 
     return (
-        <div className={style.User}>
+        <div className={`page-shell ${style.User}`}>
             <Staff />
             {/* <h2>Manage Users</h2> */}
             <div className={style.pendingRequest}>

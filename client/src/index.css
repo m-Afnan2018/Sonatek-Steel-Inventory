@@ -92,3 +92,27 @@ input[type='search']::-webkit-search-results-decoration { display: none; }
 
 .loader { width: 50px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(farthest-side, var(--brand-600) 94%, #0000) top / 8px 8px no-repeat, conic-gradient(#0000 30%, var(--brand-500)); -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0); mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0); animation: spinLoader 1s infinite linear; }
 @keyframes spinLoader { 100% { transform: rotate(1turn); } }
+
+
+.page-shell {
+    min-height: 100%;
+    padding: 1rem;
+    color: var(--text-primary);
+}
+
+.page-shell h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.glass-card {
+    background: color-mix(in srgb, var(--surface-base) 90%, transparent);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+}
+
