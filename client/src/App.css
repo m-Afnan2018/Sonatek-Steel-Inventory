@@ -6,12 +6,14 @@
 .main-container {
     display: flex;
     height: calc(100vh - 64px);
+    gap: 0.35rem;
+    padding: 0.2rem;
 }
 
 .main-container> :nth-child(2) {
     width: 100%;
     overflow-y: auto;
-    padding: 0.25rem;
+    padding: 0.4rem;
     background: transparent;
     color: var(--text-primary);
 }
@@ -35,7 +37,7 @@ form label {
     display: block;
     margin-bottom: 4px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-secondary);
 }
 
@@ -73,10 +75,10 @@ table thead th {
     z-index: 2;
     padding: 10px;
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     background: var(--surface-soft);
     border-bottom: 1px solid var(--border-subtle);
     text-align: center;
@@ -85,8 +87,8 @@ table thead th {
 table tbody td {
     padding: 8px 10px;
     font-size: 0.78rem;
-    font-weight: 400;
-    color: var(--text-secondary);
+    font-weight: 500;
+    color: var(--text-primary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -176,4 +178,14 @@ table td p {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 900px) {
+    .main-container {
+        gap: 0.2rem;
+    }
+
+    .main-container> :nth-child(2) {
+        padding: 0.25rem;
+    }
 }

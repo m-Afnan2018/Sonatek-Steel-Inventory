@@ -3,18 +3,19 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
-    height: 80%;
+    padding: 1.2rem;
+    height: 100%;
     width: 100%;
+    color: var(--text-primary);
 }
 
 .Auth>form {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 2rem;
+    gap: 1.35rem;
     align-items: center;
-    padding: 1rem;
+    padding: 0.6rem;
     width: 100%;
 }
 
@@ -25,19 +26,17 @@
 }
 
 .horizontalLine {
-    width: 80%;
-    border-top: 1px solid rgba(0, 0, 0, 1);
+    width: 100%;
+    border-top: 1px solid var(--border-subtle);
 }
 
 .Auth>h3 {
-    color: rgba(0, 0, 0, 1);
-    font-size: 0.75rem;
-    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
     line-height: 1.25rem;
-    letter-spacing: 0px;
-    text-align: left;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
 }
 
 .Auth>h3>span {
@@ -46,23 +45,20 @@
 
 .Auth .blueText {
     cursor: pointer;
-    color: rgba(9, 133, 180, 1);
-    font-size: 12px;
+    color: var(--brand-600);
+    font-size: 0.75rem;
     font-weight: 600;
-    line-height: 15px;
-    letter-spacing: 0px;
-    text-align: right;
+    line-height: 1rem;
     position: absolute;
     right: 0;
 }
 
 .Auth label {
-        color: #767676;
+    color: var(--text-secondary);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0;
-    line-height: 1.125rem;
-    text-align: left;
+    line-height: 1.1rem;
 }
 
 .password {
@@ -70,32 +66,24 @@
 }
 
 .password>svg {
-        color: #767676;
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 1rem;
     position: absolute;
     right: 8px;
-    top: 6px;
+    top: 8px;
 }
 
 .Auth button {
-    padding: 0.5rem 3rem;
-    border-radius: 8px;
-    background: rgba(9, 133, 180, 1);
+    padding: 0.62rem 2.8rem;
+    border-radius: 10px;
+    background: linear-gradient(120deg, var(--brand-500), var(--brand-600));
     border: none;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
 }
 
 .Auth button:hover {
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
-    background: rgba(9, 133, 180, 1);
-}
-
-
-@media (max-width: 500px) {
-    .Auth .container {
-        width: 80dvw;
-    }
+    box-shadow: var(--shadow-soft);
 }

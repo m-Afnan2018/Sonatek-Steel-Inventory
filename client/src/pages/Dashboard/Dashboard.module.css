@@ -1,15 +1,19 @@
 .Dashboard {
-    padding: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    padding: 0.6rem;
+    display: grid;
+    grid-template-columns: 1.2fr auto;
+    grid-template-areas:
+        'header tabs'
+        'content content';
+    gap: 0.7rem;
 }
 
 .dashboardHeader {
+    grid-area: header;
     background: var(--surface-base);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
     box-shadow: var(--shadow-soft);
 }
 
@@ -23,12 +27,14 @@
 }
 
 .dashboardHeader p {
-    margin-top: 0.25rem;
-    color: var(--text-muted);
-    font-size: 0.82rem;
+    margin-top: 0.3rem;
+    color: var(--text-secondary);
+    font-size: 0.83rem;
+    max-width: 52ch;
 }
 
 .tabContainer {
+    grid-area: tabs;
     display: flex;
     align-items: center;
     gap: 0.45rem;
@@ -46,7 +52,7 @@
     border-radius: 0.55rem;
     color: var(--text-secondary);
     font-size: 0.78rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     cursor: pointer;
@@ -59,14 +65,25 @@
 .tabContainer .selected {
     background: linear-gradient(120deg, var(--brand-500), var(--brand-600));
     color: #f8fafc;
-    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 15px color-mix(in srgb, var(--brand-600) 35%, transparent);
 }
 
 .contentCard {
+    grid-area: content;
     background: var(--surface-base);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 0.2rem;
+    border-radius: 14px;
+    padding: 0.3rem;
     box-shadow: var(--shadow-soft);
     min-height: 320px;
+}
+
+@media (max-width: 860px) {
+    .Dashboard {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            'header'
+            'tabs'
+            'content';
+    }
 }

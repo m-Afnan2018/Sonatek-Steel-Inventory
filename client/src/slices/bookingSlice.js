@@ -68,7 +68,7 @@ const bookingSlice = createSlice({
             state.parties = action.payload;
         },
         updateParty(state, action) {
-            state.parties = [...state.party, action.payload];
+            state.parties = [...state.parties, action.payload];
         },
         setIncompleteBookings(state, action) {
             state.incompleteBookings = action.payload;
@@ -121,7 +121,7 @@ const bookingSlice = createSlice({
             state.pendingBookings = [...state.pendingBookings, action.payload];
         },
         removePendingBooking(state, action) {
-            state.pendingBookings = state.pendingBookings.filter((item) => item._id === action.payload);
+            state.pendingBookings = state.pendingBookings.filter((item) => item._id !== action.payload);
         },
         updatePendingBooking(state, action) {
 
