@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import style from './Dashboard.module.css';
 import { getAllUsers } from 'services/operations/userAPI';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getAllItem } from 'services/operations/itemAPI';
 import UpcomingDashboard from 'components/core/Dashboard/UpcomingDashboard';
 import InventoryDashboard from 'components/core/Dashboard/InventoryDashboard';
@@ -12,6 +12,9 @@ const DASHBOARD_TABS = ['Upcoming', 'Inventory', 'Booking'];
 
 const Dashboard = () => {
     const dispatch = useDispatch();
+    const { upcomingItem, listViewList } = useSelector((state) => state.item);
+    const { bookings, pendingBookings } = useSelector((state) => state.booking);
+    const { allUsers } = useSelector((state) => state.user);
 
     const [selection, setSelection] = useState(() => localStorage.getItem('dashboard-tab') || 'Upcoming');
 
@@ -31,6 +34,17 @@ const Dashboard = () => {
         if (selection === 'Booking') return <BookingDashboard />;
         return <UpcomingDashboard />;
     }, [selection]);
+
+    const dashboardStats = useMemo(
+        () => [
+            { label: 'Upcoming lots', value: upcomingItem?.length || 0 },
+            { label: 'Inventory records', value: listViewList?.length || 0 },
+            { label: 'Live bookings', value: bookings?.length || 0 },
+            { label: 'Pending vehicles', value: pendingBookings?.length || 0 },
+            { label: 'Active users', value: allUsers?.length || 0 },
+        ],
+        [allUsers?.length, bookings?.length, listViewList?.length, pendingBookings?.length, upcomingItem?.length],
+    );
 
     return (
         <section className={style.Dashboard}>
@@ -53,6 +67,15 @@ const Dashboard = () => {
                     >
                         {tabItem}
                     </button>
+                ))}
+            </div>
+
+            <div className={style.metricsGrid}>
+                {dashboardStats.map((stat) => (
+                    <article key={stat.label} className={style.metricCard}>
+                        <p>{stat.label}</p>
+                        <h2>{stat.value}</h2>
+                    </article>
                 ))}
             </div>
 
