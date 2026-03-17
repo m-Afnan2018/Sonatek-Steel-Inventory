@@ -4,6 +4,7 @@
     grid-template-columns: 1.2fr auto;
     grid-template-areas:
         'header tabs'
+        'metrics metrics'
         'content content';
     gap: 0.7rem;
 }
@@ -78,12 +79,44 @@
     min-height: 320px;
 }
 
+.metricsGrid {
+    grid-area: metrics;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(100px, 1fr));
+    gap: 0.5rem;
+}
+
+.metricCard {
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    background: linear-gradient(140deg, color-mix(in srgb, var(--surface-base) 80%, var(--brand-500)), var(--surface-base));
+    box-shadow: var(--shadow-soft);
+}
+
+.metricCard p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.metricCard h2 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
 @media (max-width: 860px) {
     .Dashboard {
         grid-template-columns: 1fr;
         grid-template-areas:
             'header'
             'tabs'
+            'metrics'
             'content';
+    }
+
+    .metricsGrid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
     }
 }

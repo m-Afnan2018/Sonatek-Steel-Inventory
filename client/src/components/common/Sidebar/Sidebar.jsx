@@ -11,7 +11,7 @@ import { LuUsersRound } from 'react-icons/lu';
 import { FaRegUserCircle } from 'react-icons/fa';
 import { HiOutlineDocumentReport } from 'react-icons/hi';
 
-const Sidebar = ({ sidebar }) => {
+const Sidebar = ({ sidebar, isMobile }) => {
     const { userData } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
 
@@ -52,11 +52,16 @@ const Sidebar = ({ sidebar }) => {
 
     return (
         <aside
-            className={`${style.Sidebar} ${!currentSidebar ? style.collapsed : ''}`}
+            className={`${style.Sidebar} ${!currentSidebar ? style.collapsed : ''} ${isMobile ? style.mobileSidebar : ''} ${isMobile && sidebar ? style.mobileOpen : ''}`}
             onMouseEnter={() => setCurrentSidebar(true)}
             onMouseLeave={() => setCurrentSidebar(sidebar)}
             aria-label='Sidebar navigation'
         >
+            <div className={style.profileBadge}>
+                <h2>{`${userData?.firstName || ''} ${userData?.lastName || ''}`.trim() || 'Team Member'}</h2>
+                <p>{userData?.role || 'viewer'}</p>
+            </div>
+
             <nav>
                 {links.map((linkItem) => {
                     if (!canSee(linkItem.roles)) return null;
