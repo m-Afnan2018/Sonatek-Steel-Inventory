@@ -1,129 +1,110 @@
-/* Upcoming component classes */
 .Upcoming {
-    padding: 0.25rem;
-    background: white !important;
+    padding: 0.4rem;
+    background: transparent;
 }
 
 .Upcoming td input {
-    padding: 0.15rem;
-    border: 1px solid;
+    padding: 0.2rem;
+    border: 1px solid var(--input-border);
 }
 
 .Upcoming td svg {
-    font-size: 1.75rem;
+    font-size: 1.15rem;
     cursor: pointer;
-    padding: 0;
 }
 
-.Upcoming td>div {
+.Upcoming td > div {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.Upcoming td>div>svg {
-    padding: 0.25rem;
-    border: 1px solid grey;
-    border-radius: 0.35rem;
-    color: black;
+.Upcoming td > div > svg {
+    padding: 0.3rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.45rem;
+    color: var(--text-secondary);
     cursor: pointer;
+    background: var(--surface-elevated);
 }
 
 .heading {
-    padding: 0.5rem;
-    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.75rem 0.75rem 0 0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    background-color: #f3f3ff;
-    font-weight: 500;
-    text-align: center;
-    color: grey;
-    font-size: 1rem;
-    margin-bottom: 0;
+    gap: 0.8rem;
+    background-color: var(--surface-base);
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
     width: 100%;
-    margin: 0 auto;
-    border: 1px solid darkgrey;
+    border: 1px solid var(--border-subtle);
     border-bottom: 0;
 }
 
-.heading>span {
+.heading > span {
     cursor: pointer;
 }
 
+.importButton {
+    margin-left: auto;
+    font-size: 0.8rem;
+    padding: 0.32rem 0.8rem;
+    border-radius: 999px;
+}
+
+.templateLink {
+    font-size: 0.8rem;
+    text-decoration: underline;
+    color: var(--brand-600);
+}
+
 .card {
-    background: #f3f3ff;
-    border-radius: 0 0 1rem 1rem;
-    padding: 4px;
-    box-shadow: none;
-    border: 1px solid darkgrey;
-    border-radius: 0 0 0.5rem 0.5rem;
+    background: var(--surface-base);
+    border-radius: 0 0 0.75rem 0.75rem;
+    border: 1px solid var(--border-subtle);
     overflow: hidden;
     border-top: 0;
-    padding-top: 0;
 }
 
 .loading,
 .empty {
-    /* Styles for conditional rendering */
     text-align: center;
     padding: 30px;
-    color: #666;
+    color: var(--text-muted);
     font-size: 1rem;
 }
 
 .tableWrapper {
-    /* Wrapper for table scrolling */
     overflow: auto;
     height: 100%;
-    /* border-radius: 1rem; */
-    /* overflow-x: auto; */
 }
 
-
 .coloredShipTo {
-    /* Used for the Warehouse cell in SingleItem */
-    border-radius: 0.25rem;
+    border-radius: 0.4rem;
     width: fit-content;
-    padding: 0.15rem 0.25rem;
+    padding: 0.2rem 0.35rem;
     font-weight: 600;
     text-transform: capitalize;
     line-height: 1.15;
-    padding-top: 0.3rem;
 }
 
-/* AddForm component classes (as it's used inside Upcoming) */
 .AddForm {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    overflow: hidden;
     padding: 1rem;
-    background: white;
-    border-radius: 1rem 1rem 0 0;
-    overflow: visible;
+    background: var(--surface-base);
 }
 
-.AddForm>div {
+.AddForm > div {
     width: calc((100% - 20rem) / 5);
 }
 
 .AddForm button {
-    padding: 0.5rem 3rem;
-    border-radius: 8px;
-    background-color: #11386C;
-    border: none;
-    color: #f0fbff;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.AddForm button:hover {
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
-    color: #05516f;
-    background-color: #f0fbff;
+    padding: 0.5rem 1.25rem;
 }
 
 .AddForm input[type='text'] {
@@ -138,7 +119,7 @@
 
 .AddForm input::placeholder {
     font-size: 0.75rem;
-    color: hsl(0, 0%, 50%)
+    color: var(--text-muted);
 }
 
 .addNew {
@@ -148,21 +129,10 @@
     gap: 1rem;
 }
 
-.addNew>button {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    background-color: #f3f3ff;
-    font-weight: 500;
-    text-align: center;
-    color: grey;
-    font-size: 0.875rem;
+.addNew > button {
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    font-size: 0.8rem;
     width: 100%;
-}
-
-.addNew>button:hover {
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 1);
-    background-color: #05516f;
-    color: #f0fbff;
 }
