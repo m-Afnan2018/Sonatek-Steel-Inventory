@@ -4,7 +4,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { OverlayProvider } from 'hooks/useOverlay';
 
@@ -57,6 +57,8 @@ function App() {
     // Local State
     // =======================
     const [sidebar, setSidebar] = useState(false);
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 900);
+    const location = useLocation();
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('app-theme');
         if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
@@ -83,6 +85,22 @@ function App() {
         mediaQuery.addEventListener('change', updateTheme);
         return () => mediaQuery.removeEventListener('change', updateTheme);
     }, []);
+
+    useEffect(() => {
+        const syncDevice = () => setIsMobile(window.innerWidth <= 900);
+        syncDevice();
+        window.addEventListener('resize', syncDevice);
+
+        return () => {
+            window.removeEventListener('resize', syncDevice);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isMobile) {
+            setSidebar(false);
+        }
+    }, [isMobile, location.pathname]);
 
     // =======================
     // Loader Toast Handling
@@ -157,7 +175,16 @@ function App() {
             <Navbar triggerSidebar={triggerSidebar} theme={theme} toggleTheme={toggleTheme} />
 
             <div className="main-container">
-                <Sidebar sidebar={sidebar} />
+                <Sidebar sidebar={sidebar} isMobile={isMobile} />
+
+                {isMobile && sidebar && (
+                    <button
+                        aria-label='Close navigation panel'
+                        className='sidebar-backdrop'
+                        onClick={triggerSidebar}
+                        type='button'
+                    />
+                )}
 
                 <OverlayProvider>
                     <Routes>
