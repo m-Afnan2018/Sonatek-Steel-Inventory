@@ -1,0 +1,788 @@
+.ShowOverlay {
+    position: relative;
+    padding: 1rem;
+    background-color: var(--bg-surface);
+    width: 90%;
+    height: 90%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.ShowOverlay>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ShowOverlay button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    background: var(--accent);
+}
+
+.ShowOverlay button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.radioGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.radioButton {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.radioButton input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.radioLabel {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: var(--bg-elevated);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.radioButton:hover .radioLabel {
+    background-color: var(--bg-hover);
+    border-color: var(--accent-border);
+}
+
+.radioButton input[type='radio']:checked+.radioLabel {
+    background-color: var(--accent-muted);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 2px 8px var(--accent-muted);
+}
+
+.radioButton input[type='radio']:focus+.radioLabel {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Details overlay styles */
+.DetailsOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.DetailsContent {
+    width: 90%;
+    max-width: 1000px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.DetailsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.HeaderActions {
+    display: flex;
+    gap: .5rem
+}
+
+.CloseButton {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.CloseButton:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.DetailsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.Card {
+    background: var(--bg-elevated);
+    padding: 0.8rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.FullWidth {
+    grid-column: 1 / -1;
+    padding: 0.8rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.ItemRow {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: .6rem 0;
+    border-bottom: 1px dashed var(--border)
+}
+
+.ItemMain {
+    flex: 1
+}
+
+.ItemMeta {
+    width: 220px;
+    text-align: right
+}
+
+.DetailsFooter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem
+}
+
+.PrimaryButton {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.PrimaryButton:hover {
+    background: var(--accent-hover);
+}
+
+.pending {
+    color: var(--warning);
+    font-weight: 700
+}
+
+.processing {
+    color: var(--accent);
+    font-weight: 700
+}
+
+.delivered {
+    color: var(--success);
+    font-weight: 700
+}
+
+.cancelled {
+    color: var(--danger);
+    font-weight: 700
+}
+
+/* Add Item Form Styles */
+.AddItemForm {
+    position: relative;
+    padding: 1rem;
+    background-color: var(--bg-surface);
+    width: 90%;
+    height: 90%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
+    overflow: scroll;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.AddItemForm>div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.AddItemForm>div>div {
+    background: var(--accent-muted);
+    color: var(--accent);
+    padding: 0.25rem 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    font-weight: 700;
+    width: max-content;
+    border: 1px solid var(--accent-border);
+}
+
+.twoInOne>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.formBlock>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    position: relative;
+    width: 100%;
+}
+
+.formBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    gap: 1.65rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    border: 1px solid var(--border);
+}
+
+.formBlock button {
+    padding: 0rem 3rem;
+    border-radius: var(--radius-md);
+    color: #fff;
+    border: none;
+    background-color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    height: 2rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.formBlock button:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.formBlock input {
+    padding: 0.5rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    width: 100%;
+}
+
+.formBlock input[disabled] {
+    background-color: var(--bg-hover);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.formBlock label {
+    color: var(--text-secondary);
+    font-weight: 700;
+    width: 100%;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.radioButton {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.radioButton input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.radioLabel {
+    display: inline-block;
+    padding: 10px 24px;
+    background-color: var(--bg-elevated);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.radioButton:hover .radioLabel {
+    background-color: var(--bg-hover);
+    border-color: var(--accent-border);
+}
+
+.radioButton input[type='radio']:checked+.radioLabel {
+    background-color: var(--accent-muted);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 2px 8px var(--accent-muted);
+}
+
+.radioButton input[type='radio']:focus+.radioLabel {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.error {
+    display: block;
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+    position: absolute;
+    right: 0;
+    bottom: -1rem;
+    font-weight: 700;
+}
+
+/* Varient Details */
+.Overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+}
+
+.VarientDetailCard {
+    width: min(1100px, 96%);
+    max-height: 90vh;
+    overflow: auto;
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.overlayHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+
+.title {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+}
+
+.closeBtn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: var(--radius-md);
+}
+
+.cardTitle {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    align-items: center;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.label {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+}
+
+.address {
+    text-align: right;
+    color: var(--text-secondary);
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 96px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: var(--radius-md);
+}
+
+.chipLabel {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.chipValue {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-top: 6px;
+}
+
+.sectionTitle {
+    margin: 12px 0 8px;
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.listItem {
+    padding: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+}
+
+.itemTitle {
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status {
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.itemMeta {
+    display: flex;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.qty {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.small {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.bookingsSection {
+    margin-top: 8px;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.closePrimary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.closePrimary:hover {
+    background: var(--accent-hover);
+    opacity: 0.95;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chip {
+        min-width: 84px;
+    }
+}
+
+.ViewIncompleteBookingDetail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.ViewIncompleteBookingDetail h4 {
+    text-align: start;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.FullWidth>table {
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.FullWidth>table th,
+.FullWidth>table td {
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    padding: 2px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+}
+
+.FullWidth>table td {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 400;
+    height: 2rem;
+    border-bottom: 0;
+    font-size: 0.75rem;
+    height: 3rem;
+}
+
+.FullWidth>table td svg {
+    font-size: 1rem;
+}
+
+.FullWidth>table th {
+    background-color: var(--bg-elevated);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.FullWidth button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    min-width: 6rem;
+    font-weight: 600;
+}
+
+.FullWidth button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.4);
+}
+
+.buttons {
+    border-bottom: 0px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.FullWidth .inputField {
+    position: relative
+}
+
+.FullWidth .inputField input {
+    width: 100%;
+    margin-bottom: 1rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem;
+}
+
+.FullWidth .inputField span {
+    position: absolute;
+    bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--danger);
+    font-weight: 700;
+    overflow: hidden;
+}
+
+/* OrderConfirmationOverlay */
+.OrderConfirmationOverlay {
+    position: relative;
+    background-color: var(--bg-surface);
+    width: 90%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.OrderConfirmationOverlay>div:nth-child(1) {
+    width: calc(100% - 2rem);
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.OrderConfirmationOverlay>div:nth-child(1)>div{
+    width: 100%;
+}
+
+.OrderConfirmationOverlay select {
+    padding: 0.25rem;
+    font-weight: 400;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.OrderConfirmationOverlay td div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}

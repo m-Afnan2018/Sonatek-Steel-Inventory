@@ -1,0 +1,31 @@
+{
+  "name": "inventory_server",
+  "version": "1.0.0",
+  "description": "This is the server file of sonatek inventory.",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "server": "nodemon server.js"
+  },
+  "author": "Ganesyx",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^17.2.2",
+    "exceljs": "^0.2.46",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.6",
+    "nodemon": "^3.1.10",
+    "uuid": "^8.3.2",
+    "xlsx": "^0.18.5"
+  }
+}

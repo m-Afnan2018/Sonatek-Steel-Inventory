@@ -1,0 +1,304 @@
+/* Page layout */
+.Warehouse {
+    background: var(--bg-base);
+    min-height: 100vh;
+    padding: 2rem;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: var(--text-primary);
+}
+
+/* Page title */
+.Warehouse>h2 {
+    font-size: 28px;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Header area */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.count {
+    margin-top: 6px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* controls (search + add) */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    min-width: 260px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search::placeholder {
+    color: var(--text-muted);
+}
+
+.search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* Buttons */
+.addBtn {
+    background-color: var(--accent);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.addBtn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+/* Form */
+.form {
+    margin: 1rem 0 1.25rem;
+    padding: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.formRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.form input {
+    padding: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    min-width: 190px;
+    font-size: 14px;
+}
+
+.form input::placeholder {
+    color: var(--text-muted);
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.formActions button {
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.formActions button[type="submit"] {
+    background: var(--accent);
+    color: #fff;
+}
+
+.formActions button[type="submit"]:hover {
+    background: var(--accent-hover);
+}
+
+.formActions button[type="button"] {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.formActions button[type="button"]:hover {
+    background: var(--bg-active);
+    color: var(--text-primary);
+}
+
+/* Table container */
+.tableWrap {
+    margin-top: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    overflow-x: auto;
+    margin-bottom: 4rem;
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    font-size: 14px;
+}
+
+.table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+
+.table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+    text-align: left;
+    color: var(--text-secondary);
+}
+
+/* Row hover */
+.row:hover {
+    background: var(--bg-hover);
+}
+
+/* Cells */
+.cellPrimary {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.cellSecondary {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* Inline edit inputs */
+.inlineInput {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.inlineInput:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* Actions */
+.actionGroup {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.editBtn,
+.itemsBtn,
+.saveBtn,
+.cancelBtn {
+    padding: 7px 10px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.editBtn {
+    background: var(--accent);
+    color: #fff;
+}
+
+.editBtn:hover {
+    background: var(--accent-hover);
+}
+
+.itemsBtn {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.itemsBtn:hover {
+    background: var(--bg-active);
+    color: var(--text-primary);
+}
+
+.saveBtn {
+    background: var(--success);
+    color: #fff;
+}
+
+.cancelBtn {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+}
+
+.cancelBtn:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+}
+
+/* Centered cells */
+.center {
+    text-align: center;
+}
+
+/* No data row */
+.noData {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-muted);
+}
+
+/* Loader */
+.loader {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Responsive adjustments */
+@media (max-width: 880px) {
+    .search {
+        min-width: 160px;
+    }
+
+    .table {
+        font-size: 13px;
+        min-width: 700px;
+    }
+}

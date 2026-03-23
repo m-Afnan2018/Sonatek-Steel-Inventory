@@ -1,0 +1,239 @@
+.UpcomingOptions {
+    position: relative;
+    background-color: var(--bg-surface);
+    width: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-md);
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.6);
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    padding: 1rem;
+    overflow: hidden;
+    height: 90%;
+    max-height: 425px;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.UpcomingOptions input,
+.UpcomingOptions select {
+    padding: 0rem;
+    font-weight: 400;
+    border-radius: 0.25rem;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    width: 70%;
+    padding: 2px;
+}
+
+.UpcomingOptions>div {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.UpcomingOptions>div>table {
+    min-width: calc(50% - 1rem);
+    width: calc(50% - 1rem);
+}
+
+.UpcomingOptions td {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.UpcomingOptions>div>div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: fit-content;
+    padding: 1rem;
+    background: var(--accent-muted);
+    border-radius: var(--radius-lg);
+    gap: 0.5rem;
+    border: 1px solid var(--accent-border);
+}
+
+.fillUpData {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fillUpData h2 {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    width: 30%;
+    padding-left: 1rem;
+}
+
+.fillUpData h3 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.fillUpData>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.fillUpData>div>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+}
+
+.UpcomingOptions h1 {
+    width: 100%;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.UpcomingOptions .groupBtn {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.15rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+    height: 2.5rem;
+    border-radius: 100rem;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    width: fit-content;
+}
+
+.groupBtn>button {
+    height: 100%;
+    width: 8rem;
+    text-align: center;
+    background-color: var(--bg-hover);
+    padding: 0.25rem;
+    border: none;
+    border-radius: 100rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.groupBtn>button:hover {
+    background-color: var(--accent-muted);
+    color: var(--accent);
+}
+
+.UpcomingOptions td {
+    overflow: visible;
+}
+
+.UpcomingOptions tr>td:nth-child(1) {
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.UpcomingOptions select .UpcomingOptions input {
+    width: 100%;
+}
+
+.UpcomingOptions table {
+    overflow: visible;
+}
+
+.InventoryOptions {
+    max-height: fit-content;
+    height: auto;
+    border-radius: var(--radius-xl);
+}
+
+.InventoryOptions .tableView {
+    flex-direction: column;
+    padding: 1rem;
+    height: 100%;
+    border-radius: var(--radius-md);
+    overflow-y: visible;
+    padding: 0;
+}
+
+.InventoryOptions .toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.InventoryOptions section {
+    background: var(--bg-surface);
+    padding: 0;
+    height: 100%;
+    border-radius: var(--radius-md);
+    width: 100%;
+}
+
+
+.InventoryOptions .groupRadio {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.15rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+    height: fit-content;
+    border-radius: 100rem;
+    overflow: hidden;
+    width: fit-content;
+}
+
+.groupRadio>button {
+    height: 100%;
+    width: 8rem;
+    text-align: center;
+    background-color: var(--bg-hover);
+    padding: 0.25rem;
+    border: none;
+    border-radius: 100rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.groupRadio>button:hover {
+    background-color: var(--accent-muted);
+    color: var(--accent);
+}
+
+.InventoryOptions>svg {
+    position: absolute;
+    font-size: 2rem;
+    padding: 0.25rem;
+    background: var(--accent);
+    border-radius: 10rem;
+    color: #fff;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+
+.css-1xc3v61-indicatorSeparator {
+    display: none;
+}
+
+.css-tj5bde-Svg {
+    width: 14px;
+    height: 14px;
+}

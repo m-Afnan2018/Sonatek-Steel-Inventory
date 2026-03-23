@@ -1,0 +1,578 @@
+/* Staff */
+.staffContainer {
+    font-family: "Poppins", sans-serif;
+    color: var(--text-primary);
+    margin: 2rem;
+    padding: 1rem;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.staffContainer h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem 16px;
+    color: var(--text-primary);
+}
+
+.heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.card {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+}
+
+.table th {
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.table tr:hover {
+    background-color: var(--bg-hover);
+    cursor: pointer;
+}
+
+.activeRow {
+    background-color: var(--accent-muted);
+}
+
+.verified {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.notVerified {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .table th,
+    .table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .heading {
+        font-size: 1.2rem;
+    }
+}
+
+/* Items */
+.inStock {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.sold {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.reserved {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.cancelled {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Varients */
+.Varient {
+    color: var(--text-primary);
+    margin: 2rem;
+    padding: 1rem;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.Varient h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem 16px;
+    color: var(--text-primary);
+}
+
+.cardsWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    padding: 0px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-border);
+}
+
+.card h4 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.detailTable {
+    overflow-x: auto;
+    height: 10rem;
+    overflow-y: scroll;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: left;
+    color: var(--text-secondary);
+}
+
+.table th {
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background-color: var(--bg-hover);
+}
+
+/* Bookings */
+.bookingsContainer {
+    padding: 20px;
+}
+
+.filterWrapper {
+    margin-bottom: 15px;
+}
+
+.filterWrapper label {
+    margin-right: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.tableWrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: max-content;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.table th,
+.table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: center;
+}
+
+.table th {
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background-color: var(--bg-hover);
+}
+
+.pending {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.processing {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.delivered {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.cancelled {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.itemList {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.itemList li {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    color: var(--text-secondary);
+}
+
+/* Bookings */
+.Bookings {
+    font-family: "Poppins", sans-serif;
+    color: var(--text-primary);
+    margin: 2rem;
+    padding: 1rem;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.Bookings .heading {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Summary Cards */
+.Bookings .summaryGrid {
+    color: var(--text-primary);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.Bookings .card {
+    padding: 15px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--text-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+}
+
+.Bookings .cardTitle {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.Bookings .cardValue {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.Bookings .total {
+    background: var(--bg-elevated);
+}
+
+.Bookings .pending {
+    background: var(--bg-elevated);
+}
+
+.Bookings .processing {
+    background: var(--bg-elevated);
+}
+
+.Bookings .delivered {
+    background: var(--bg-elevated);
+}
+
+.Bookings .cancelled {
+    background: var(--bg-elevated);
+}
+
+/* Agents Section */
+.Bookings .agentsSection h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.Bookings .agentGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.Bookings .agentCard {
+    flex: 1 1 180px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+}
+
+.Bookings .agentCard h4 {
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+/* Table Styles */
+.Bookings .tableContainer h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.Bookings .tableContainer {
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+.Bookings .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface);
+}
+
+.Bookings .table th,
+.table td {
+    padding: 2px;
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.Bookings .table th {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+}
+
+.Bookings .table tr:hover {
+    background: var(--bg-hover);
+}
+
+/* Status Colors */
+.Bookings .pending {
+    color: var(--warning);
+}
+
+.Bookings .processing {
+    color: var(--accent);
+}
+
+.Bookings .delivered {
+    color: var(--success);
+}
+
+.Bookings .cancelled {
+    color: var(--danger);
+}
+
+.Bookings .itemDetails {
+    background: var(--bg-elevated);
+    margin: 4px 0;
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Loading / Error */
+.Bookings .loader,
+.error {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+.controlsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.searchForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.controlsRow>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 900;
+}
+
+.searchForm button,
+.controlsRow button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    color: #fff;
+    border: none;
+    background-color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.searchForm button:hover,
+.controlsRow button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.searchForm input {
+    border-radius: var(--radius-lg);
+    padding: 0.5rem 0.5rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    width: 100%;
+}
+
+/* Dashboard filter form */
+.formBlock {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    background: var(--bg-elevated);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-family: "Inter", sans-serif;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+}
+
+.formBlock label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.formBlock input,
+.formBlock select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.formBlock input::placeholder {
+    color: var(--text-muted);
+}
+
+.formBlock input:focus,
+.formBlock select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.twoInOne {
+    display: flex;
+    gap: 1rem;
+}
+
+.twoInOne>div {
+    flex: 1;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-end;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+}
+
+.buttonGroup button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.buttonGroup button:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive tweak for smaller screens */
+@media (max-width: 600px) {
+    .formBlock {
+        grid-template-columns: 1fr;
+    }
+
+    .buttonGroup {
+        justify-content: center;
+    }
+}

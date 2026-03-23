@@ -1,0 +1,243 @@
+/* =========================
+   Layout & Container
+========================= */
+
+.staffContainer {
+    margin: 12px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: 1px solid var(--border);
+}
+
+/* =========================
+   Search / Filter Bar
+========================= */
+
+.searchForm {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.searchInput {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.searchInput::placeholder {
+    color: var(--text-muted);
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.searchButton {
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.searchButton:hover {
+    background: var(--accent-hover);
+}
+
+/* =========================
+   Card Wrapper
+========================= */
+
+.card {
+    padding: 0;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+/* =========================
+   Main Table
+========================= */
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    padding: 10px 14px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.table tbody td {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.table tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+/* =========================
+   Alignment Helpers
+========================= */
+
+.numCell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.idCell {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* =========================
+   Action Icons
+========================= */
+
+.actionCell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actionIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+}
+
+.actionIcon:hover {
+    background: var(--accent-muted);
+    border-color: var(--accent-border);
+    color: var(--accent);
+}
+
+/* =========================
+   Expanded Row (Bookings)
+========================= */
+
+.expandedCell {
+    background: var(--bg-elevated);
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+}
+
+/* =========================
+   Status Pills
+========================= */
+
+.statusPill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: capitalize;
+}
+
+.statusProcessing {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.statusShipped {
+    background: var(--success-muted);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.statusCancelled {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* =========================
+   Pagination
+========================= */
+
+.controlsRow {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 16px;
+    gap: 8px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.controlsRow button {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.controlsRow button:hover {
+    background: var(--accent-hover);
+}
+
+/* =========================
+   Loading / Empty
+========================= */
+
+.loading,
+.empty {
+    padding: 32px;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}

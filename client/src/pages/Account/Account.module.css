@@ -1,0 +1,80 @@
+.Account {
+    background: var(--bg-base);
+}
+
+.Account>h2 {
+    color: var(--text-primary);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+    letter-spacing: 0px;
+    text-align: left;
+    margin-left: 2rem;
+    margin-top: 2rem;
+}
+
+.Account form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+}
+
+.Account form>div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: 90%;
+}
+
+.Account form label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.Account form input {
+    width: 80%;
+    border-radius: 0px 24px 24px 0px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.Account form input::placeholder {
+    color: var(--text-muted);
+}
+
+.Account form span {
+    color: var(--danger);
+    font-weight: 900;
+    font-size: 0.75rem;
+}
+
+.Account button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+}
+
+.Account button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.Account form>div:nth-last-child(1) {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 2rem;
+}

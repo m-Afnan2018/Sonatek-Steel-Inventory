@@ -1,0 +1,39 @@
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-base);
+}
+
+.Varient {
+    display: flex;
+    background: var(--bg-base);
+}
+
+.Varient>h2 {
+    color: var(--text-primary);
+    font-family: Inter;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+    letter-spacing: 0px;
+    text-align: left;
+    margin-left: 2rem;
+    margin-top: 2rem;
+}
+
+.Varient button {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    color: #fff;
+    border: none;
+    background-color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0.25rem;
+}
+
+.Varient button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}

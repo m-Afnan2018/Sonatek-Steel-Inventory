@@ -1,0 +1,57 @@
+import React from 'react';
+import style from './Navbar.module.css';
+import { useSelector } from 'react-redux';
+import { RiMenu2Fill } from 'react-icons/ri';
+import { IoNotificationsOutline } from 'react-icons/io5';
+
+const Navbar = ({ triggerSidebar }) => {
+  const { userData } = useSelector((state) => state.auth);
+
+  const initials = userData
+    ? `${(userData.firstName || '')[0] || ''}${(userData.lastName || '')[0] || ''}`.toUpperCase()
+    : '??';
+
+  const formatRole = (role = '') =>
+    role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return (
+    <header className={style.Navbar}>
+      {/* Hamburger */}
+      <button className={style.menuToggle} onClick={triggerSidebar} aria-label="Toggle sidebar">
+        <RiMenu2Fill />
+      </button>
+
+      {/* Logo */}
+      <div className={style.logo}>
+        <span className={style.logoText}>
+          Sonatek <span>Steel</span>
+        </span>
+      </div>
+
+      <div className={style.spacer} />
+
+      <div className={style.rightSection}>
+        {/* Notification */}
+        <div className={style.iconBtn} title="Notifications">
+          <IoNotificationsOutline />
+          <span className={style.badge} />
+        </div>
+
+        {/* User */}
+        <div className={style.userPill}>
+          <div className={style.avatar}>{initials}</div>
+          <div className={style.userInfo}>
+            <span className={style.userName}>
+              {userData ? `${userData.firstName} ${userData.lastName}` : '—'}
+            </span>
+            <span className={style.userRole}>
+              {formatRole(userData?.role)}
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;

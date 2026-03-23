@@ -1,0 +1,263 @@
+/* Upcoming component classes */
+.Upcoming {
+    padding: 0.25rem;
+    background: var(--bg-base) !important;
+}
+
+.Upcoming td input {
+    padding: 0.15rem;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+}
+
+.Upcoming td svg {
+    font-size: 1.75rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.Upcoming td>div {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.Upcoming td>div>svg {
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.35rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.heading {
+    padding: 0.5rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--bg-surface);
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 0;
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-bottom: 0;
+}
+
+.heading>span {
+    cursor: pointer;
+}
+
+.card {
+    background: var(--bg-surface);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: 4px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    border-top: 0;
+    padding-top: 0;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.tableWrapper {
+    overflow: auto;
+    height: 100%;
+}
+
+
+.coloredShipTo {
+    border-radius: 0.25rem;
+    width: fit-content;
+    padding: 0.15rem 0.25rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.15;
+    padding-top: 0.3rem;
+}
+
+/* AddForm component classes (as it's used inside Upcoming) */
+.AddForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 1rem;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    overflow: visible;
+}
+
+.AddForm>div {
+    width: calc((100% - 20rem) / 5);
+}
+
+.AddForm button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AddForm button:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.AddForm input[type='text'] {
+    height: 1rem !important;
+}
+
+.AddForm input {
+    height: 2.25rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.AddForm input::placeholder {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.addNew {
+    margin: 0.5rem;
+    border-radius: var(--radius-lg);
+    display: flex;
+    gap: 1rem;
+}
+
+.addNew>button {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background-color: var(--bg-elevated);
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+.addNew>button:hover {
+    background-color: var(--accent-muted);
+    border-color: var(--accent-border);
+    color: var(--accent);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.4);
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--bg-surface);
+    font-size: 0.85rem;
+}
+
+.table th {
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+    color: var(--text-secondary);
+}
+
+.table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-hover);
+    cursor: pointer;
+}
+
+.activeRow {
+    background-color: var(--accent-muted) !important;
+}
+
+.table tbody tr {
+    position: relative;
+}
+
+.table tbody tr[data-marked="true"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--success);
+}
+
+.descCell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
+.numCell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+}
+
+.actionCell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionIcon {
+    padding: 0.35rem;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.actionIcon:hover {
+    background: var(--accent-muted);
+    border-color: var(--accent-border);
+    color: var(--accent);
+}

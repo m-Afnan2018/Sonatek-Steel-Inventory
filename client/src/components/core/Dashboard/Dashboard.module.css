@@ -1,0 +1,335 @@
+/* ============================================================
+   DASHBOARD PANELS
+============================================================ */
+
+.Dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+}
+
+/* ============================================================
+   TOOLBAR (search + controls)
+============================================================ */
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.searchInput {
+  flex: 1;
+  height: 36px;
+  padding: 0 var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent);
+}
+
+.searchButton {
+  all: unset;
+  height: 36px;
+  padding: 0 var(--space-4);
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+
+.searchButton:hover {
+  background: var(--accent-hover);
+}
+
+/* ============================================================
+   FILTER FORM
+============================================================ */
+
+.formBlock {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.formBlock > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.formBlock label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.formBlock select,
+.formBlock input {
+  height: 32px;
+  padding: 0 var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  transition: border-color var(--transition-fast);
+}
+
+.formBlock select:focus,
+.formBlock input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.formBlock select option {
+  background: var(--bg-elevated);
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: flex-end;
+}
+
+.buttonGroup button {
+  all: unset;
+  height: 32px;
+  padding: 0 var(--space-3);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.buttonGroup button:hover {
+  background: var(--danger-muted);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+/* ============================================================
+   TABLE CARD WRAPPER
+============================================================ */
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  flex: 1;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition-fast);
+}
+
+.table thead th:hover {
+  color: var(--text-primary);
+}
+
+.table tbody td {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.activeRow {
+  background: var(--accent-muted) !important;
+}
+
+/* Colored warehouse badge */
+.coloredShipTo {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Inline edit buttons */
+.inlineButtons {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.inlineButtons button {
+  all: unset;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inlineButtons button:first-child {
+  background: var(--success-muted);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.inlineButtons button:last-child {
+  background: var(--danger-muted);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+/* ============================================================
+   LOADING / EMPTY
+============================================================ */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  color: var(--text-muted);
+  gap: var(--space-3);
+  font-size: 0.875rem;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.empty p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.controlsRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.paginationControls button {
+  all: unset;
+  height: 30px;
+  padding: 0 var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.paginationControls button:hover {
+  background: var(--accent-muted);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.paginationInfo {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 var(--space-2);
+}
+
+/* ============================================================
+   ERROR TEXT
+============================================================ */
+
+.error {
+  font-size: 0.6875rem;
+  color: var(--danger);
+  margin-top: 2px;
+}

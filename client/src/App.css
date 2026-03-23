@@ -1,0 +1,541 @@
+/* ============================================================
+   APP LAYOUT
+============================================================ */
+
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-base);
+  overflow: hidden;
+}
+
+.main-container {
+  display: flex;
+  height: calc(100vh - var(--navbar-height));
+  overflow: hidden;
+}
+
+/* The content pane (next sibling after sidebar) */
+.main-container > :nth-child(2) {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-base);
+  padding: var(--space-6);
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.page-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SECTION HEADING (legacy .main-heading support)
+============================================================ */
+
+.main-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.card-sm {
+  padding: var(--space-4);
+}
+
+/* ============================================================
+   FORMS (Global)
+============================================================ */
+
+form label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-3);
+  font-size: 0.8125rem;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+form textarea {
+  height: auto;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+}
+
+form input::placeholder,
+form textarea::placeholder {
+  color: var(--text-muted);
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent);
+}
+
+form select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.simpleField {
+  width: 120px;
+  height: 2rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+/* Form field group */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.field-error {
+  font-size: 0.6875rem;
+  color: var(--danger);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   TABLES (Global)
+============================================================ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+table tbody td {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  white-space: nowrap;
+}
+
+table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Center-align specific columns */
+table td.center,
+table th.center {
+  text-align: center;
+}
+
+/* Icons inside table */
+table td svg {
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+/* Inline badges */
+table td .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   NESTED TABLES
+============================================================ */
+
+.nestedRow td {
+  background: var(--bg-elevated);
+  padding: 0 !important;
+}
+
+.nestedTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-elevated);
+  border-left: 2px solid var(--accent);
+}
+
+.nestedTable thead th {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: var(--bg-active);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.nestedTable tbody td {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+}
+
+/* ============================================================
+   BUTTONS (Global)
+============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Variants */
+.btn.default,
+.btn-primary {
+  background: var(--accent);
+}
+.btn.default:hover,
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn.success,
+.btn-success {
+  background: var(--success);
+}
+
+.btn.error,
+.btn-danger {
+  background: var(--danger);
+}
+.btn.error:hover,
+.btn-danger:hover {
+  background: var(--danger-hover);
+}
+
+.btn.waiting,
+.btn-warning {
+  background: var(--warning);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* Icon button */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.btn-icon.danger:hover {
+  background: var(--danger-muted);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+/* Legacy crossButton */
+.crossButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--danger-muted);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.crossButton:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ============================================================
+   STATUS BADGES
+============================================================ */
+
+.badge-success {
+  background: var(--success-muted);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.badge-warning {
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-danger {
+  background: var(--danger-muted);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+.badge-info {
+  background: var(--info-muted);
+  color: var(--info);
+}
+
+.badge-default {
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.badge-neutral {
+  background: rgba(100,116,139,0.15);
+  color: var(--text-secondary);
+  border: 1px solid rgba(100,116,139,0.2);
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--text-muted);
+}
+
+.empty-state h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.empty-state p {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+
+/* ============================================================
+   SEARCH BAR
+============================================================ */
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper svg {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.search-input {
+  height: 36px;
+  padding: 0 var(--space-3) 0 var(--space-8);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  width: 240px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-accent);
+  width: 280px;
+}
+
+/* ============================================================
+   DIVIDER
+============================================================ */
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: var(--space-4) 0;
+}
+
+/* ============================================================
+   UTILITY
+============================================================ */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.w-full { width: 100%; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }

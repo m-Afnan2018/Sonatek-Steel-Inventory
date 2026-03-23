@@ -1,0 +1,122 @@
+import React, { useEffect, useState } from 'react'
+import style from './Inventory.module.css'
+import { deleteItem, getItem } from 'services/operations/itemAPI';
+import { useDispatch, useSelector } from 'react-redux';
+import { formatDate } from 'utils/dateHandler';
+import { useOverlay } from 'hooks/useOverlay';
+import AddItemForm from 'components/common/Overlay/AddItemForm';
+
+const ViewAll = ({ list }) => {
+    const [view, setView] = useState(null);
+
+    const onView = (id) => {
+        if (view && view === id) {
+            setView(null);
+        } else {
+            setView(id)
+        }
+    }
+
+    return (
+        <div className={style.viewAll}>
+            {
+                (list === null || list?.length === 0) && <div className={style.noItem}>
+                    No Item found
+                </div>
+            }
+            {
+                list && list?.length > 0 && list.map((item) => {
+                    return <div key={item._id}>
+                        <div className={style.heading} style={{ borderRadius: item.wagonNumber === view ? '0.5rem 0.5rem 0 0' : '0.5rem' }} onClick={() => onView(item.wagonNumber)}>
+                            <h3>{item.wagonNumber}</h3>
+                        </div>
+                        <ViewMaterial data={item} show={item.wagonNumber === view} />
+                    </div>
+                })
+            }
+        </div >
+    )
+}
+
+const ViewMaterial = ({ data, show }) => {
+    const [showMore, setShowMore] = useState(null);
+    const onView = (id) => {
+        if (showMore && showMore === id) {
+            setShowMore(null);
+        } else {
+            setShowMore(id)
+        }
+    }
+    useEffect(() => setShowMore(null), [show]);
+    return <div className={style.view} style={{ height: show ? `${(data.items.length * 2.5) + (showMore ? 22 : 0)}rem` : 0 }}>
+        {data.items.map((i, index) => {
+            return <div className={style.subHeading} onClick={() => onView(index + 1)}>
+                <h4>{i.name}</h4>
+                <View view={i.data} show={index + 1 === showMore} />
+            </div>
+        })}
+    </div>
+}
+
+const View = ({ view, show }) => {
+    const dispatch = useDispatch()
+
+    const { selectUpdate } = useSelector((state) => state.item);
+    const { showOverlay } = useOverlay();
+    useEffect(() => {
+        if (selectUpdate) {
+            showOverlay(AddItemForm);
+        }
+    }, [selectUpdate, showOverlay])
+
+    const onUpdate = () => {
+        getItem({ itemId: view._id }, dispatch, 'selectUpdate');
+    }
+
+    const onDelete = () => {
+        deleteItem({ itemId: view._id }, dispatch);
+    }
+
+    return (
+        <div className={style.viewMore} style={{ height: show ? '22rem' : 0 }}>
+            <div>
+                <h4>Type:</h4>
+                <h5>{view.type}</h5>
+            </div>
+            <div>
+                <h4>Grade:</h4>
+                <h5>{view.grade}</h5>
+            </div>
+            <div>
+                <h4>Width: </h4>
+                <h5>{view.width}</h5>
+            </div>
+            <div>
+                <h4>Remaining:</h4>
+                <h5>{view.quantity}</h5>
+            </div>
+            <div>
+                <h4>Thickness:</h4>
+                <h5>{view.thickness}</h5>
+            </div>
+            <div>
+                <h4>Wagon Number:</h4>
+                <h5>{view.wagonNumber}</h5>
+            </div>
+            <div>
+                <h4>Challan Number:</h4>
+                <h5>{view.challanNumber}</h5>
+            </div>
+            <div>
+                <h4>Challan Date:</h4>
+                <h5>{formatDate(view.challanDate)}</h5>
+            </div>
+            <div style={{ borderBottom: 0 }}>
+                <button onClick={onUpdate}>Update</button>
+                <button onClick={onDelete}>Delete</button>
+            </div>
+        </div>
+    )
+}
+
+export default ViewAll

@@ -1,0 +1,70 @@
+.NotVerified {
+    height: 100dvh;
+    width: 100dvw;
+    background: radial-gradient(50.00% 50.00% at 50% 50%, var(--bg-active), var(--bg-base) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 60dvw;
+    max-width: 500px;
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+}
+
+.heading {
+    background: var(--bg-elevated);
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.heading>img {
+    width: auto;
+    height: 90%;
+}
+
+h3 {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.loaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 5rem;
+}
+
+.NotVerified button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.NotVerified button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 500px) {
+    .container {
+        width: 90dvw;
+    }
+}

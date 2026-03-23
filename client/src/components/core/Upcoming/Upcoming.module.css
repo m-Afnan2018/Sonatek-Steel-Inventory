@@ -1,0 +1,58 @@
+.AddForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg-elevated);
+    padding: 4px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    overflow: hidden;
+    border-top: 0;
+    padding-top: 0;
+    margin-bottom: 1rem;
+    overflow: visible;
+}
+
+.AddForm>div {
+    width: calc((100% - 20rem) / 4);
+}
+
+.AddForm button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.AddForm button:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.AddForm input[type='text'] {
+    height: 1rem !important;
+}
+
+.AddForm input {
+    height: 2.25rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.AddForm input::placeholder {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.test {
+    background: var(--bg-elevated);
+    padding: 0rem;
+}

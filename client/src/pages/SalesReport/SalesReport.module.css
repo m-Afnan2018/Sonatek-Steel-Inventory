@@ -1,0 +1,179 @@
+/* Items */
+.staffContainer {
+    padding: 0.25rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+}
+
+.staffContainer h3 {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    margin-bottom: 0.25rem;
+}
+
+.heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.card {
+    background: var(--bg-surface);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.tableWrapper {
+    overflow: auto;
+    height: 100%;
+}
+
+.activeRow {
+    background-color: var(--accent-muted);
+}
+
+.controlsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.controlsRow>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 900;
+}
+
+.controlsRow button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    border: none;
+    color: #fff;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.controlsRow button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.formBlock {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    background: var(--bg-elevated);
+    padding: 1rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-family: "Inter", sans-serif;
+}
+
+.formBlock label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.formBlock input,
+.formBlock select {
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    transition: border-color 0.2s ease;
+    font-weight: 400;
+}
+
+.formBlock input:focus,
+.formBlock select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.coloredShipTo {
+    border-radius: 0.25rem;
+    width: fit-content;
+    padding: 0.15rem 0.25rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 1.15;
+    padding-top: 0.3rem;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-end;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+}
+
+.buttonGroup button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    color: #fff;
+    border: none;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.buttonGroup button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.paginationInfo {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 400;
+    cursor: pointer;
+}
+
+/* Responsive tweak for smaller screens */
+@media (max-width: 600px) {
+    .formBlock {
+        grid-template-columns: 1fr;
+    }
+
+    .buttonGroup {
+        justify-content: center;
+    }
+}

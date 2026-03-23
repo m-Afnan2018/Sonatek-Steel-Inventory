@@ -1,0 +1,100 @@
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-base);
+}
+
+.Inventory {
+    background: var(--bg-base);
+    width: 100%;
+}
+
+.allItems {
+    margin: 2rem;
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+}
+
+.allItems>h3 {
+    margin: auto;
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.search {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search>input {
+    width: 100%;
+}
+
+.allItems button {
+    padding: 0.5rem 3rem;
+    border-radius: var(--radius-md);
+    color: #fff;
+    border: none;
+    background-color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.allItems button:hover {
+    background: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
+.allItems form {
+    overflow: hidden;
+}
+
+.allItems input,
+select {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    background-color: var(--bg-elevated);
+    font-weight: 600;
+}
+
+.addNew {
+    margin: 0.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    display: flex;
+    gap: 1rem;
+}
+
+.addNew>button {
+    padding: 0rem 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--accent);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+    height: 2rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.addNew>button:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.6);
+}
