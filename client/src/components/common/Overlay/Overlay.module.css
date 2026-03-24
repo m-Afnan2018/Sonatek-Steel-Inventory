@@ -1,14 +1,11 @@
 .ShowOverlay {
     position: relative;
-    padding: 1rem;
+    padding: 1.25rem;
     background-color: var(--bg-surface);
-    width: 90%;
-    height: 90%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    left: 50%;
+    width: min(460px, 92vw);
+    max-height: 90vh;
     border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -16,6 +13,7 @@
     gap: 1rem;
     border: 1px solid var(--border);
     color: var(--text-primary);
+    overflow-y: auto;
 }
 
 .ShowOverlay>div {
@@ -97,7 +95,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--overlay-bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -225,21 +223,18 @@
 /* Add Item Form Styles */
 .AddItemForm {
     position: relative;
-    padding: 1rem;
+    padding: 1.25rem;
     background-color: var(--bg-surface);
-    width: 90%;
-    height: 90%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    left: 50%;
+    width: min(720px, 92vw);
+    max-height: 90vh;
     border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
     gap: 1rem;
-    overflow: scroll;
+    overflow-y: auto;
     border: 1px solid var(--border);
     color: var(--text-primary);
 }
@@ -399,7 +394,7 @@
 .Overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: var(--overlay-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -635,7 +630,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--overlay-bg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -744,18 +739,17 @@
 .OrderConfirmationOverlay {
     position: relative;
     background-color: var(--bg-surface);
-    width: 90%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    left: 50%;
+    width: min(520px, 92vw);
+    max-height: 90vh;
     border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
     border: 1px solid var(--border);
     color: var(--text-primary);
+    overflow-y: auto;
 }
 
 .OrderConfirmationOverlay>div:nth-child(1) {

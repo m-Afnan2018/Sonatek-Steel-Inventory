@@ -130,17 +130,17 @@ const SingleItem = ({ color, setSelection, item, view }) => {
     };
 
     const status = {
-        'Cold Rolled': { background: '#E0F2FE', foreground: '#0369A1' },
-        'Hot Rolled': { background: '#FEE2E2', foreground: '#B91C1C' }
+        'Cold Rolled': { background: 'var(--info-muted)',   foreground: 'var(--info)' },
+        'Hot Rolled':  { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
     };
 
     return (
         <tr
             className={`${view === item._id ? style.activeRow : ""}`}
-            style={{ backgroundColor: select ? '#EFF6FF' : 'white' }}
+            style={{ backgroundColor: select ? 'var(--accent-muted)' : 'transparent' }}
             onClick={handleSelect}
         >
-            <td>{select ? <FaCheckSquare style={{ color: '#1D54D9', background: 'white', borderRadius: '0.4rem' }} /> : <FaSquare style={{ color: 'white', background: '#1D54D9', borderRadius: '0.25rem' }} />}</td>
+            <td>{select ? <FaCheckSquare style={{ color: 'var(--accent)', borderRadius: '0.4rem' }} /> : <FaSquare style={{ color: 'var(--accent)', borderRadius: '0.25rem', opacity: 0.4 }} />}</td>
             <td>{item.item_id || "-"}</td>
             <td>{item.wagonNumber || "-"}</td>
             <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.challanNumber ? 'In Inventory' : "Arriving"}</td>
@@ -159,7 +159,7 @@ const SingleItem = ({ color, setSelection, item, view }) => {
                 <span>{item.grade?.name || "-"}</span>
             </td>
 
-            <td style={{ fontWeight: '500', color: 'black' }}>{item.quantity.toFixed(3) ?? "-"}</td>
+            <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{item.quantity != null ? Number(item.quantity).toFixed(3) : '-'}</td>
             <td style={{ display: "flex" }}>{item.warehouse === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.warehouse.name.toLowerCase()}</p>}</td>
 
         </tr>

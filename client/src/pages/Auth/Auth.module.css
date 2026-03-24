@@ -3,12 +3,13 @@
   width: 100dvw;
   background: var(--bg-base);
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(56,189,248,0.06) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 50%, var(--accent-muted) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  transition: background-color var(--transition-slow);
 }
 
 .container {
@@ -16,8 +17,9 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(99,102,241,0.05);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--accent-muted);
   overflow: hidden;
+  transition: background-color var(--transition-slow), border-color var(--transition-slow);
 }
 
 .heading {
@@ -28,6 +30,7 @@
   padding: var(--space-8) var(--space-8) var(--space-6);
   border-bottom: 1px solid var(--border-subtle);
   text-align: center;
+  background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
 }
 
 .heading h1 {

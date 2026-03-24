@@ -43,7 +43,7 @@ const Party = () => {
                         <tbody>
                             {parties.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className={style.noData}>No warehouses found</td>
+                                    <td colSpan={2} className={style.noData}>No parties found</td>
                                 </tr>
                             ) : parties.map((c) => (
                                 <React.Fragment key={c._id}>

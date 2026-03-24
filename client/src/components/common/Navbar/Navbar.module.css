@@ -5,9 +5,10 @@
   padding: 0 var(--space-5);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
-  gap: var(--space-4);
+  gap: var(--space-3);
   position: relative;
   z-index: 50;
+  transition: background-color var(--transition-slow), border-color var(--transition-slow);
 }
 
 /* Hamburger */
@@ -22,13 +23,14 @@
   border: 1px solid var(--border);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .menuToggle:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .menuToggle svg {
@@ -41,12 +43,6 @@
   align-items: center;
   gap: var(--space-3);
   text-decoration: none;
-}
-
-.logoImg {
-  height: 32px;
-  width: auto;
-  object-fit: contain;
 }
 
 .logoText {
@@ -70,7 +66,48 @@
 .rightSection {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+}
+
+/* Icon buttons — shared by notification div and theme toggle button */
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  font-family: inherit;
+  font-size: inherit;
+  flex-shrink: 0;
+}
+
+.iconBtn:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.iconBtn svg {
+  font-size: 1.125rem;
+}
+
+/* Notification dot */
+.badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--danger);
+  border: 1.5px solid var(--bg-surface);
 }
 
 /* User pill */
@@ -83,6 +120,7 @@
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   cursor: default;
+  transition: background-color var(--transition-slow), border-color var(--transition-slow);
 }
 
 .avatar {
@@ -90,11 +128,11 @@
   height: 32px;
   border-radius: 50%;
   background: var(--accent-muted);
-  border: 1px solid var(--accent-border);
+  border: 1.5px solid var(--accent-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--accent);
   flex-shrink: 0;
@@ -118,40 +156,4 @@
   color: var(--text-muted);
   text-transform: capitalize;
   line-height: 1.2;
-}
-
-/* Notification bell placeholder */
-.iconBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  cursor: pointer;
-  position: relative;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.iconBtn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.iconBtn svg {
-  font-size: 1.125rem;
-}
-
-.badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--danger);
-  border: 1.5px solid var(--bg-surface);
 }

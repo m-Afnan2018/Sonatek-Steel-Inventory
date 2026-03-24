@@ -384,7 +384,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                         {loadingBookings ? (
                             <div style={{ textAlign: 'center', padding: '2rem' }}>Loading bookings...</div>
                         ) : bookingList === null || bookingList.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
                                 No bookings found for this item
                             </div>
                         ) : (
@@ -476,30 +476,30 @@ const BookingsSubtable = ({ bookings }) => {
         fontSize: '0.7rem',
         textTransform: 'uppercase',
         letterSpacing: '0.04em',
-        color: '#6B7280',
-        borderBottom: '1px solid #E5E7EB'
+        color: 'var(--text-muted)',
+        borderBottom: '1px solid var(--border)'
     }
 
     const tdStyle = {
         padding: '0',
-        borderBottom: '1px solid #F1F5F9'
+        borderBottom: '1px solid var(--border-subtle)'
     }
 
     const status = {
         cancelled: {
             padding: 0,
-            background: '#FEE2E2',
-            color: '#991B1B',
+            background: 'var(--danger-muted)',
+            color: 'var(--danger)',
         },
         shipped: {
             padding: 0,
-            background: '#DCFCE7',
-            color: '#166534',
+            background: 'var(--success-muted)',
+            color: 'var(--success)',
         },
         processing: {
             padding: 0,
-            background: '#FEF3C7',
-            color: '#92400E',
+            background: 'var(--warning-muted)',
+            color: 'var(--warning)',
         }
     }
 
@@ -516,7 +516,7 @@ const BookingsSubtable = ({ bookings }) => {
     return (
         <table className='nestedTable' >
             <thead>
-                <tr style={{ backgroundColor: '#e0e0e0' }}>
+                <tr style={{ backgroundColor: 'var(--bg-active)' }}>
                     <th style={thStyle}>Order ID</th>
                     <th style={thStyle}>Form Type</th>
                     <th style={thStyle}>Quantity</th>

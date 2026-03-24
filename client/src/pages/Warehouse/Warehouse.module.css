@@ -1,10 +1,10 @@
 /* Page layout */
 .Warehouse {
     background: var(--bg-base);
-    min-height: 100vh;
     padding: 2rem;
-    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    font-family: var(--font-sans);
     color: var(--text-primary);
+    transition: background-color var(--transition-slow);
 }
 
 /* Page title */

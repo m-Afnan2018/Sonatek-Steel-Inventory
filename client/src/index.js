@@ -22,21 +22,21 @@ root.render(
                 position="bottom-right"
                 toastOptions={{
                     style: {
-                        background: '#21253a',
+                        background: '#1e2533',
                         color: '#e2e8f0',
-                        border: '1px solid #2d3148',
+                        border: '1px solid #263147',
                         borderRadius: '8px',
                         fontSize: '0.8125rem',
                         fontFamily: "'DM Sans', system-ui, sans-serif",
                     },
                     success: {
-                        iconTheme: { primary: '#10b981', secondary: '#21253a' },
+                        iconTheme: { primary: '#10b981', secondary: '#1e2533' },
                     },
                     error: {
-                        iconTheme: { primary: '#ef4444', secondary: '#21253a' },
+                        iconTheme: { primary: '#ef4444', secondary: '#1e2533' },
                     },
                     loading: {
-                        iconTheme: { primary: '#6366f1', secondary: '#21253a' },
+                        iconTheme: { primary: '#3b82f6', secondary: '#1e2533' },
                     },
                 }}
             />

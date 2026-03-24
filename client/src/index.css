@@ -1,21 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 /* ============================================================
-   DESIGN TOKENS
+   DARK THEME (default)  — matches Sonatek Steel brand palette
 ============================================================ */
-:root {
+:root,
+[data-theme="dark"] {
   /* Backgrounds */
-  --bg-base:        #0f1117;
-  --bg-surface:     #1a1d27;
-  --bg-elevated:    #21253a;
-  --bg-hover:       #252940;
-  --bg-active:      #2d3154;
+  --bg-base:        #0d1117;
+  --bg-surface:     #161b24;
+  --bg-elevated:    #1e2533;
+  --bg-hover:       #252d3e;
+  --bg-active:      #2c3650;
 
-  /* Accent */
-  --accent:         #6366f1;
-  --accent-hover:   #5254cc;
-  --accent-muted:   rgba(99,102,241,0.12);
-  --accent-border:  rgba(99,102,241,0.35);
+  /* Brand Accent — Sonatek Blue */
+  --accent:         #3b82f6;
+  --accent-hover:   #2563eb;
+  --accent-muted:   rgba(59,130,246,0.12);
+  --accent-border:  rgba(59,130,246,0.35);
 
   /* Semantic Colors */
   --success:        #10b981;
@@ -38,13 +39,82 @@
   --text-primary:   #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted:     #64748b;
-  --text-inverse:   #0f1117;
+  --text-inverse:   #0d1117;
 
   /* Borders */
-  --border:         #2d3148;
-  --border-subtle:  #1e2236;
-  --border-strong:  #3d4165;
+  --border:         #263147;
+  --border-subtle:  #1a2336;
+  --border-strong:  #374869;
 
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-accent: 0 0 0 3px rgba(59,130,246,0.25);
+
+  /* Overlay backdrop */
+  --overlay-bg: rgba(10,16,30,0.85);
+}
+
+/* ============================================================
+   LIGHT THEME  — Sonatek brand blues on white/light-grey
+============================================================ */
+[data-theme="light"] {
+  /* Backgrounds */
+  --bg-base:        #f0f4fc;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #f5f8ff;
+  --bg-hover:       #eaf0fb;
+  --bg-active:      #dce8f8;
+
+  /* Brand Accent — Sonatek Blue (full saturation on light) */
+  --accent:         #2241a6;
+  --accent-hover:   #12396d;
+  --accent-muted:   rgba(34,65,166,0.10);
+  --accent-border:  rgba(34,65,166,0.30);
+
+  /* Semantic Colors */
+  --success:        #059669;
+  --success-muted:  rgba(5,150,105,0.10);
+  --success-border: rgba(5,150,105,0.25);
+
+  --warning:        #d97706;
+  --warning-muted:  rgba(217,119,6,0.10);
+  --warning-border: rgba(217,119,6,0.25);
+
+  --danger:         #dc2626;
+  --danger-hover:   #b91c1c;
+  --danger-muted:   rgba(220,38,38,0.10);
+  --danger-border:  rgba(220,38,38,0.25);
+
+  --info:           #0284c7;
+  --info-muted:     rgba(2,132,199,0.10);
+
+  /* Text */
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --text-inverse:   #ffffff;
+
+  /* Borders */
+  --border:         #d1daf0;
+  --border-subtle:  #e2e8f5;
+  --border-strong:  #b0bcd8;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(34,65,166,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 12px rgba(34,65,166,0.12), 0 2px 6px rgba(0,0,0,0.08);
+  --shadow-lg:  0 8px 32px rgba(34,65,166,0.16), 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-accent: 0 0 0 3px rgba(34,65,166,0.20);
+
+  /* Overlay backdrop */
+  --overlay-bg: rgba(10,20,60,0.55);
+}
+
+/* ============================================================
+   SHARED TOKENS  (theme-independent)
+============================================================ */
+:root {
   /* Typography */
   --font-sans:  'DM Sans', system-ui, -apple-system, sans-serif;
   --font-mono:  'IBM Plex Mono', 'Courier New', monospace;
@@ -61,27 +131,21 @@
   --space-12: 48px;
 
   /* Border Radius */
-  --radius-sm:  4px;
-  --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  16px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md:  0 4px 12px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-accent: 0 0 0 3px rgba(99,102,241,0.25);
-
   /* Layout */
-  --sidebar-width:       240px;
-  --sidebar-collapsed:   64px;
-  --navbar-height:       60px;
+  --sidebar-width:     240px;
+  --sidebar-collapsed: 64px;
+  --navbar-height:     60px;
 
   /* Transitions */
-  --transition-fast:   150ms ease;
-  --transition-base:   200ms ease;
-  --transition-slow:   300ms ease;
+  --transition-fast:  150ms ease;
+  --transition-base:  200ms ease;
+  --transition-slow:  300ms ease;
 }
 
 /* ============================================================
@@ -110,6 +174,7 @@ body {
   overflow: hidden;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
 /* Allow text selection in inputs & textareas */

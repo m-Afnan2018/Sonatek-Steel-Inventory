@@ -1,59 +1,37 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 
 const OverlayContext = createContext();
 
 export function OverlayProvider({ children }) {
     const [overlay, setOverlay] = useState(null);
 
-    function showOverlay(Component, props = {}) {
+    const showOverlay = useCallback((Component, props = {}) => {
         setOverlay({ Component, props });
-    }
+    }, []);
 
-    function hideOverlay() {
+    const hideOverlay = useCallback(() => {
         setOverlay(null);
-    }
+    }, []);
 
-    const showStyle = {
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#001f2bd4',
-        zIndex: 10,
-    }
-
-    const hideStyle = {
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#001f2b',
-    }
-
-    const innerStyle = {
-        padding: '1rem',
-        background: 'white',
-        width: '80%',
-        height: '80%',
-        top: '50%',
-        transform: 'translate(-50%, -50 %)',
-        left: '50%',
-        borderRadius: '1rem',
-        boxShadow: '1px 1px black',
+    const backdropStyle = {
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'var(--overlay-bg)',
+        zIndex: 100,
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        gap: '1rem',
-    }
+        justifyContent: 'center',
+        backdropFilter: 'blur(2px)',
+        WebkitBackdropFilter: 'blur(2px)',
+    };
 
     return (
         <OverlayContext.Provider value={{ showOverlay, hideOverlay }}>
             {overlay && (
-                <div style={overlay ? showStyle : hideStyle} onClick={hideOverlay}>
-                    <overlay.Component style={{innerStyle}} {...overlay.props} close={hideOverlay} />
+                <div style={backdropStyle} onClick={hideOverlay}>
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <overlay.Component {...overlay.props} close={hideOverlay} />
+                    </div>
                 </div>
             )}
             {children}

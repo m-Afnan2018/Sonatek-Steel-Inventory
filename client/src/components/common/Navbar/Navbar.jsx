@@ -3,8 +3,9 @@ import style from './Navbar.module.css';
 import { useSelector } from 'react-redux';
 import { RiMenu2Fill } from 'react-icons/ri';
 import { IoNotificationsOutline } from 'react-icons/io5';
+import { MdOutlineLightMode, MdOutlineDarkMode } from 'react-icons/md';
 
-const Navbar = ({ triggerSidebar }) => {
+const Navbar = ({ triggerSidebar, theme, toggleTheme }) => {
   const { userData } = useSelector((state) => state.auth);
 
   const initials = userData
@@ -31,6 +32,16 @@ const Navbar = ({ triggerSidebar }) => {
       <div className={style.spacer} />
 
       <div className={style.rightSection}>
+        {/* Theme toggle */}
+        <button
+          className={style.iconBtn}
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+        </button>
+
         {/* Notification */}
         <div className={style.iconBtn} title="Notifications">
           <IoNotificationsOutline />

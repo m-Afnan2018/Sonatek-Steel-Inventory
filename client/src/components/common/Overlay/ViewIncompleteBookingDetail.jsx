@@ -106,8 +106,8 @@ const ViewIncompleteBookingDetail = ({ data,
                             <input type='text' placeholder={'Enter the Vechicle number to confirm deliver it or reason to cancel'} />
                         </div>}
                         {['admin', 'director', 'accountant'].includes(userData.role) && data.status !== 'Cancelled' && <div className={style.buttons}>
-                            <button type='submit' style={{ backgroundColor: '#6f0505' }}>Cancel</button>
-                            <button type='submit' style={{ backgroundColor: '#056f18' }}>Ship</button>
+                            <button type='submit' style={{ backgroundColor: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                            <button type='submit' style={{ backgroundColor: 'var(--success)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>Ship</button>
                         </div>}
                     </form>
                 </div>

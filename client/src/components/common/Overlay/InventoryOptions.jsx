@@ -8,7 +8,7 @@ import { cancelBooking, createBookingFromInventory, getAllBookingByItem, increas
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'black' }}>{name}:</h2>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>{name}:</h2>
         <h3 style={{ fontSize: '0.75rem', fontWeight: 400 }}>{value}</h3>
     </div >
 }
@@ -62,7 +62,7 @@ const InventoryOptions = ({ data, close, type }) => {
         <div
             className={`${style.UpcomingOptions} ${style.InventoryOptions}`}
             onClick={(e) => e.stopPropagation()}
-            style={{ width: type === 'booking' || type === 'increaseQuantity' ? '444px' : '90%' }}
+            style={{ width: type === 'booking' || type === 'increaseQuantity' ? 'min(460px, 92vw)' : 'min(860px, 92vw)' }}
         >
             <RxCrossCircled onClick={close} />
             <div>
@@ -81,7 +81,7 @@ const InventoryOptions = ({ data, close, type }) => {
                     gap: '0.5rem',
                     display: 'flex',
                     flexDirection: 'column',
-                    border: '1px solid #bcbcbc'
+                    border: '1px solid var(--border)'
                 }}>
                     {tableData({ name: 'ID', value: data.item_id })}
                     {tableData({ name: 'Date', value: data.date?.slice(0, 10) })}
@@ -483,10 +483,10 @@ const TableView = ({ data }) => {
                         <button
                             onClick={() => setShow("Pending")}
                             style={{
-                                border: '1px solid #11386c',
-                                color: show === "Pending" ? "#f0f0ff" : "#11386c",
-                                backgroundColor:
-                                    show === "Pending" ? "#11386c" : "#f0f0ff",
+                                border: '1px solid var(--accent)',
+                                color: show === "Pending" ? '#fff' : 'var(--accent)',
+                                backgroundColor: show === "Pending" ? 'var(--accent)' : 'var(--bg-elevated)',
+                                cursor: 'pointer', borderRadius: 'var(--radius-sm)', padding: '4px 12px', fontWeight: 600,
                             }}
                         >
                             Pending
@@ -494,17 +494,17 @@ const TableView = ({ data }) => {
                         <button
                             onClick={() => setShow("Completed")}
                             style={{
-                                border: '1px solid #11386c',
-                                color: show === "Pending" ? "#11386c" : "#f0f0ff",
-                                backgroundColor:
-                                    show === "Pending" ? "#f0f0ff" : "#11386c",
+                                border: '1px solid var(--accent)',
+                                color: show === "Pending" ? 'var(--accent)' : '#fff',
+                                backgroundColor: show === "Pending" ? 'var(--bg-elevated)' : 'var(--accent)',
+                                cursor: 'pointer', borderRadius: 'var(--radius-sm)', padding: '4px 12px', fontWeight: 600,
                             }}
                         >
                             Completed
                         </button>
                     </div>
                 </div>
-                <div style={{ width: "100%", height: "1px", backgroundColor: "black" }} />
+                <div style={{ width: "100%", height: "1px", backgroundColor: "var(--border)" }} />
             </div>
 
             <table>

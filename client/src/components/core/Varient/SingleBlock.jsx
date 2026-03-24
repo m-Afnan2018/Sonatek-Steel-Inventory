@@ -80,9 +80,9 @@ const SingleBlock = ({ list, name }) => {
         <div className={style.Varient}>
             <h3>{name}</h3>
             <div style={{ height: showForm ? '0' : '40px', opacity: showForm ? '0' : '1' }}>
-                <button onClick={() => handleClick('ALL')} style={{ boxShadow: type === 'ALL' && 'inset 0px 0px 4px 0px black', background: type === 'ALL' && 'rgb(0 122 138)', color: type === 'ALL' && '#f0fbff' }}>All</button>
-                <button onClick={() => handleClick('HR')} style={{ boxShadow: type === 'HR' && 'inset 0px 0px 4px 0px black', background: type === 'HR' && 'rgb(0 122 138)', color: type === 'HR' && '#f0fbff' }}>HR</button>
-                <button onClick={() => handleClick('CR')} style={{ boxShadow: type === 'CR' && 'inset 0px 0px 4px 0px black', background: type === 'CR' && 'rgb(0 122 138)', color: type === 'CR' && '#f0fbff' }}>CR</button>
+                <button onClick={() => handleClick('ALL')} style={{ background: type === 'ALL' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'ALL' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>All</button>
+                <button onClick={() => handleClick('HR')} style={{ background: type === 'HR' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'HR' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>HR</button>
+                <button onClick={() => handleClick('CR')} style={{ background: type === 'CR' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'CR' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>CR</button>
                 <button onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '4rem'}}>Add</button>
             </div>
             <form style={{ height: showForm ? '40px' : '0' }} onSubmit={(e) => onSubmit(e, name)}>

@@ -8,6 +8,7 @@
   height: 100vh;
   background: var(--bg-base);
   overflow: hidden;
+  transition: background-color var(--transition-slow);
 }
 
 .main-container {
@@ -22,6 +23,7 @@
   overflow-y: auto;
   background: var(--bg-base);
   padding: var(--space-6);
+  transition: background-color var(--transition-slow);
 }
 
 /* ============================================================
@@ -75,6 +77,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
+  transition: background-color var(--transition-slow), border-color var(--transition-slow);
 }
 
 .card-sm {

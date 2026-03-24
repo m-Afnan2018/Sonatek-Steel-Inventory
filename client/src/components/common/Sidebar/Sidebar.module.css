@@ -5,7 +5,7 @@
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
   overflow: hidden;
-  transition: width var(--transition-slow);
+  transition: width var(--transition-slow), background-color var(--transition-slow), border-color var(--transition-slow);
   flex-shrink: 0;
   z-index: 40;
 }

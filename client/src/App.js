@@ -45,6 +45,11 @@ import { removeError, removeSuccess } from 'slices/loaderSlice';
 import { getUser } from 'services/operations/authAPI';
 import { getAllVarients } from 'services/operations/varientAPI';
 
+// =======================
+// Theme Hook
+// =======================
+import { useTheme } from 'hooks/useTheme';
+
 function App() {
 
     // =======================
@@ -58,6 +63,7 @@ function App() {
     // =======================
     const [sidebar, setSidebar] = useState(false);
     const dispatch = useDispatch();
+    const { theme, toggleTheme } = useTheme();
 
     // =======================
     // Loader Toast Handling
@@ -133,7 +139,7 @@ function App() {
     // =======================
     return (
         <div className="App">
-            <Navbar triggerSidebar={triggerSidebar} />
+            <Navbar triggerSidebar={triggerSidebar} theme={theme} toggleTheme={toggleTheme} />
 
             <div className="main-container">
                 <Sidebar sidebar={sidebar} />

@@ -191,7 +191,7 @@ const Warehouse = () => {
                                             ) : <div className={style.cellSecondary}>{c.phoneNumber}</div>}
                                         </td>
                                         <td className={style.center}>{c.totalItems || 0}</td>
-                                        <td className={style.center}>{c.totalQuantity.toFixed(3) || 0}</td>
+                                        <td className={style.center}>{c.totalQuantity != null ? Number(c.totalQuantity).toFixed(3) : '0.000'}</td>
                                         <td>
                                             {editingId === c._id ? (
                                                 <div className={style.actionGroup}>

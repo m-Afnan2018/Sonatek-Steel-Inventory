@@ -14,11 +14,11 @@ import { useOverlay } from 'hooks/useOverlay';
 import ViewIncompleteBookingDetail from 'components/common/Overlay/ViewIncompleteBookingDetail';
 
 const STATUS_STYLES = {
-    Pending: { background: '#FFF4E5', foreground: '#D97706' },
-    Processing: { background: '#E0E7FF', foreground: '#4338CA' },
-    Shipped: { background: '#E0F2FE', foreground: '#0369A1' },
-    Delivered: { background: '#DCFCE7', foreground: '#15803D' },
-    Cancelled: { background: '#FEE2E2', foreground: '#B91C1C' },
+    Pending:    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
+    Processing: { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
+    Shipped:    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
+    Delivered:  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
+    Cancelled:  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
 };
 
 const Action = () => {
@@ -155,7 +155,7 @@ const Action = () => {
 
                             return (
                                 <tr key={booking._id} onClick={() => viewData(booking)}>
-                                    <td style={{ fontWeight: '500', color: 'black' }}>{booking.partySnapshot?.name}</td>
+                                    <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{booking.partySnapshot?.name}</td>
                                     <td>{formatDate(booking.bookingDate)}</td>
                                     <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{`${booking.bookedBy.firstName} ${booking.bookedBy.lastName}`}</td>
                                     <td style={{ display: 'flex' }}>

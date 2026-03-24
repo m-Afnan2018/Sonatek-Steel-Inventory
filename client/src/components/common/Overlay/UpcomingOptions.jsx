@@ -7,7 +7,7 @@ import { markForBooking, moveToInventory, unmarkForBooking } from 'services/oper
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'black' }}>{name}:</h2>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>{name}:</h2>
         <h3 style={{ fontSize: '0.75rem', fontWeight: 400 }}>{value}</h3>
     </div >
 }
@@ -110,18 +110,18 @@ const UpcomingOptions = ({ data, close, type }) => {
             <div>
                 <h1>Upcoming Action</h1>
                 <div className={style.groupBtn}>
-                    <button onClick={() => setShow('party')} style={{ borderRadius: '100rem 0 0 100rem', color: show === 'party' ? 'white' : '#11386c', backgroundColor: show === 'party' ? '#11386c' : 'white' }}>To Party</button>
-                    <button onClick={() => { if (!data.marking) setShow('inventory') }} style={{ cursor: data.marking ? 'not-allowed' : 'pointer', borderRadius: '0 100rem 100rem 0', color: show === 'party' ? '#11386c' : 'white', backgroundColor: show === 'party' ? 'white' : '#11386c' }}>To Inventory</button>
+                    <button onClick={() => setShow('party')} style={{ borderRadius: '100rem 0 0 100rem', color: show === 'party' ? '#fff' : 'var(--accent)', backgroundColor: show === 'party' ? 'var(--accent)' : 'var(--bg-elevated)', border: '1px solid var(--accent)', padding: '4px 14px', fontWeight: 600, cursor: 'pointer' }}>To Party</button>
+                    <button onClick={() => { if (!data.marking) setShow('inventory') }} style={{ cursor: data.marking ? 'not-allowed' : 'pointer', borderRadius: '0 100rem 100rem 0', color: show === 'party' ? 'var(--accent)' : '#fff', backgroundColor: show === 'party' ? 'var(--bg-elevated)' : 'var(--accent)', border: '1px solid var(--accent)', padding: '4px 14px', fontWeight: 600 }}>To Inventory</button>
                 </div>
             </div>
 
-            <div style={{ width: '100%', height: '1px', backgroundColor: 'black' }}></div>
+            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border)' }}></div>
 
             <div>
                 <div style={{
                     height: 'fit-content',
                     padding: '1rem',
-                    background: '#0000ff0f',
+                    background: 'var(--accent-muted)',
                     borderRadius: '1rem',
                     gap: '0.5rem'
                 }}>

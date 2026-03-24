@@ -102,8 +102,8 @@ const Account = () => {
                         })}
                         style={{
                             backgroundColor: editted
-                                ? 'white'
-                                : 'rgba(196, 196, 196, 1)',
+                                ? 'var(--bg-elevated)'
+                                : 'var(--bg-hover)',
                         }}
                         disabled={!editted}
                     />
@@ -128,8 +128,8 @@ const Account = () => {
                         })}
                         style={{
                             backgroundColor: editted
-                                ? 'white'
-                                : 'rgba(196, 196, 196, 1)',
+                                ? 'var(--bg-elevated)'
+                                : 'var(--bg-hover)',
                         }}
                         disabled={!editted}
                     />
@@ -155,8 +155,8 @@ const Account = () => {
                         })}
                         style={{
                             backgroundColor: editted
-                                ? 'white'
-                                : 'rgba(196, 196, 196, 1)',
+                                ? 'var(--bg-elevated)'
+                                : 'var(--bg-hover)',
                         }}
                         disabled={!editted}
                     />

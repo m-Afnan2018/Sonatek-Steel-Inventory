@@ -20,7 +20,7 @@ const SingleVarient = ({ onDelete, onUpdate, value }) => {
 
     return (
         <tr className={style.SingleVarient} onClick={() => setEditable(true)}>
-            <td style={{ color: 'black' }}> {editable ? <input placeholder={value.name} type='text' value={edit} onChange={(e) => setEdit(e.target.value)} /> : value.name}</td>
+            <td style={{ color: 'var(--text-primary)' }}> {editable ? <input placeholder={value.name} type='text' value={edit} onChange={(e) => setEdit(e.target.value)} /> : value.name}</td>
             <td style={{ fontWeight: '500', textDecoration: 'underline' }}> {value.type}</td>
             <td>
                 {editable ? <div>

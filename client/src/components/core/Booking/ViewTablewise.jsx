@@ -161,11 +161,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const dispatch = useDispatch();
 
     const status = {
-        'Pending': { background: '#FFF4E5', foreground: '#D97706' },
-        'Processing': { background: '#E0E7FF', foreground: '#4338CA' },
-        'Shipped': { background: '#E0F2FE', foreground: '#0369A1' },
-        'Delivered': { background: '#DCFCE7', foreground: '#15803D' },
-        'Cancelled': { background: '#FEE2E2', foreground: '#B91C1C' }
+        'Pending':    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
+        'Processing': { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
+        'Shipped':    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
+        'Delivered':  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
+        'Cancelled':  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
     };
 
     const isOpen = view === item._id;
@@ -208,7 +208,7 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                 style={{ cursor: "pointer" }}
             >
                 <td style={{ fontWeight: '500' }}>{item.orderId || "-"}</td>
-                <td style={{ fontWeight: '500', color: 'black' }}>{item.party || "-"}</td>
+                <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{item.party || "-"}</td>
                 {allowed && <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.bookedBy || "-"}</td>}
                 <td>{bookingDate}</td>
                 <td>{item.items?.length}</td>

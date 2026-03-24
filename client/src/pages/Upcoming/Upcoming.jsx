@@ -122,8 +122,8 @@ const Upcoming = () => {
                                 <tr style={{ borderBottom: 'none' }}>
                                     <td></td>
                                     <td></td>
-                                    <td style={{ fontWeight: '600', color: 'black' }}>Total quantity:</td>
-                                    <td style={{ fontWeight: '600', color: 'black' }}>{count.toFixed(3)}</td>
+                                    <td style={{ fontWeight: '600', color: 'var(--text-primary)' }}>Total quantity:</td>
+                                    <td style={{ fontWeight: '600', color: 'var(--accent)' }}>{count != null ? Number(count).toFixed(3) : '0.000'}</td>
                                 </tr>
                             </tfoot>
                         </table>
