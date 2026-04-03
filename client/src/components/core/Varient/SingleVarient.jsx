@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import style from './Varient.module.css'
 import { IoTrashOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
@@ -6,6 +6,10 @@ import { RxCheck, RxCross2 } from "react-icons/rx";
 const SingleVarient = ({ onDelete, onUpdate, value }) => {
     const [edit, setEdit] = useState(value.name)
     const [editable, setEditable] = useState(false);
+
+    useEffect(() => {
+        setEdit(value.name);
+    }, [value.name]);
 
     const updating = (e) => {
         e.stopPropagation()

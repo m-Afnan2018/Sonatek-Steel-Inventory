@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import style from './Varient.module.css'
 import SingleVarient from './SingleVarient'
 import { addVarient, deleteVarient, updateVarient } from 'services/operations/varientAPI'
@@ -8,19 +8,21 @@ const SingleBlock = ({ list, name }) => {
     const [showForm, setShowForm] = useState(false)
     const [varient, setVarient] = useState('')
     const [option, setOption] = useState('Hot Rolled');
-    const [show, setShow] = useState(list);
     const [type, setType] = useState('ALL')
+
+    const show = useMemo(() => {
+        if (type === 'HR') return list ? list.filter(i => i.type === 'Hot Rolled') : [];
+        if (type === 'CR') return list ? list.filter(i => i.type === 'Cold Rolled') : [];
+        return list || [];
+    }, [list, type]);
 
     const handleClick = (t) => {
         if (t === 'HR') {
             setType('HR')
-            setShow(list.filter(i => i.type === 'Hot Rolled'))
         } else if (t === 'CR') {
             setType('CR')
-            setShow(list.filter(i => i.type === 'Cold Rolled'))
         } else {
             setType('ALL')
-            setShow(list);
         }
     }
 
@@ -83,7 +85,7 @@ const SingleBlock = ({ list, name }) => {
                 <button onClick={() => handleClick('ALL')} style={{ background: type === 'ALL' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'ALL' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>All</button>
                 <button onClick={() => handleClick('HR')} style={{ background: type === 'HR' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'HR' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>HR</button>
                 <button onClick={() => handleClick('CR')} style={{ background: type === 'CR' ? 'var(--accent)' : 'var(--bg-elevated)', color: type === 'CR' ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}>CR</button>
-                <button onClick={() => setShowForm(true)} style={{marginLeft: 'auto', width: '4rem'}}>Add</button>
+                <button onClick={() => setShowForm(true)} style={{ marginLeft: 'auto', width: '4rem' }}>Add</button>
             </div>
             <form style={{ height: showForm ? '40px' : '0' }} onSubmit={(e) => onSubmit(e, name)}>
                 <div>
@@ -91,7 +93,7 @@ const SingleBlock = ({ list, name }) => {
                         id='type'
                         defaultValue={option}
                         onChange={(e) => setOption(e.target.value)}
-                        style={{width: '4rem'}}
+                        style={{ width: '4rem' }}
                     >
                         {name !== 'Grade' && <option value='Both'>All</option>}
                         <option value='Hot Rolled'>  HR </option>
