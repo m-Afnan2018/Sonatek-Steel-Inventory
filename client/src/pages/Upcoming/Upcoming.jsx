@@ -8,6 +8,7 @@ import { generateShipToColors } from 'utils/colorHandler';
 import { downloadTemplate, uploadCSV } from 'services/operations/utilAPI';
 import { useOverlay } from 'hooks/useOverlay';
 import UpcomingOptions from 'components/common/Overlay/UpcomingOptions';
+import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 import { getAllPartyDetails } from 'services/operations/bookingAPI';
 import { FaRegTrashCan } from "react-icons/fa6";
 import { FiEye } from 'react-icons/fi';
@@ -175,7 +176,10 @@ const SingleItem = ({ color, item, setView, view }) => {
 
     const handleDelete = (e) => {
         e.stopPropagation();
-        deleteItem({ itemId: item._id }, dispatch)
+        showOverlay(ConfirmationOverlay, {
+            message: 'Delete this item? This cannot be undone.',
+            onAccept: () => deleteItem({ itemId: item._id }, dispatch),
+        });
     }
 
     const handleOrder = () => {

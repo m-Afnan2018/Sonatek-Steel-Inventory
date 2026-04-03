@@ -25,7 +25,7 @@ const Navbar = ({ triggerSidebar, theme, toggleTheme }) => {
 
       {/* Logo */}
       <div className={style.logo}>
-        <img src={Logo} alt="Sonatek Steel logo" />
+        <img src={Logo} alt="Sonatek Steel logo" style={{ filter: theme === 'dark' ? 'invert(0)' : 'invert(1)' }} />
       </div>
 
       <div className={style.spacer} />

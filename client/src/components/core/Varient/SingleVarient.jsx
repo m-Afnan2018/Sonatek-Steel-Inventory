@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react'
 import style from './Varient.module.css'
 import { IoTrashOutline } from "react-icons/io5";
 import { RxCheck, RxCross2 } from "react-icons/rx";
+import { useOverlay } from 'hooks/useOverlay';
+import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 
 const SingleVarient = ({ onDelete, onUpdate, value }) => {
+    const { showOverlay } = useOverlay();
     const [edit, setEdit] = useState(value.name)
     const [editable, setEditable] = useState(false);
 
@@ -51,7 +54,13 @@ const SingleVarient = ({ onDelete, onUpdate, value }) => {
                 ) : (
                     <IoTrashOutline
                         style={{ color: 'red', cursor: 'pointer' }}
-                        onClick={(e) => { e.stopPropagation(); onDelete(value._id); }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            showOverlay(ConfirmationOverlay, {
+                                message: `Delete "${value.name}"? This cannot be undone.`,
+                                onAccept: () => onDelete(value._id),
+                            });
+                        }}
                     />
                 )}
             </td>

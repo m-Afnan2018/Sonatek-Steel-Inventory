@@ -762,7 +762,7 @@
     margin-bottom: 0;
 }
 
-.OrderConfirmationOverlay>div:nth-child(1)>div{
+.OrderConfirmationOverlay>div:nth-child(1)>div {
     width: 100%;
 }
 
