@@ -438,11 +438,30 @@ const addVarient = async (req, res) => {
 
 const getAllVarients = async (req, res) => {
     try {
-        // Performing Task
-        const warehouses = await Warehouse.find({});
-        const grades = await Grade.find({})
-        const thickness = await Thickness.find({});
-        const widths = await Width.find({});
+        // Fetch all variants
+        const [warehousesDocs, gradesDocs, thicknessDocs, widthsDocs] = await Promise.all([
+            Warehouse.find({}).lean(),
+            Grade.find({}).lean(),
+            Thickness.find({}).lean(),
+            Width.find({}).lean(),
+        ]);
+
+        // Helper: attach inUse flag by checking Item references
+        const attachInUse = async (docs, field) => {
+            return Promise.all(
+                docs.map(async (doc) => {
+                    const used = await Item.exists({ [field]: doc._id });
+                    return { ...doc, inUse: !!used };
+                })
+            );
+        };
+
+        const [warehouses, grades, thickness, widths] = await Promise.all([
+            attachInUse(warehousesDocs, 'warehouse'),
+            attachInUse(gradesDocs, 'grade'),
+            attachInUse(thicknessDocs, 'thickness'),
+            attachInUse(widthsDocs, 'width'),
+        ]);
 
         res.status(200).json({
             success: true,
