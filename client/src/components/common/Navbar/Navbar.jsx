@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from 'assets/images/Logo.png';
 import style from './Navbar.module.css';
 import { useSelector } from 'react-redux';
 import { RiMenu2Fill } from 'react-icons/ri';
@@ -24,9 +25,7 @@ const Navbar = ({ triggerSidebar, theme, toggleTheme }) => {
 
       {/* Logo */}
       <div className={style.logo}>
-        <span className={style.logoText}>
-          Sonatek <span>Steel</span>
-        </span>
+        <img src={Logo} alt="Sonatek Steel logo" />
       </div>
 
       <div className={style.spacer} />

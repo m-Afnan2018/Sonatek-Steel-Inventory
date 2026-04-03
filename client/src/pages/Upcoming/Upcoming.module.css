@@ -196,6 +196,11 @@
     transition: background 0.15s ease;
 }
 
+.table thead tr {
+    position: relative;
+    z-index: 0;
+}
+
 .table tbody tr:hover {
     background-color: var(--bg-hover);
     cursor: pointer;
@@ -207,6 +212,7 @@
 
 .table tbody tr {
     position: relative;
+    z-index: 0;
 }
 
 .table tbody tr[data-marked="true"]::before {
