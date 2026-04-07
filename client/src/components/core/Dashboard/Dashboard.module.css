@@ -78,7 +78,7 @@
   border-radius: var(--radius-lg);
 }
 
-.formBlock > div {
+.formBlock>div {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -151,12 +151,16 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .tableWrapper {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 420px;
+  flex: 1;
+  min-height: 0;
 }
 
 .table {
