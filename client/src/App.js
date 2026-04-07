@@ -61,7 +61,13 @@ function App() {
     // =======================
     // Local State
     // =======================
-    const [sidebar, setSidebar] = useState(false);
+    const [sidebar, setSidebar] = useState(() => {
+        try {
+            return localStorage.getItem('sidebarOpen') === 'true';
+        } catch {
+            return false;
+        }
+    });
     const dispatch = useDispatch();
     const { theme, toggleTheme } = useTheme();
 
@@ -131,7 +137,9 @@ function App() {
     // UI Handlers
     // =======================
     const triggerSidebar = () => {
-        setSidebar(!sidebar);
+        const next = !sidebar;
+        setSidebar(next);
+        try { localStorage.setItem('sidebarOpen', next); } catch {}
     };
 
     // =======================
