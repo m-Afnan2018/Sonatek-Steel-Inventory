@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useActiveTheme } from "hooks/useActiveTheme";
 import style from "./Upcoming.module.css";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,7 @@ const AddForm = () => {
     const dispatch = useDispatch();
 
     const [type, setType] = useState(false);
+    useActiveTheme(); // re-renders this component when dark/light theme toggles
 
     const { showOverlay } = useOverlay()
 
@@ -103,19 +105,37 @@ const AddForm = () => {
         }
     };
 
+    // Reads live CSS variables so the dropdown adapts to dark / light theme automatically
+    const getCSSVar = (name) =>
+        getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
     const customStyles = {
-        control: (provided) => ({
+        control: (provided, state) => ({
             ...provided,
             minHeight: "2rem",
             height: "1rem",
             fontSize: "0.75rem",
             padding: "0 2px",
-            borderRadius: '0.5rem'
+            borderRadius: '0.5rem',
+            backgroundColor: getCSSVar('--bg-elevated'),
+            borderColor: state.isFocused ? getCSSVar('--accent') : getCSSVar('--border'),
+            boxShadow: state.isFocused ? `0 0 0 2px ${getCSSVar('--accent-border')}` : 'none',
+            '&:hover': { borderColor: getCSSVar('--border-strong') },
         }),
         valueContainer: (provided) => ({
             ...provided,
             height: "1rem",
             padding: "0 4px",
+            fontSize: "0.75rem",
+        }),
+        singleValue: (provided) => ({
+            ...provided,
+            color: getCSSVar('--text-primary'),
+            fontSize: "0.75rem",
+        }),
+        placeholder: (provided) => ({
+            ...provided,
+            color: getCSSVar('--text-muted'),
             fontSize: "0.75rem",
         }),
         input: (provided) => ({
@@ -124,7 +144,8 @@ const AddForm = () => {
             padding: "0px",
             fontSize: "0.75rem",
             borderRadius: '0.5rem',
-            height: '16px'
+            height: '16px',
+            color: getCSSVar('--text-primary'),
         }),
         indicatorsContainer: (provided) => ({
             ...provided,
@@ -133,20 +154,38 @@ const AddForm = () => {
         dropdownIndicator: (provided) => ({
             ...provided,
             padding: "2px",
+            color: getCSSVar('--text-muted'),
         }),
         clearIndicator: (provided) => ({
             ...provided,
             padding: "2px",
-        }),
-        option: (provided) => ({
-            ...provided,
-            fontSize: "0.75rem",
-            padding: "4px 8px",
+            color: getCSSVar('--text-muted'),
         }),
         menu: (provided) => ({
             ...provided,
             fontSize: "0.75rem",
-        })
+            backgroundColor: getCSSVar('--bg-elevated'),
+            border: `1px solid ${getCSSVar('--border')}`,
+            boxShadow: getCSSVar('--shadow-md'),
+        }),
+        menuList: (provided) => ({
+            ...provided,
+            padding: '2px 0',
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            fontSize: "0.75rem",
+            padding: "4px 8px",
+            backgroundColor: state.isSelected
+                ? getCSSVar('--accent')
+                : state.isFocused
+                ? getCSSVar('--bg-hover')
+                : 'transparent',
+            color: state.isSelected
+                ? '#ffffff'
+                : getCSSVar('--text-primary'),
+            cursor: 'pointer',
+        }),
     };
 
     const typeChange = (e) => {
