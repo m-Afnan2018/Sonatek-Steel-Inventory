@@ -14,7 +14,7 @@ const AddForm = () => {
     const { thicknesses, grades, widths, warehouses } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
 
-    const [type, setType] = useState(false);
+    const [type] = useState('Cold Rolled');
     useActiveTheme(); // re-renders this component when dark/light theme toggles
 
     const { showOverlay } = useOverlay()
@@ -66,14 +66,12 @@ const AddForm = () => {
         })) || [];
     }
 
-    const typeOption = [{
-        label: 'HR',
-        value: 'Hot Rolled'
-    },
-    {
-        label: 'CR',
-        value: 'Cold Rolled'
-    }]
+    const typeOption = [
+        {
+            label: 'CR',
+            value: 'Cold Rolled'
+        }
+    ]
 
     const handleKeyDown = (e, prevField, nextField) => {
         if (e.key === "Enter") {
@@ -179,8 +177,8 @@ const AddForm = () => {
             backgroundColor: state.isSelected
                 ? getCSSVar('--accent')
                 : state.isFocused
-                ? getCSSVar('--bg-hover')
-                : 'transparent',
+                    ? getCSSVar('--bg-hover')
+                    : 'transparent',
             color: state.isSelected
                 ? '#ffffff'
                 : getCSSVar('--text-primary'),
@@ -188,9 +186,7 @@ const AddForm = () => {
         }),
     };
 
-    const typeChange = (e) => {
-        setType(e.value);
-    }
+
 
     const onBookinging = (data) => {
         let mini = 0;
@@ -222,30 +218,7 @@ const AddForm = () => {
                 />
             </div>
 
-            {/* Type */}
-            <div>
-                <Controller
-                    name="type"
-                    control={control}
-                    render={({ field }) => (
-                        <Select
-                            classNames={{
-                                control: (state) =>
-                                    state.isFocused ? style.test : style.test,
 
-                            }}
-                            {...field}
-                            options={typeOption}
-                            value={field.value}
-                            onChange={(option) => { field.onChange(option); typeChange(option) }}
-                            onKeyDown={(e) => handleSelectEnter(e, field, typeOption, 'date', "width")}
-                            placeholder="Type"
-                            styles={customStyles}
-                            isSearchable
-                        />
-                    )}
-                />
-            </div>
 
             {/* Thickness */}
             <div>

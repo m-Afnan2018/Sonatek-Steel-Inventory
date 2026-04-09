@@ -42,7 +42,6 @@ const Filter = ({ filterOptions, setFilterOptions }) => {
                     {...register('type', { required: 'Grade is required' })}
                 >
                     <option value=''>Select type:</option>
-                    <option value={'Hot Rolled'}> Hot Rolled </option>
                     <option value={'Cold Rolled'}> Cold Rolled </option>
                 </select>
                 {errors.grade && <span className={style.error}>{errors.grade.message}</span>}

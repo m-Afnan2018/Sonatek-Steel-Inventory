@@ -153,11 +153,11 @@ const SingleItem = ({ item, view, setView, allowed }) => {
         : "-";
 
     const status = {
-        'Pending':    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
-        'Processing': { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
-        'Shipped':    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
-        'Delivered':  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
-        'Cancelled':  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
+        'Pending': { background: 'var(--warning-muted)', foreground: 'var(--warning)' },
+        'Processing': { background: 'var(--accent-muted)', foreground: 'var(--accent)' },
+        'Shipped': { background: 'var(--info-muted)', foreground: 'var(--info)' },
+        'Delivered': { background: 'var(--success-muted)', foreground: 'var(--success)' },
+        'Cancelled': { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
     };
 
     const isOpen = view === item._id;
@@ -245,7 +245,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
             grade: "",
-            type: "",
+            type: "Cold Rolled",
             width: "",
             thickness: "",
             warehouse: "",
@@ -323,14 +323,13 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
     return (
         <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
-            <div>
+            {/* <div>
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")}>
                     <option value="">All</option>
-                    <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
-            </div>
+            </div> */}
 
             {/* Grade */}
             <div>
