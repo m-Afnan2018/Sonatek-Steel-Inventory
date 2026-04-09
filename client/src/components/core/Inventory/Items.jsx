@@ -5,13 +5,14 @@ import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 import { LuDownload } from "react-icons/lu";
-import { FiEye } from 'react-icons/fi';
+import { FiEye, FiEdit } from 'react-icons/fi';
 import { FaPlus } from "react-icons/fa6";
 import { IoCartOutline } from 'react-icons/io5';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 'services/operations/bookingAPI';
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
+import { RxCheck, RxCross2 } from "react-icons/rx";
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -164,40 +165,36 @@ const Items = () => {
 };
 
 const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow }) => {
-    const challanDate = item.challanDate
-        ? new Date(item.challanDate).toLocaleDateString()
-        : '-';
-
     const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
-    const [select, setSelect] = useState('');
-    const [value, setValue] = useState('');
+    const [itemDetail, setItemDetail] = useState(item);
+    const [isEditing, setIsEditing] = useState(false);
     const [bookingList, setBookingList] = useState(null);
     const [loadingBookings, setLoadingBookings] = useState(false);
     const { showOverlay } = useOverlay();
 
-    const clickHandler = (type) => {
-        setSelect(type);
-        setValue(item[type]);
+    useEffect(() => setItemDetail(item), [item]);
+
+    const handleEditToggle = (e) => {
+        e.stopPropagation();
+        setIsEditing(true);
     };
 
     const handleSave = (e) => {
         e.stopPropagation();
-        const grade = item.grade._id;
-        const thickness = item.thickness._id;
-        const width = item.width._id;
-        const warehouse = item.warehouse?._id;
-        let Item = { ...item, grade, thickness, width, warehouse: warehouse };
-        let updatedItem = { ...Item, [select]: value };
-        updateItem(updatedItem, dispatch);
-        setSelect('');
+        const grade = itemDetail.grade._id;
+        const thickness = itemDetail.thickness._id;
+        const width = itemDetail.width._id;
+        const warehouse = itemDetail.warehouse?._id;
+        let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
+        updateItem(Item, dispatch);
+        setIsEditing(false);
     };
 
     const handleCancel = (e) => {
         e.stopPropagation();
-        setValue(item[select]);
-        setSelect('');
+        setIsEditing(false);
     };
 
     const toggleSubtable = async (e) => {
@@ -217,7 +214,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         function convertItem(data) {
             return {
                 _id: data._id,
-                item_id: data.id,
+                item_id: data.item_id,
                 type: data.type,
                 grade: data.grade,
                 form: "Coil",
@@ -236,7 +233,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
             };
         }
 
-        const output = convertItem(item);
+        const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
             type: 'increaseQuantity',
@@ -248,7 +245,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         function convertItem(data) {
             return {
                 _id: data._id,
-                item_id: data.id,
+                item_id: data.item_id,
                 type: data.type,
                 grade: data.grade,
                 form: "Coil",
@@ -267,7 +264,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
             };
         }
 
-        const output = convertItem(item);
+        const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
             type: 'logs',
@@ -279,7 +276,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         function convertItem(data) {
             return {
                 _id: data._id,
-                item_id: data.id,
+                item_id: data.item_id,
                 type: data.type,
                 grade: data.grade,
                 form: "Coil",
@@ -298,7 +295,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
             };
         }
 
-        const output = convertItem(item);
+        const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
             type: 'booking',
@@ -309,72 +306,113 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         })
     };
 
-    const renderEditableField = (type, inputType = 'text') => (
-        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-            <input
-                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
-                type={inputType}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            />
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div>
-        </div>
-    );
+    const renderDropdownField = (type, options) => {
+        const valueSetter = (val) => {
+            const option = options.find(i => i._id === val);
+            setItemDetail((prev) => ({ ...prev, [type]: option }));
+        };
 
-    const renderDropdownField = (type, options) => (
-        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-            <select
-                style={{ padding: '0rem', width: '3rem' }}
-                value={value?._id}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            >
-                <option value="">Select</option>
-                {options.map((opt) => (
-                    <option key={opt._id} value={opt._id}>
-                        {opt.name || opt.value}
-                    </option>
-                ))}
-            </select>
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
+        return (
+            <div onClick={(e) => e.stopPropagation()}>
+                <select
+                    style={{ width: 'auto', padding: '0.15rem' }}
+                    value={itemDetail[type]?._id || ""}
+                    onChange={(e) => valueSetter(e.target.value)}
+                >
+                    <option value="" disabled>Select</option>
+                    {options.map((opt) => (
+                        <option key={opt._id} value={opt._id}>
+                            {opt.name || opt.value}
+                        </option>
+                    ))}
+                </select>
             </div>
+        );
+    };
+
+    const renderEditableField = (type, inputType = 'text', size = '8rem') => {
+        const valueSetter = (val) => {
+            setItemDetail((prev) => ({ ...prev, [type]: val }));
+        }
+
+        return <div onClick={(e) => e.stopPropagation()}>
+            <input
+                style={{ width: size, padding: '0.15rem' }}
+                type={inputType}
+                value={itemDetail[type] || ''}
+                onChange={(e) => valueSetter(e.target.value)}
+            />
         </div>
-    );
+    };
 
     return (
         <>
             <tr>
-                <td className={style.idCell}>{item.item_id}</td>
-                <td>{challanDate || '-'}</td>
-                <td>{`${item.thickness?.name} X ${item.width?.name} X ${item.grade?.name}`}</td>
-                <td className={style.numCell}>{item.originalQuantity}</td>
-                <td className={style.numCell}>{item.remaining}</td>
-                <td>{item.warehouse?.name || '-'}</td>
-                <td onClick={() => clickHandler('remark')}>
-                    {select === 'remark'
-                        ? renderEditableField('remark')
-                        : item.remark || '-'}
+                <td className={style.idCell}>{itemDetail.item_id}</td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderEditableField('challanDate', 'date', '8rem')
+                        : itemDetail.challanDate ? new Date(itemDetail.challanDate).toLocaleDateString() : '-'}
+                </td>
+                <td style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('thickness', thicknesses)
+                            : <span style={{ width: '3rem' }}>{itemDetail.thickness?.name}</span>}
+                    </div>
+                    X
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('width', widths)
+                            : <span style={{ width: '3rem' }}>{itemDetail.width?.name}</span>}
+                    </div>
+                    X
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('grade', grades)
+                            : <span style={{ width: '3rem' }}>{itemDetail.grade?.name}</span>}
+                    </div>
+                </td>
+                <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderEditableField('originalQuantity', 'number', '5rem')
+                        : itemDetail.originalQuantity}
+                </td>
+                <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderEditableField('remaining', 'number', '5rem')
+                        : itemDetail.remaining}
+                </td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderDropdownField('warehouse', warehouses)
+                        : itemDetail.warehouse?.name || '-'}
+                </td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderEditableField('remark', 'text', '6rem')
+                        : itemDetail.remark || '-'}
                 </td>
 
                 <td className={style.actionCell}>
-                    <span className={style.actionIcon} onClick={handlePreview} title="View details">
-                        <FiEye />
-                    </span>
-                    <span className={style.actionIcon} onClick={handleUpdateQuantity} title="View details">
-                        <FaPlus />
-                    </span>
-                    <IoCartOutline onClick={handleOrder} style={{ cursor: 'pointer' }} title="Quick Order" />
-                    {expandedRow === item._id ? (
-                        <MdExpandLess onClick={toggleSubtable} title="Hide Bookings" />
-                    ) : (
-                        <MdExpandMore onClick={toggleSubtable} title="Show Bookings" />
-                    )}
+                    {!isEditing ? <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                        <span className={style.actionIcon} onClick={handlePreview} title="View details">
+                            <FiEye />
+                        </span>
+                        <span className={style.actionIcon} onClick={handleUpdateQuantity} title="Update Stock">
+                            <FaPlus />
+                        </span>
+                        <IoCartOutline className={style.actionIcon} onClick={handleOrder} style={{ cursor: 'pointer', padding: '0.35rem', height: '30px', width: '30px' }} title="Quick Order" />
+                        <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} title="Edit Item" /></span>
+                        {expandedRow === item._id ? (
+                            <MdExpandLess className={style.actionIcon} onClick={toggleSubtable} style={{ padding: '0.35rem', height: '30px', width: '30px', cursor: 'pointer' }} title="Hide Bookings" />
+                        ) : (
+                            <MdExpandMore className={style.actionIcon} onClick={toggleSubtable} style={{ padding: '0.35rem', height: '30px', width: '30px', cursor: 'pointer' }} title="Show Bookings" />
+                        )}
+                    </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
+                        <span className={style.actionIcon}><RxCheck style={{ color: 'green', fontSize: '1.25rem' }} onClick={handleSave} /></span>
+                        <span className={style.actionIcon}><RxCross2 style={{ color: 'red', fontSize: '1.25rem' }} onClick={handleCancel} /></span>
+                    </div>}
                 </td>
             </tr>
 
@@ -435,7 +473,7 @@ const BookingsSubtable = ({ bookings }) => {
         const vNum = (list.filter((i) => i._id === id))[0];
 
         // updateRemark(id, vNum.remark);
-        updateRemark({bookingId: id, remark: vNum.remarks}, dispatch);
+        updateRemark({ bookingId: id, remark: vNum.remarks }, dispatch);
         setEditRemark(null)
     };
 
@@ -541,7 +579,7 @@ const BookingsSubtable = ({ bookings }) => {
                         <td style={tdStyle}>{bookingDate(booking.bookingDate)}</td>
                         <td style={tdStyle}>{booking.shipTo || '-'}</td>
                         {/* <td style={tdStyle}>{booking.remarks || '-'}</td> */}
-                        <td onClick={() => setEditRemark(booking._id)} style={{overflow: 'visible'}}> {editRemark === booking._id ?
+                        <td onClick={() => setEditRemark(booking._id)} style={{ overflow: 'visible' }}> {editRemark === booking._id ?
                             <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
                                 <input
                                     style={{ padding: '0rem 0.25rem', width: '6.25rem' }}

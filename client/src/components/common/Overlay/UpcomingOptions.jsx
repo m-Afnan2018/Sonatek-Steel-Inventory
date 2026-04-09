@@ -161,6 +161,7 @@ const UpcomingOptions = ({ data, close, type }) => {
 
 const MoveToInventory = ({ data, close, fillUpData, setFillUpData, setHandleSubmit }) => {
     const { warehouses } = useSelector(state => state.varient);
+    const [validationError, setValidationError] = useState('');
 
     const dispatch = useDispatch();
 
@@ -179,6 +180,10 @@ const MoveToInventory = ({ data, close, fillUpData, setFillUpData, setHandleSubm
     useEffect(() => {
         // Set the submit handler for this component
         setHandleSubmit(() => async () => {
+            if (!fillUpData?.challanNumber || fillUpData.challanNumber.trim() === '') {
+                setValidationError('Please enter Challan Number');
+                return;
+            }
             moveToInventory(fillUpData, dispatch)
             close();
         });
@@ -189,63 +194,84 @@ const MoveToInventory = ({ data, close, fillUpData, setFillUpData, setHandleSubm
             ...prev,
             [field]: e.target.value
         }));
+        if (validationError) setValidationError('');
     };
 
-    return <div className={style.fillUpData}>
-        <div>
-            <h2>Warehouse</h2>
-            <select
-                value={fillUpData?.warehouse || ''}
-                onChange={(e) => handleChange('warehouse', e)}
-            >
-                <option value="" disabled>Select</option>
-                <option value={''}>NULL</option>
-                {warehouses?.map((opt) => (
-                    <option key={opt._id} value={opt._id}>
-                        {opt.name}
-                    </option>
-                ))}
-            </select>
-        </div>
-        <div>
-            <h2>Challan Date</h2>
-            <input
-                type='date'
-                value={fillUpData?.challanDate || ''}
-                onChange={(e) => handleChange('challanDate', e)}
-            />
-        </div>
-        <div>
-            <h2>Challan Number</h2>
-            <input
-                type="text"
-                value={fillUpData?.challanNumber || ''}
-                onChange={(e) => handleChange('challanNumber', e)}
-            />
-        </div>
-        <div>
-            <h2>Vehicle Number</h2>
-            <input
-                type="text"
-                value={fillUpData?.vehicleNumber || ''}
-                onChange={(e) => handleChange('vehicleNumber', e)}
-            />
-        </div>
-        <div>
-            <h2>Loader</h2>
-            <input
-                type="text"
-                value={fillUpData?.loader || ''}
-                onChange={(e) => handleChange('loader', e)}
-            />
-        </div>
-        <div>
-            <h2>Transport</h2>
-            <input
-                type="text"
-                value={fillUpData?.transport || ''}
-                onChange={(e) => handleChange('transport', e)}
-            />
+    return <div>
+        {validationError && (
+            <div style={{
+                marginBottom: '15px',
+                backgroundColor: 'rgb(255, 235, 238)',
+                color: 'rgb(198, 40, 40)',
+                borderRadius: '4px',
+                border: '1px solid rgb(239, 83, 80)',
+                position: 'absolute',
+                fontSize: '0.75em',
+                padding: '0.1rem',
+                fontWeight: '800',
+                left: '75%',
+                transform: 'translateX(-50%)',
+            }}>
+                {validationError}
+            </div>
+        )}
+        <div className={style.fillUpData}>
+            <div>
+                <h2>Warehouse</h2>
+                <select
+                    value={fillUpData?.warehouse || ''}
+                    onChange={(e) => handleChange('warehouse', e)}
+                >
+                    <option value="" disabled>Select</option>
+                    <option value={''}>NULL</option>
+                    {warehouses?.map((opt) => (
+                        <option key={opt._id} value={opt._id}>
+                            {opt.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <h2>Challan Date</h2>
+                <input
+                    type='date'
+                    value={fillUpData?.challanDate || ''}
+                    onChange={(e) => handleChange('challanDate', e)}
+                />
+            </div>
+            <div>
+                <h2>Challan Number</h2>
+                <input
+                    required={true}
+                    type="text"
+                    value={fillUpData?.challanNumber || ''}
+                    onChange={(e) => handleChange('challanNumber', e)}
+                />
+            </div>
+            <div>
+                <h2>Vehicle Number</h2>
+                <input
+                    type="text"
+                    value={fillUpData?.vehicleNumber || ''}
+                    onChange={(e) => handleChange('vehicleNumber', e)}
+                />
+            </div>
+            <div>
+                <h2>Loader</h2>
+                <input
+                    type="text"
+                    value={fillUpData?.loader || ''}
+                    onChange={(e) => handleChange('loader', e)}
+                />
+            </div>
+            <div>
+                <h2>Transport</h2>
+                <input
+                    type="text"
+                    value={fillUpData?.transport || ''}
+                    onChange={(e) => handleChange('transport', e)}
+                />
+            </div>
         </div>
     </div>
 }

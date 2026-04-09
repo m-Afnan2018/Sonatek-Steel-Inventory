@@ -11,7 +11,7 @@ import UpcomingOptions from 'components/common/Overlay/UpcomingOptions';
 import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 import { getAllPartyDetails } from 'services/operations/bookingAPI';
 import { FaRegTrashCan } from "react-icons/fa6";
-import { FiEye } from 'react-icons/fi';
+import { FiEye, FiEdit } from 'react-icons/fi';
 import { MdOutlineWarehouse } from 'react-icons/md';
 import { IoCartOutline } from 'react-icons/io5';
 
@@ -146,12 +146,11 @@ const SingleItem = ({ color, item, setView, view }) => {
 
     const [itemDetail, setItemDetail] = useState(item);
 
-    const [select, setSelect] = useState('');
-    // const [value, setValue] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
 
-    const clickHandler = (type) => {
-        setSelect(type);
-        // setValue(item[type]);
+    const handleEditToggle = (e) => {
+        e.stopPropagation();
+        setIsEditing(true);
     };
 
     const { showOverlay } = useOverlay();
@@ -163,15 +162,14 @@ const SingleItem = ({ color, item, setView, view }) => {
         const width = itemDetail.width._id;
         const warehouse = itemDetail.warehouse?._id;
         let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
-        // let updatedItem = { ...Item };
         updateItem(Item, dispatch);
-        setSelect('');
+        setIsEditing(false);
     };
 
     const handleCancel = (e) => {
         e.stopPropagation();
         setItemDetail(item);
-        setSelect('');
+        setIsEditing(false);
     };
 
     const handleDelete = (e) => {
@@ -259,26 +257,15 @@ const SingleItem = ({ color, item, setView, view }) => {
     useEffect(() => setItemDetail(item), [item])
 
     const renderDropdownField = (type, options) => {
-
         const valueSetter = (val) => {
             const option = options.find(i => i._id === val);
             setItemDetail((prev) => ({ ...prev, [type]: option }));
-            setSelect('');
         };
 
         return (
-            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+            <div onClick={(e) => e.stopPropagation()}>
                 <select
-                    // ✅ Auto-open dropdown using callback ref
-                    ref={(el) => {
-                        if (el) {
-                            setTimeout(() => {
-                                el.focus();
-                                el.click(); // Programmatically open it
-                            }, 800);
-                        }
-                    }}
-                    style={{ padding: '0rem', width: '3rem' }}
+                    style={{ width: 'auto' }}
                     value={itemDetail[type]?._id || ""}
                     onChange={(e) => valueSetter(e.target.value)}
                 >
@@ -293,25 +280,18 @@ const SingleItem = ({ color, item, setView, view }) => {
         );
     };
 
-
     const renderEditableField = (type, inputType = 'text', size = '8rem') => {
-
         const valueSetter = (val) => {
             setItemDetail((prev) => ({ ...prev, [type]: val }));
         }
 
-        return <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+        return <div onClick={(e) => e.stopPropagation()}>
             <input
-                style={{ padding: '0rem', width: size }}
+                style={{ width: size }}
                 type={inputType}
-                value={itemDetail[type]}
+                value={itemDetail[type] || ''}
                 onChange={(e) => valueSetter(e.target.value)}
-                autoFocus
             />
-            {/* <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div> */}
         </div>
     };
 
@@ -333,57 +313,55 @@ const SingleItem = ({ color, item, setView, view }) => {
                 {itemDetail.id}
             </td>
             {/* Date */}
-            <td onClick={() => clickHandler('date')}>
-                {select === 'date'
-                    ? renderEditableField('date', 'date')
+            <td onClick={(e) => e.stopPropagation()}>
+                {isEditing
+                    ? renderEditableField('date', 'date', '7rem')
                     : itemDetail.date?.slice(0, 10) || '-'}
             </td>
 
             {/* Thickness x Width x Grade */}
-            <td className={style.descCell}>
+            <td className={style.descCell} onClick={(e) => e.stopPropagation()}>
                 {/* Thickness */}
-                <div onClick={() => clickHandler('thickness')}>
-                    {select === 'thickness'
+                <div>
+                    {isEditing
                         ? renderDropdownField('thickness', thicknesses)
                         : <span style={{ width: '3rem' }}>{itemDetail.thickness.name}</span>}
                 </div>
                 X
                 {/* Width */}
-                <div onClick={() => clickHandler('width')}>
-                    {select === 'width'
+                <div>
+                    {isEditing
                         ? renderDropdownField('width', widths)
                         : <span style={{ width: '3rem' }}>{itemDetail.width.name}</span>}
                 </div>
                 X
                 {/* Grade */}
-                <div onClick={() => clickHandler('grade')}>
-                    {select === 'grade'
+                <div>
+                    {isEditing
                         ? renderDropdownField('grade', grades)
                         : <span style={{ width: '3rem' }}>{itemDetail.grade.name}</span>}
                 </div>
             </td>
 
             {/* Quantity */}
-            <td style={{ textDecoration: 'underline', fontWeight: '500' }} onClick={() => clickHandler('originalQuantity')}>
-                {select === 'originalQuantity'
-                    ? renderEditableField('originalQuantity', 'number', '3rem')
+            <td style={{ textDecoration: 'underline', fontWeight: '500' }} onClick={(e) => e.stopPropagation()}>
+                {isEditing
+                    ? renderEditableField('originalQuantity', 'number', '4rem')
                     : Number(itemDetail.originalQuantity).toFixed(3)}
             </td>
 
             {/* Wagon Number */}
-            <td onClick={() => clickHandler('wagonNumber')}>
-                {select === 'wagonNumber'
-                    ? renderEditableField('wagonNumber', 'text', '5rem')
+            <td onClick={(e) => e.stopPropagation()}>
+                {isEditing
+                    ? renderEditableField('wagonNumber', 'text', '6rem')
                     : itemDetail.wagonNumber || '-'}
             </td>
 
             {/* Warehouse */}
-            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
-                {select === 'warehouse' ? (
-                    <div onClick={() => clickHandler('warehouse')}>
-                        {select === 'warehouse'
-                            ? renderDropdownField('warehouse', warehouses)
-                            : <span>{itemDetail?.warehouse?.name}</span>}
+            <td onClick={(e) => e.stopPropagation()}>
+                {isEditing ? (
+                    <div>
+                        {renderDropdownField('warehouse', warehouses)}
                     </div>
                 ) : (
                     itemDetail.warehouse === null ? "NA" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{itemDetail.warehouse.name.toLowerCase()}</p>
@@ -395,22 +373,22 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Remark */}
-            <td onClick={() => clickHandler('remark')}>
-                {select === 'remark'
-                    ? renderEditableField('remark', 'text', '5rem')
+            <td onClick={(e) => e.stopPropagation()}>
+                {isEditing
+                    ? renderEditableField('remark', 'text', '6rem')
                     : itemDetail.remark || '-'}
             </td>
 
-
             <td className={style.actionCell}>
-                {select === '' && JSON.stringify(item) === JSON.stringify(itemDetail) ? <div style={{ gap: '0.25rem' }}>
+                {!isEditing ? <div style={{ gap: '0.25rem' }}>
                     <span className={style.actionIcon}><FiEye onClick={item.marking ? handleOrder : handleInventory} /></span>
                     <span className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} onClick={handleInventory} /></span>
                     <span className={style.actionIcon}><IoCartOutline onClick={handleOrder} /></span>
+                    <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} /></span>
                     <span className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} onClick={handleDelete} /></span>
-                </div> : <div>
-                    <RxCheck style={{ color: 'green' }} onClick={handleSave} />
-                    <RxCross2 style={{ color: 'red' }} onClick={handleCancel} />
+                </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
+                    <span className={style.actionIcon}><RxCheck style={{ color: 'green', fontSize: '1.25rem' }} onClick={handleSave} /></span>
+                    <span className={style.actionIcon}><RxCross2 style={{ color: 'red', fontSize: '1.25rem' }} onClick={handleCancel} /></span>
                 </div>}
             </td>
         </tr >
