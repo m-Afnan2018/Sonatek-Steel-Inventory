@@ -70,6 +70,7 @@ export const warehouseEndpoints = {
     UPDATE_WAREHOUSE: `${BASE_URL}/warehouses/updateWarehouse`,
     HIDE_WAREHOUSES: `${BASE_URL}/warehouses/hideWarehouse`,
     SHOW_WAREHOUSES: `${BASE_URL}/warehouses/showWarehouse`,
+    DELETE_WAREHOUSE: `${BASE_URL}/warehouses/deleteWarehouse`,
     GET_DATA_BY_WAREHOUSES: `${BASE_URL}/warehouses/getDataByWarehouses`,
     GET_ALL_WAREHOUSE_DETAILS: `${BASE_URL}/warehouses/getAllWarehouseDetails`
 }

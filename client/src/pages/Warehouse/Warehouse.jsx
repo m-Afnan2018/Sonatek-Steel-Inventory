@@ -8,7 +8,9 @@ import {
     hideWarehouse,
     showWarehouse,
     updateWarehouse,
+    deleteWarehouse
 } from "services/operations/warehouseAPI";
+import { FaTrash } from "react-icons/fa";
 
 const Warehouse = () => {
     const [warehouses, setWarehouses] = useState([]);
@@ -103,6 +105,10 @@ const Warehouse = () => {
         }
     }
 
+    function handleDelete(id) {
+        deleteWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
+    }
+
     return (
         <div className={style.Warehouse}>
             <h2>Manage Warehouses</h2>
@@ -147,12 +153,12 @@ const Warehouse = () => {
                     <table className={style.table}>
                         <thead>
                             <tr>
-                                <th style={{width: '6rem'}}>Name</th>
-                                <th style={{width: '10rem'}}>Address</th>
-                                <th style={{width: '6rem'}}>Phone</th>
-                                <th style={{width: '5rem'}}>Total Items</th>
-                                <th style={{width: '5rem'}}>Total Qty</th>
-                                <th style={{minWidth: '16rem'}}>Actions</th>
+                                <th style={{ width: '6rem' }}>Name</th>
+                                <th style={{ width: '10rem' }}>Address</th>
+                                <th style={{ width: '6rem' }}>Phone</th>
+                                <th style={{ width: '5rem' }}>Total Items</th>
+                                <th style={{ width: '5rem' }}>Total Qty</th>
+                                <th style={{ minWidth: '16rem' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -207,6 +213,9 @@ const Warehouse = () => {
                                                     <button className={style.itemsBtn} onClick={() => handleVisibility(c._id, c.visible)}>
                                                         {c.visible ? "Hide" : "Show"}
                                                     </button>
+                                                    {c.totalItems === 0 && <button className={style.itemsBtn} onClick={() => handleDelete(c._id)}>
+                                                        <FaTrash style={{ color: "red" }} />
+                                                    </button>}
                                                 </div>
                                             )}
                                         </td>
