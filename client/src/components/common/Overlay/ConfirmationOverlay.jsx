@@ -6,7 +6,7 @@ const ConfirmationOverlay = ({ message, onAccept, close }) => {
         <div className={style.ShowOverlay}>
             <h4 style={{ color: 'var(--text-primary)' }}>{message}</h4>
             <div>
-                <button onClick={onAccept}>Ok</button>
+                <button onClick={() => { onAccept?.(); close?.(); }}>Ok</button>
                 <button onClick={close}>Cancel</button>
             </div>
         </div>

@@ -5,7 +5,8 @@ import { deleteItem, getUpcomingItem, updateItem } from 'services/operations/ite
 import { MdDelete } from "react-icons/md";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { generateShipToColors } from 'utils/colorHandler';
-
+import { useOverlay } from 'hooks/useOverlay';
+import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 const UpcomingDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState([]);
@@ -117,9 +118,14 @@ const SingleItem = ({ color, item, setView, view }) => {
         setSelect('');
     };
 
+    const { showOverlay } = useOverlay();
+
     const handleDelete = (e) => {
         e.stopPropagation();
-        deleteItem({ itemId: item._id }, dispatch)
+        showOverlay(ConfirmationOverlay, {
+            message: `Delete this item? This cannot be undone.`,
+            onAccept: () => deleteItem({ itemId: item._id }, dispatch),
+        });
     }
 
     useEffect(() => setItemDetail(item), [item])
