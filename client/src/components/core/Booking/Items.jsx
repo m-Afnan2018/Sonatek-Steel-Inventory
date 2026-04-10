@@ -183,7 +183,7 @@ const Filters = ({ setFilters, setItems }) => {
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
             grade: "",
-            type: "",
+            type: "Cold Rolled",
             width: "",
             thickness: "",
             warehouse: "",
@@ -226,13 +226,13 @@ const Filters = ({ setFilters, setItems }) => {
     return (
         <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
-            <div>
+            {/* <div>
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")} onClick={handleTypeChange}>
                     <option value="">All</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
-            </div>
+            </div> */}
 
             {/* Grade */}
             <div>

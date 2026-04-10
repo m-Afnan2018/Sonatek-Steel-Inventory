@@ -110,8 +110,8 @@ const UpcomingOptions = ({ data, close, type }) => {
             <div>
                 <h1>Upcoming Action</h1>
                 <div className={style.groupBtn}>
-                    <button onClick={() => setShow('party')} style={{ borderRadius: '100rem 0 0 100rem', color: show === 'party' ? '#fff' : 'var(--accent)', backgroundColor: show === 'party' ? 'var(--accent)' : 'var(--bg-elevated)', border: '1px solid var(--accent)', padding: '4px 14px', fontWeight: 600, cursor: 'pointer' }}>To Party</button>
-                    <button onClick={() => { if (!data.marking) setShow('inventory') }} style={{ cursor: data.marking ? 'not-allowed' : 'pointer', borderRadius: '0 100rem 100rem 0', color: show === 'party' ? 'var(--accent)' : '#fff', backgroundColor: show === 'party' ? 'var(--bg-elevated)' : 'var(--accent)', border: '1px solid var(--accent)', padding: '4px 14px', fontWeight: 600 }}>To Inventory</button>
+                    <button onClick={() => setShow('party')} style={{ borderRadius: '100rem 0 0 100rem', color: show === 'party' ? '#fff' : 'var(--accent)', backgroundColor: show === 'party' ? 'var(--accent)' : 'var(--bg-elevated)', border: '1px solid var(--accent)', padding: '0px 12px', fontWeight: 600, cursor: 'pointer' }}>To Party</button>
+                    <button onClick={() => { if (!data.marking) setShow('inventory') }} style={{ cursor: data.marking ? 'not-allowed' : 'pointer', borderRadius: '0 100rem 100rem 0', color: show === 'party' ? 'var(--accent)' : '#fff', backgroundColor: show === 'party' ? 'var(--bg-elevated)' : 'var(--accent)', border: '1px solid var(--accent)', padding: '0px 12px', fontWeight: 600 }}>To Inventory</button>
                 </div>
             </div>
 

@@ -24,12 +24,12 @@ const Items = () => {
     const [sortType, setSortType] = useState(null)
     const { listViewList, totalQuantity, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
-    const [colors, setColors] = useState(null)
+    const [colors, setColors] = useState(null);
 
     const [showFilters, setShowFilters] = useState(null);
 
     const [filters, setFilters] = useState({
-        type: '',
+        type: 'Cold Rolled',
         grade: '',
         formType: '',
         width: '',
@@ -174,7 +174,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     const [loadingBookings, setLoadingBookings] = useState(false);
     const { showOverlay } = useOverlay();
 
-    useEffect(() => setItemDetail(item), [item]);
+    useEffect(() => setItemDetail(prev => ({ ...prev, ...item })), [item]);
 
     const handleEditToggle = (e) => {
         e.stopPropagation();
@@ -234,6 +234,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         }
 
         const output = convertItem(itemDetail);
+        console.log(output);
 
         showOverlay(InventoryOptions, {
             type: 'increaseQuantity',

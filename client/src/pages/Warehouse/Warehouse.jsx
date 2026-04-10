@@ -153,9 +153,9 @@ const Warehouse = () => {
                     <table className={style.table}>
                         <thead>
                             <tr>
-                                <th style={{ width: '6rem' }}>Name</th>
+                                <th style={{ width: '8rem' }}>Name</th>
                                 <th style={{ width: '10rem' }}>Address</th>
-                                <th style={{ width: '6rem' }}>Phone</th>
+                                <th style={{ width: '8.5rem' }}>Phone</th>
                                 <th style={{ width: '5rem' }}>Total Items</th>
                                 <th style={{ width: '5rem' }}>Total Qty</th>
                                 <th style={{ minWidth: '16rem' }}>Actions</th>
@@ -193,6 +193,10 @@ const Warehouse = () => {
                                                     className={style.inlineInput}
                                                     value={editFields.phoneNumber}
                                                     onChange={(e) => setEditFields((s) => ({ ...s, phoneNumber: e.target.value }))}
+                                                    type="number"
+                                                    pattern="[0-9]{10}"
+                                                    maxLength={12}
+                                                    minLength={10}
                                                 />
                                             ) : <div className={style.cellSecondary}>{c.phoneNumber}</div>}
                                         </td>

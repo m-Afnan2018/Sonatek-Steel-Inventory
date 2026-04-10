@@ -207,7 +207,7 @@ const SingleItem = ({ item, view, setView, allowed }) => {
                             </thead>
                             <tbody>
                                 {item.items?.map((i) => (
-                                    <tr key={i._id}>
+                                    <tr key={i._id} style={{ height: '45px', paddingLeft: '1rem' }}>
                                         <td>{i.formType}</td>
                                         <td>{i.itemSnapshot.type}</td>
                                         <td>{`${i.itemSnapshot.thickness?.name || "-"} X ${i.itemSnapshot.width?.name || "-"} X ${i.itemSnapshot.grade?.name || "-"}`}</td>

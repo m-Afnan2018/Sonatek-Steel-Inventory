@@ -161,11 +161,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const dispatch = useDispatch();
 
     const status = {
-        'Pending':    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
-        'Processing': { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
-        'Shipped':    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
-        'Delivered':  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
-        'Cancelled':  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
+        'Pending': { background: 'var(--warning-muted)', foreground: 'var(--warning)' },
+        'Processing': { background: 'var(--accent-muted)', foreground: 'var(--accent)' },
+        'Shipped': { background: 'var(--info-muted)', foreground: 'var(--info)' },
+        'Delivered': { background: 'var(--success-muted)', foreground: 'var(--success)' },
+        'Cancelled': { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
     };
 
     const isOpen = view === item._id;
@@ -247,7 +247,9 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                             </thead>
                             <tbody>
                                 {item.items?.map((i) => (
-                                    <tr key={i._id}>
+                                    <tr style={{
+                                        height: '45px'
+                                    }} key={i._id}>
                                         <td>{i.formType}</td>
                                         <td>{i.itemSnapshot.type}</td>
                                         <td>{`${i.itemSnapshot.thickness?.name || "-"} X ${i.itemSnapshot.width?.name || "-"} X ${i.itemSnapshot.grade?.name || "-"}`}</td>
