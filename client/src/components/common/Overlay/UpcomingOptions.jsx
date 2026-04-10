@@ -122,7 +122,7 @@ const UpcomingOptions = ({ data, close, type }) => {
                     height: 'fit-content',
                     padding: '1rem',
                     background: 'var(--accent-muted)',
-                    borderRadius: '1rem',
+                    borderRadius: '.5rem',
                     gap: '0.5rem'
                 }}>
                     {tableData({ name: 'ID', value: data.item_id })}
@@ -336,10 +336,6 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
             }
             if (!fillUpData?.invoiceDate) {
                 setValidationError('Please select Invoice Date');
-                return false;
-            }
-            if (!fillUpData?.vehicleNumber) {
-                setValidationError('Please select Vehicle Date');
                 return false;
             }
         }
