@@ -19,9 +19,9 @@ const AddForm = () => {
 
     const { showOverlay } = useOverlay()
 
-    const { register, handleSubmit, control, setFocus } = useForm({
+    const { register, handleSubmit, control, setFocus, watch, setValue } = useForm({
         defaultValues: {
-            type: null,
+            type: 'Cold Rolled',
             thickness: null,
             width: null,
             grade: null,
@@ -84,6 +84,7 @@ const AddForm = () => {
         if (e.key === 'ArrowRight' && nextField) {
             setFocus(nextField)
         }
+        console.log(e.key)
     };
 
     const handleSelectEnter = (e, field, options = [], prevField = null, nextField = null) => {
@@ -286,14 +287,55 @@ const AddForm = () => {
             </div>
 
             {/* Quantity */}
-            <div style={{ width: '6rem' }}>
+            <div style={{ width: '6.2rem' }}>
                 <input
-                    style={{ width: '100%', height: '2rem' }}
-                    type="number"
-                    {...register("quantity")}
-                    onKeyDown={(e) => handleKeyDown(e, 'grade', "warehouse")}
+                    style={{ width: '100%', height: '2rem', padding: '1rem' }}
+                    type="text"
+                    inputMode="numeric"
+                    value={watch('quantity') || ''}
+                    onChange={(e) => {
+                        // Strip everything except digits
+                        const digits = e.target.value.replace(/[^0-9]/g, '');
+                        if (digits === '') {
+                            setValue('quantity', '');
+                            return;
+                        }
+                        // Pad to at least 4 digits so we always have X.XXX
+                        const padded = digits.padStart(4, '0');
+                        const intPart = padded.slice(0, padded.length - 3).replace(/^0+(?=\d)/, '') || '0';
+                        const decPart = padded.slice(-3);
+                        setValue('quantity', `${intPart}.${decPart}`);
+                    }}
+                    onKeyDown={(e) => {
+                        // Allow: backspace, delete, tab, escape, arrow keys
+                        const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'];
+                        if (allowed.includes(e.key)) {
+                            if (e.key === 'Backspace' || e.key === 'Delete') {
+                                // Remove last digit from raw digits
+                                const current = watch('quantity') || '';
+                                const digits = current.replace(/[^0-9]/g, '');
+                                const newDigits = digits.slice(0, -1);
+                                if (newDigits === '') {
+                                    setValue('quantity', '');
+                                } else {
+                                    const padded = newDigits.padStart(4, '0');
+                                    const intPart = padded.slice(0, padded.length - 3).replace(/^0+(?=\d)/, '') || '0';
+                                    const decPart = padded.slice(-3);
+                                    setValue('quantity', `${intPart}.${decPart}`);
+                                }
+                                e.preventDefault();
+                                return;
+                            }
+                            handleKeyDown(e, 'grade', 'warehouse');
+                            return;
+                        }
+                        // Block non-digit keys
+                        if (!/^[0-9]$/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                     placeholder="Quantity"
-                    step={'any'}
+
                 />
             </div>
 
