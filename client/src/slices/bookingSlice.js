@@ -68,6 +68,13 @@ const bookingSlice = createSlice({
             state.parties = action.payload;
         },
         updateParty(state, action) {
+            const updated = action.payload;
+            state.parties = state.parties.map(p => p._id === updated._id ? updated : p);
+        },
+        deleteParty(state, action) {
+            state.parties = state.parties.filter(p => p._id !== action.payload);
+        },
+        addParty(state, action) {
             state.parties = [...state.parties, action.payload];
         },
         setIncompleteBookings(state, action) {
@@ -143,6 +150,8 @@ export const {
     setOptions,
     setParty,
     updateParty,
+    deleteParty,
+    addParty,
     updateBookingRemark,
     setPagination,
     addIncompleteBookings,

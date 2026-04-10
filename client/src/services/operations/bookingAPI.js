@@ -11,11 +11,13 @@ import {
     setIncompleteBookings,
     setOptions,
     setParty,
+    addParty as addPartyAction,
+    updateParty as updatePartyAction,
+    deleteParty as deletePartyAction,
     updateBookingStatus
 } from "slices/bookingSlice";
 import { deleteFromUpcomingItem, setPagination } from "slices/itemSlice";
 import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
-
 export async function searchOptions(params, dispatch, setter) {
     try {
         dispatch(addLoader("searchOptions"));
@@ -366,15 +368,56 @@ export async function getAllPartyDetails(dispatch) {
     }
 }
 
-export async function deleteParty(dispatch) {
+export async function createParty(params, dispatch) {
     try {
-        dispatch(addLoader("deleteParty"));
+        dispatch(addLoader("createParty"));
 
-        const response = (await apiConnector('POST', bookingEndpoints.ADD_PARTY)).data;
+        const response = (await apiConnector('POST', bookingEndpoints.ADD_PARTY, params)).data;
 
+        if (response.success) {
+            dispatch(addPartyAction(response.party));
+        }
 
-        dispatch(showSuccess({ id: "deleteParty", message: response.message }));
+        dispatch(showSuccess({ id: "createParty", message: response.message }));
+        return response.success;
     } catch (err) {
-        dispatch(showError({ id: "deleteParty", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+        dispatch(showError({ id: "createParty", message: err?.response?.data?.message || "Failed to add party" }));
+        return false;
+    }
+}
+
+export async function editParty(params, dispatch) {
+    try {
+        dispatch(addLoader("editParty"));
+
+        const response = (await apiConnector('PATCH', bookingEndpoints.UPDATE_PARTY, params)).data;
+
+        if (response.success) {
+            dispatch(updatePartyAction(response.party));
+        }
+
+        dispatch(showSuccess({ id: "editParty", message: response.message }));
+        return response.success;
+    } catch (err) {
+        dispatch(showError({ id: "editParty", message: err?.response?.data?.message || "Failed to update party" }));
+        return false;
+    }
+}
+
+export async function removeParty(params, dispatch) {
+    try {
+        dispatch(addLoader("removeParty"));
+
+        const response = (await apiConnector('DELETE', bookingEndpoints.DELETE_PARTY, params)).data;
+
+        if (response.success) {
+            dispatch(deletePartyAction(params.id));
+        }
+
+        dispatch(showSuccess({ id: "removeParty", message: response.message }));
+        return response.success;
+    } catch (err) {
+        dispatch(showError({ id: "removeParty", message: err?.response?.data?.message || "Failed to delete party" }));
+        return false;
     }
 }

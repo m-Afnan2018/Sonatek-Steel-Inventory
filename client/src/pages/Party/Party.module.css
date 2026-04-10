@@ -183,6 +183,22 @@
     color: var(--text-secondary);
 }
 
+.deleteBtn {
+    background: var(--danger);
+    color: #fff;
+    padding: 7px 10px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    margin-left: .5rem;
+}
+
+.deleteBtn:hover {
+    background: var(--danger-hover);
+}
+
 /* Row hover */
 .row:hover {
     background: var(--bg-hover);

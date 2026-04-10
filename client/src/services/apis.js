@@ -62,6 +62,8 @@ export const bookingEndpoints = {
     GET_ALL_BOOKING_DETAILS_TABLEWISE: `${BASE_URL}/booking/getAllBookingsDetailsTablewise`,
     GET_ALL_PARTY: `${BASE_URL}/booking/getAllParty`,
     GET_ALL_PARTY_DETAILS: `${BASE_URL}/booking/getAllPartyDetails`,
+    ADD_PARTY: `${BASE_URL}/booking/addParty`,
+    UPDATE_PARTY: `${BASE_URL}/booking/updateParty`,
     DELETE_PARTY: `${BASE_URL}/booking/deleteParty`,
 }
 

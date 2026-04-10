@@ -1578,6 +1578,39 @@ const getAllPartyDetails = async (req, res) => {
     }
 };
 
+const addParty = async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        const party = new Party({ name });
+
+        await party.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully added the party",
+            party
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const updateParty = async (req, res) => {
+    try {
+        const { id, name } = req.body;
+
+        const party = await Party.findByIdAndUpdate(id, { name }, { new: true });
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully updated the party",
+            party
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
 const getAllBookingsByItem = async (req, res) => {
     try {
         const { item } = req.body;
@@ -1656,6 +1689,8 @@ module.exports = {
     getAllBookingDetailsTablewise,
     getAllIncompleteBookingsDetails,
     getAllParty,
+    addParty,
+    updateParty,
     deleteParty,
     getAllPartyDetails,
     getAllBookingsByItem
