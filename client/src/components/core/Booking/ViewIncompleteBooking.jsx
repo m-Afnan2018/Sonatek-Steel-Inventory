@@ -14,11 +14,11 @@ import { useOverlay } from 'hooks/useOverlay';
 import ViewIncompleteBookingDetail from 'components/common/Overlay/ViewIncompleteBookingDetail';
 
 const STATUS_STYLES = {
-    Pending:    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
-    Processing: { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
-    Shipped:    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
-    Delivered:  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
-    Cancelled:  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
+    Pending: { background: 'var(--warning-muted)', foreground: 'var(--warning)' },
+    Processing: { background: 'var(--accent-muted)', foreground: 'var(--accent)' },
+    Shipped: { background: 'var(--info-muted)', foreground: 'var(--info)' },
+    Delivered: { background: 'var(--success-muted)', foreground: 'var(--success)' },
+    Cancelled: { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
 };
 
 const ViewIncompleteBooking = () => {
@@ -34,6 +34,7 @@ const ViewIncompleteBooking = () => {
 
     useEffect(() => {
         setBookings(incompleteBookings);
+        console.log(incompleteBookings);
     }, [incompleteBookings])
 
     // Fetch all bookings once
@@ -60,7 +61,7 @@ const ViewIncompleteBooking = () => {
 
     // Common actions
     const handleAction = (apiFn, payload) => {
-        if (!payload?.bookingId || !payload?.fieldValue){
+        if (!payload?.bookingId || !payload?.fieldValue) {
             return;
         }
         apiFn(payload, dispatch, setBookings);
@@ -129,6 +130,7 @@ const ViewIncompleteBooking = () => {
             <table className={style.table}>
                 <thead>
                     <tr>
+                        <th style={{ width: '5%' }}>ID</th>
                         <th style={{ width: '20%' }}>Party Name</th>
                         <th style={{ width: '20%' }}>Time</th>
                         <th style={{ width: '20%' }}>Booked By</th>
@@ -155,6 +157,7 @@ const ViewIncompleteBooking = () => {
 
                             return (
                                 <tr key={booking._id} onClick={() => viewData(booking)}>
+                                    <td>{booking?.order_id}</td>
                                     <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{booking.partySnapshot?.name}</td>
                                     <td>{formatDate(booking.bookingDate)}</td>
                                     <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{`${booking.bookedBy.firstName} ${booking.bookedBy.lastName}`}</td>

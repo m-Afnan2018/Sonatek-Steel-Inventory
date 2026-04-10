@@ -115,9 +115,14 @@ const bookingSlice = createSlice({
             if (item) {
                 state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
                 if (state.bookings) {
-                    state.bookings = [transformBooking(item), ...state.bookings];
+                    const existingIndex = state.bookings.findIndex(b => b._id === bookingId);
+                    if (existingIndex !== -1) {
+                        state.bookings[existingIndex] = { ...state.bookings[existingIndex], ...transformBooking(item) };
+                    } else {
+                        state.bookings = [transformBooking(item), ...state.bookings];
+                    }
                 } else {
-                    state.bookings = [item];
+                    state.bookings = [transformBooking(item)];
                 }
             }
         },
