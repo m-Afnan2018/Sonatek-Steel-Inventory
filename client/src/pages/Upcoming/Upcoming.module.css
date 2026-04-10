@@ -2,6 +2,7 @@
 .Upcoming {
     padding: 0.25rem;
     background: var(--bg-base) !important;
+    width: 100%;
 }
 
 .Upcoming td input,

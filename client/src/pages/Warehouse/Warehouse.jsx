@@ -11,6 +11,8 @@ import {
     deleteWarehouse
 } from "services/operations/warehouseAPI";
 import { FaTrash } from "react-icons/fa";
+import { useOverlay } from "hooks/useOverlay";
+import ConfirmationOverlay from "components/common/Overlay/ConfirmationOverlay";
 
 const Warehouse = () => {
     const [warehouses, setWarehouses] = useState([]);
@@ -31,6 +33,7 @@ const Warehouse = () => {
     const [loadingItems, setLoadingItems] = useState(false);
 
     const dispatch = useDispatch();
+    const { showOverlay } = useOverlay();
 
     useEffect(() => {
         setLoading(true);
@@ -106,7 +109,12 @@ const Warehouse = () => {
     }
 
     function handleDelete(id) {
-        deleteWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
+        showOverlay(ConfirmationOverlay, {
+            message: "Are you sure you want to delete this warehouse?",
+            onAccept: () => {
+                deleteWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
+            }
+        });
     }
 
     return (

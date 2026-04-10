@@ -8,6 +8,7 @@
 .Varient {
     display: flex;
     background: var(--bg-base);
+    width: 100%;
 }
 
 .Varient>h2 {
