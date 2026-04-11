@@ -565,9 +565,9 @@ const Filters = ({ setFilters }) => {
                 type='number'
                 step="any"
                 placeholder='Enter quantity'
-                {...register('quantity')}
+                {...register('originalQuantity')}
             />
-            {errors.quantity && <span className={style.error}>{errors.quantity.message}</span>}
+            {errors.originalQuantity && <span className={style.error}>{errors.originalQuantity.message}</span>}
         </div>
 
         <div>

@@ -25,6 +25,8 @@ const ViewIncompleteBookingDetail = ({ data,
         // } else if (button.innerText === 'Delivered') {
         //     deliver(e.target[0].value, data._id)
         // }
+
+        close();
     }
 
     // const status = {
@@ -85,7 +87,7 @@ const ViewIncompleteBookingDetail = ({ data,
                             <tbody>
                                 {
                                     data.items.map((it) => (
-                                        <tr>
+                                        <tr key={it._id}>
                                             <td>{it.item?.type}</td>
                                             <td>{`${it.item?.thickness?.name} X ${it.item?.width?.name} X ${it.item?.grade?.name}`}</td>
                                             <td>{it?.formType}</td>
@@ -100,14 +102,13 @@ const ViewIncompleteBookingDetail = ({ data,
                         </table>
                     </div>
 
-                    <form onSubmit={submitting} on className={style.FullWidth}>
+                    <form onSubmit={submitting} className={style.FullWidth}>
                         <h4>Action</h4>
                         {['admin', 'director', 'accountant'].includes(userData.role) && (data.status === 'Pending' || data.status === 'Processing' || data.status === 'Shipped') && <div className={style.inputField}>
-                            <input type='text' placeholder={'Enter the Vechicle number to confirm deliver it or reason to cancel'} />
+                            <input type='text' placeholder={'Enter the Vechicle number to confirm deliver it or reason to cancel'} required />
                         </div>}
                         {['admin', 'director', 'accountant'].includes(userData.role) && data.status !== 'Cancelled' && <div className={style.buttons}>
                             <button
-                                onClick={close}
                                 type='submit' style={{ backgroundColor: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
                             <button type='submit' style={{ backgroundColor: 'var(--success)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', padding: '6px 14px', cursor: 'pointer', fontWeight: 600 }}>Ship</button>
                         </div>}

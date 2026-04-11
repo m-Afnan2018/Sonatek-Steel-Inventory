@@ -189,7 +189,7 @@ h4 {
 .view {
     background-color: var(--bg-active);
     padding: 0 0.5rem;
-    box-shadow: rgba(0,0,0,0.4) 0px 4px 10px -1px inset;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 10px -1px inset;
     border-radius: 0px 0px var(--radius-md) var(--radius-md);
     overflow: hidden;
     display: flex;
@@ -202,7 +202,7 @@ h4 {
 .viewMore {
     background-color: var(--bg-active);
     padding: 0 0.5rem;
-    box-shadow: rgba(0,0,0,0.4) 0px 4px 10px -1px inset;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 10px -1px inset;
     border-radius: 0px 0px var(--radius-md) var(--radius-md);
     overflow: hidden;
     display: flex;
@@ -220,7 +220,7 @@ h4 {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    border-bottom: 1px rgba(226,232,240,0.15) solid;
+    border-bottom: 1px rgba(226, 232, 240, 0.15) solid;
     padding: 4px;
     color: var(--text-secondary);
 }
@@ -231,7 +231,7 @@ h4 {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    border-bottom: 1px rgba(226,232,240,0.15) solid;
+    border-bottom: 1px rgba(226, 232, 240, 0.15) solid;
     padding: 4px;
     color: var(--text-secondary);
 }
@@ -339,6 +339,7 @@ h4 {
 }
 
 @media (max-width: 768px) {
+
     .table th,
     .table td {
         padding: 8px 10px;
@@ -488,6 +489,7 @@ h4 {
     color: #fff;
     font-weight: 400;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .controlsRow button:hover {
@@ -585,7 +587,8 @@ h4 {
 }
 
 .buttonGroup button {
-    padding: 0.25rem 0.5rem;
+    padding: 0.3rem 0.5rem;
+    margin-top: 6px;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid var(--border);
