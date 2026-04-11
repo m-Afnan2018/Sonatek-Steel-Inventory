@@ -52,7 +52,7 @@ const Items = () => {
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
         grade: "",
-        type: "",
+        type: "Cold Rolled",
         width: "",
         thickness: "",
         warehouse: "",
@@ -116,6 +116,7 @@ const Items = () => {
                                     <th style={{ width: '8rem' }}>Vehicle Number</th>
                                     <th style={{ width: '8rem' }}>Ship To</th>
                                     <th style={{ width: '8rem' }}>Remark</th>
+                                    <th style={{ width: '10rem' }}>Reason</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -200,6 +201,10 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
         </div>
     );
 
+    function turncate(str, n) {
+        return str.slice(0, n) + (str.length > n ? '...' : '');
+    }
+
     return (
         <>
             <tr
@@ -226,7 +231,8 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                 </td>
                 <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
                 <td>{item.shipTo ?? "-"}</td>
-                {edit ? renderEditableField() : <td onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{item.remark ?? "-"}</td>}
+                {edit ? renderEditableField() : <td title={item.remark} onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{turncate(item.remark, 12) ?? "-"}</td>}
+                <td title={item.reason}>{turncate(item.reason, 12) ?? "-"}</td>
             </tr>
 
             {isOpen && (

@@ -100,6 +100,7 @@ const bookingSlice = createSlice({
 
                 const listView = ({
                     _id: raw._id,
+                    orderId: raw.order_id || "-",
                     bookedBy: raw.bookedBySnapshot?.name,
                     bookingDate: raw.bookingDate,
                     items: raw.items,
