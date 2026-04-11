@@ -214,7 +214,7 @@ const getAllItem = async (req, res) => {
             sortBy = "createdAt",
             order = "desc",
             page = 1,
-            limit = 50,
+            limit = 12,
             filters = null,
         } = req.body;
 

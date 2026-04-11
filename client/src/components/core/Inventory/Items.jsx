@@ -40,11 +40,16 @@ const Items = () => {
         warehouse: '',
     })
 
+    // Track the latest query params so pagination always sends the same filters/search/sort
+    const currentParams = React.useRef({ search: '', filters: null, sortBy: null, order: 'desc' });
+
     const dispatch = useDispatch();
 
     const onSearch = (e) => {
         e.preventDefault();
-        getAllItem({ search: search }, dispatch);
+        const params = { search, filters, sortBy: sortType, order };
+        currentParams.current = params;
+        getAllItem({ ...params, page: 1 }, dispatch);
     }
 
     const onDownload = async () => {
@@ -82,17 +87,22 @@ const Items = () => {
     }, [listViewList]);
 
     const sortBy = (val) => {
-        setOrder(order === 'asc' ? 'desc' : 'asc');
+        const newOrder = order === 'asc' ? 'desc' : 'asc';
+        setOrder(newOrder);
         setSortType(val);
-        getAllItem({ search, filters, sortBy: val, order: order }, dispatch);
+        const params = { search, filters, sortBy: val, order: newOrder };
+        currentParams.current = params;
+        getAllItem({ ...params, page: 1 }, dispatch);
     }
 
     const nextPage = () => {
-        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page + 1 }, dispatch);
+        const nextPageNum = (pagination?.page ?? 1) + 1;
+        getAllItem({ ...currentParams.current, page: nextPageNum }, dispatch);
     }
 
     const prevPage = () => {
-        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page - 1 }, dispatch);
+        const prevPageNum = Math.max(1, (pagination?.page ?? 2) - 1);
+        getAllItem({ ...currentParams.current, page: prevPageNum }, dispatch);
     }
 
     return (
@@ -112,7 +122,7 @@ const Items = () => {
                 <button type="submit" className={style.searchButton}>Search</button>
                 <button onClick={(e) => { e.preventDefault(); setShowFilters(!showFilters) }} className={style.searchButton}>Filter</button>
             </form>
-            <Filters setFilters={setFilters} showFilters={showFilters} />
+            <Filters setFilters={setFilters} showFilters={showFilters} currentParams={currentParams} search={search} />
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -153,11 +163,19 @@ const Items = () => {
 
             <div className={style.controlsRow}>
                 <div className={style.paginationControls}>
-                    {pagination?.page > 1 && <button onClick={prevPage}>Prev</button>}
+                    <button
+                        onClick={prevPage}
+                        disabled={!pagination || pagination.page <= 1}
+                        style={{ opacity: (!pagination || pagination.page <= 1) ? 0.4 : 1, cursor: (!pagination || pagination.page <= 1) ? 'not-allowed' : 'pointer' }}
+                    >Prev</button>
                     <div className={style.paginationInfo}>
-                        Page {pagination?.page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page ?? 1} of {pagination?.totalPages ?? 1}
                     </div>
-                    {pagination?.page < (pagination?.totalPages || 1) && <button onClick={nextPage}>Next</button>}
+                    <button
+                        onClick={nextPage}
+                        disabled={!pagination || pagination.page >= (pagination.totalPages ?? 1)}
+                        style={{ opacity: (!pagination || pagination.page >= (pagination.totalPages ?? 1)) ? 0.4 : 1, cursor: (!pagination || pagination.page >= (pagination.totalPages ?? 1)) ? 'not-allowed' : 'pointer' }}
+                    >Next</button>
                 </div>
             </div>
         </div>
@@ -633,14 +651,14 @@ const BookingsSubtable = ({ bookings }) => {
     );
 };
 
-const Filters = ({ setFilters, showFilters }) => {
+const Filters = ({ setFilters, showFilters, currentParams, search }) => {
     const { grades, thicknesses, warehouses, widths } = useSelector(state => state.varient)
     const dispatch = useDispatch();
     const [currentType, setCurrentType] = useState('Both');
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             formType: '',
             width: '',
@@ -661,12 +679,20 @@ const Filters = ({ setFilters, showFilters }) => {
         } else {
             setCurrentType(curr);
         }
-        getAllItem({ filters }, dispatch);
+        // Sync currentParams ref so pagination carries the latest filters
+        if (currentParams) {
+            currentParams.current = { ...currentParams.current, filters, search: search ?? '' };
+        }
+        getAllItem({ filters, search: search ?? '', page: 1 }, dispatch);
     }
 
     const handleReset = () => {
         reset()
-        getAllItem({}, dispatch);
+        // Clear currentParams ref on reset
+        if (currentParams) {
+            currentParams.current = { search: '', filters: null, sortBy: null, order: 'desc' };
+        }
+        getAllItem({ page: 1 }, dispatch);
     }
 
     return <form className={style.formBlock} onChange={handleSubmit(onSubmit)} style={{ height: showFilters ? '12rem' : '0', padding: showFilters ? '1rem' : '0' }}>
@@ -683,7 +709,7 @@ const Filters = ({ setFilters, showFilters }) => {
             {errors.grade && <span className={style.error}>{errors.remaining.message}</span>}
         </div>
 
-        <div>
+        {/* <div>
             <label htmlFor='type'>Type:</label>
             <select
                 id='type'
@@ -693,7 +719,7 @@ const Filters = ({ setFilters, showFilters }) => {
                 <option value='Cold Rolled'>  Cold Rolled </option>
             </select>
             {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-        </div>
+        </div> */}
 
         <div>
             <label htmlFor='grade'>Grade:</label>
