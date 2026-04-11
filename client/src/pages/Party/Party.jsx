@@ -263,13 +263,13 @@ const Party = () => {
                                                         >
                                                             <FiEdit2 />
                                                         </button>
-                                                        <button
+                                                        {party.totalBookings === 0 && <button
                                                             className={style.deleteBtn}
                                                             onClick={() => askDelete(party._id)}
                                                             title="Delete"
                                                         >
                                                             <FiTrash2 />
-                                                        </button>
+                                                        </button>}
                                                     </div>
                                                 )}
                                             </td>

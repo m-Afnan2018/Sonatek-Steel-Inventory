@@ -82,10 +82,8 @@ export async function createBookingFromInventory(params, dispatch) {
         const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_UPCOMING, params)).data;
 
         if (response.success) {
-            dispatch(deleteFromUpcomingItem(response.listView._id));
+            dispatch(showSuccess({ id: "createBookingFromInventory", message: response.message }));
         }
-
-        dispatch(showSuccess({ id: "createBookingFromInventory", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "createBookingFromInventory", message: err?.response?.data?.message || "Booking failed" }));
     }

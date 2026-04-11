@@ -192,6 +192,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     const [isEditing, setIsEditing] = useState(false);
     const [bookingList, setBookingList] = useState(null);
     const [loadingBookings, setLoadingBookings] = useState(false);
+    const [editRemark, setEditRemark] = useState(false);
     const { showOverlay } = useOverlay();
 
     useEffect(() => setItemDetail(prev => ({ ...prev, ...item })), [item]);
@@ -366,6 +367,34 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         </div>
     };
 
+    const changeRemark = (value) => {
+        setItemDetail((prev) => ({ ...prev, remark: value }));
+    };
+
+    const handleUpdateRemark = (e) => {
+        const grade = itemDetail.grade._id;
+        const thickness = itemDetail.thickness._id;
+        const width = itemDetail.width._id;
+        const warehouse = itemDetail.warehouse?._id;
+        const payload = { ...itemDetail, grade, thickness, width, warehouse };
+        updateItem(payload, dispatch);
+        setEditRemark(false);
+    };
+
+    const handleUpdateRemarkKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            handleUpdateRemark(id);
+            setEditRemark(null);
+        }
+    };
+
+    const cancelRemark = (e) => {
+        e.stopPropagation();
+        // Revert remark to the original item value
+        setItemDetail((prev) => ({ ...prev, remark: item.remark }));
+        setEditRemark(false);
+    };
+
     return (
         <>
             <tr>
@@ -402,16 +431,33 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                 <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
                     {isEditing
                         ? renderEditableField('remaining', 'number', '5rem')
-                        : itemDetail.remaining}
+                        : itemDetail.remaining.toFixed(3)}
                 </td>
                 <td onClick={(e) => e.stopPropagation()}>
                     {isEditing
                         ? renderDropdownField('warehouse', warehouses)
                         : itemDetail.warehouse?.name || '-'}
                 </td>
-                <td onClick={(e) => e.stopPropagation()}>
-                    {isEditing
-                        ? renderEditableField('remark', 'text', '6rem')
+                <td
+                    title={itemDetail.remark || ''}
+                    onClick={(e) => { e.stopPropagation(); if (!isEditing) setEditRemark(true); }}
+                    style={{ overflow: 'visible', cursor: 'pointer' }}
+                >
+                    {editRemark ?
+                        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', zIndex: 10 }}>
+                            <input
+                                style={{ padding: '.2rem 0.25rem', width: '6.5rem' }}
+                                type='text'
+                                value={itemDetail.remark || ''}
+                                onChange={(e) => changeRemark(e.target.value)}
+                                onKeyDown={(e) => handleUpdateRemarkKeyDown(e, itemDetail._id)}
+                                autoFocus
+                            />
+                            <div className={style.inlineButtons}>
+                                <button type="button" onClick={handleUpdateRemark}>Save</button>
+                                <button type="button" onClick={cancelRemark}>Cancel</button>
+                            </div>
+                        </div>
                         : itemDetail.remark || '-'}
                 </td>
 
@@ -497,6 +543,12 @@ const BookingsSubtable = ({ bookings }) => {
         updateRemark({ bookingId: id, remark: vNum.remarks }, dispatch);
         setEditRemark(null)
     };
+    const handleUpdateRemarkKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            handleUpdateRemark(id);
+            setEditRemark(null);
+        }
+    };
 
     const updateVehicle = (id, value) => {
         const updated = list.map((b) =>
@@ -572,6 +624,12 @@ const BookingsSubtable = ({ bookings }) => {
             return status.cancelled;
     }
 
+    function turncate(str, len) {
+        if (str.length > len) {
+            return str.slice(0, len) + '...';
+        }
+        return str;
+    }
     return (
         <table className='nestedTable' >
             <thead>
@@ -589,7 +647,7 @@ const BookingsSubtable = ({ bookings }) => {
                     <th style={thStyle}>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style={{ position: 'relative' }}>
                 {list.map((booking, index) => (
                     <tr key={booking._id || index}>
                         <td style={tdStyle}>{booking.order_id || '-'}</td>
@@ -600,13 +658,14 @@ const BookingsSubtable = ({ bookings }) => {
                         <td style={tdStyle}>{bookingDate(booking.bookingDate)}</td>
                         <td style={tdStyle}>{booking.shipTo || '-'}</td>
                         {/* <td style={tdStyle}>{booking.remarks || '-'}</td> */}
-                        <td onClick={() => setEditRemark(booking._id)} style={{ overflow: 'visible' }}> {editRemark === booking._id ?
+                        <td title={booking.remarks} onClick={() => setEditRemark(booking._id)} style={{ overflow: 'visible' }}> {editRemark === booking._id ?
                             <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', zIndex: 10 }}>
                                 <input
                                     style={{ padding: '.2rem 0.25rem', width: '6.5rem' }}
                                     type={'text'}
                                     value={booking.remarks}
                                     onChange={(e) => changeRemark(booking._id, e.target.value)}
+                                    onKeyDown={(e) => handleUpdateRemarkKeyDown(e, booking._id)}
                                     autoFocus
                                 />
                                 <div className={style.inlineButtons}>
@@ -614,9 +673,10 @@ const BookingsSubtable = ({ bookings }) => {
                                     <button type="button" onClick={() => cancelRemark(booking._id)}>Cancel</button>
                                 </div>
                             </div>
-                            : booking.remarks || '-'}
+                            : turncate(booking.remarks, 12) || '-'}
 
                         </td>
+
                         {
                             booking.status === 'Processing' ? <td style={tdStyle}>
                                 <input

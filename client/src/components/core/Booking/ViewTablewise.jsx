@@ -202,6 +202,7 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     );
 
     function turncate(str, n) {
+        if (!str) return "-";
         return str.slice(0, n) + (str.length > n ? '...' : '');
     }
 
@@ -232,7 +233,7 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                 <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
                 <td>{item.shipTo ?? "-"}</td>
                 {edit ? renderEditableField() : <td title={item.remark} onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{turncate(item.remark, 12) ?? "-"}</td>}
-                <td title={item.reason}>{turncate(item.reason, 12) ?? "-"}</td>
+                <td title={item.reason}>{item.reason ?? "-"}</td>
             </tr>
 
             {isOpen && (

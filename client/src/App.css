@@ -257,6 +257,7 @@ table td .badge {
   background: var(--bg-active);
   color: var(--text-muted);
   border-bottom: 1px solid var(--border);
+  text-align: center;
 }
 
 .nestedTable tbody td {

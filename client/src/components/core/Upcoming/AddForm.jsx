@@ -56,6 +56,7 @@ const AddForm = () => {
         addItem(formattedData, dispatch);
         // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, warehouse: data.warehouse?.label || null }]);
         setFocus("type");
+        setValue("quantity", "");
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") => {

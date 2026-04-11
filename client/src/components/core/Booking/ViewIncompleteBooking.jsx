@@ -111,6 +111,11 @@ const ViewIncompleteBooking = () => {
         </div>
     );
 
+    function turncate(str, n) {
+        if (!str) return "-";
+        return str.slice(0, n) + (str.length > n ? '...' : '');
+    }
+
     return (
         <div className={style.ViewIncompleteBooking}>
             <h3>Required Actions</h3>
@@ -173,8 +178,8 @@ const ViewIncompleteBooking = () => {
                                             {status ?? '-'}
                                         </p>
                                     </td>
-                                    <td onClick={(e) => { e.stopPropagation(); startEdit('remark', booking._id, booking.remark || ''); }}>
-                                        {isEditing ? renderEditableField() : booking.remark || '-'}
+                                    <td title={booking.remark} onClick={(e) => { e.stopPropagation(); startEdit('remark', booking._id, booking.remark || ''); }}>
+                                        {isEditing ? renderEditableField() : turncate(booking.remark, 12) || '-'}
                                     </td>
                                 </tr>
                             );

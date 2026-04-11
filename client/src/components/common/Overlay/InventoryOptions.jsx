@@ -4,7 +4,8 @@ import { Controller, useForm } from 'react-hook-form';
 import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from 'react-redux';
 import { RxCrossCircled } from "react-icons/rx";
-import { cancelBooking, createBookingFromInventory, getAllBookingByItem, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
+import { cancelBooking, createBookingFromInventory, getAllBookingByItem, getAllPartyDetails, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
+import { IoMdDoneAll } from "react-icons/io";
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
@@ -87,8 +88,8 @@ const InventoryOptions = ({ data, close, type }) => {
                     {tableData({ name: 'Date', value: data.date?.slice(0, 10) })}
                     {tableData({ name: 'Wagon Number', value: `${data?.wagonNumber}` })}
                     {tableData({ name: 'Description', value: `${data?.thickness?.name} X ${data?.width?.name} X ${data?.grade?.name}` })}
-                    {tableData({ name: 'Total Quantity', value: data.originalQuantity })}
-                    {tableData({ name: 'Current Quantity', value: data.quantity })}
+                    {tableData({ name: 'Total Quantity', value: data.originalQuantity.toFixed(3) })}
+                    {tableData({ name: 'Current Quantity', value: data.quantity.toFixed(3) })}
                 </section>
 
                 {type === 'booking' && <MoveToBooking
@@ -127,7 +128,7 @@ const IncreaseQuantity = ({ data, close }) => {
     };
 
     const validateForm = () => {
-        if (!fillUpData?.updatedQuantity) {
+        if (!fillUpData?.updatedQuantity || fillUpData?.updatedQuantity <= 0) {
             setValidationError('Please select updated Quantity');
             return false;
         }
@@ -138,7 +139,7 @@ const IncreaseQuantity = ({ data, close }) => {
     const handleUpdatedQuantitySubmit = async () => {
         setValidationError('');
 
-        validateForm();
+        if (!validateForm()) return;
 
         close();
         increaseQuantity({ ...fillUpData }, dispatch);
@@ -155,9 +156,10 @@ const IncreaseQuantity = ({ data, close }) => {
                     border: '1px solid rgb(239, 83, 80)',
                     position: 'absolute',
                     fontSize: '0.75em',
-                    padding: '0.1rem',
+                    padding: '0.3rem 0.5rem',
                     fontWeight: '800',
-                    left: '75%',
+                    top: '75px',
+                    left: '52%',
                     transform: 'translateX(-50%)',
                 }}>
                     {validationError}
@@ -215,6 +217,13 @@ const MoveToBooking = ({ data, close }) => {
 
     const { parties } = useSelector(state => state.booking);
 
+    // Fetch parties on mount so the selector is populated even after a hard refresh
+    useEffect(() => {
+        if (!parties || parties.length === 0) {
+            getAllPartyDetails(dispatch);
+        }
+    }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const handleChange = (field, e) => {
         setFillUpData((prev) => ({
             ...prev,
@@ -224,60 +233,62 @@ const MoveToBooking = ({ data, close }) => {
     };
 
     const validateForm = (selectedParty) => {
-        if (fillUpData?.invoiceNumber && fillUpData?.invoiceNumber.trim().length > 0) {
-            if (!fillUpData?.formType) {
-                setValidationError('Please select Form Type');
-                return false;
-            }
-            if (!fillUpData?.quantity || fillUpData?.quantity <= 0) {
-                setValidationError('Please enter a valid Quantity');
-                return false;
-            }
-            if (!selectedParty) {
-                setValidationError('Please select or add a Party');
-                return false;
-            }
-            if (!fillUpData?.shipTo || fillUpData?.shipTo.trim().length === 0) {
-                setValidationError('Please enter Ship To address');
-                return false;
-            }
-            if (!fillUpData?.invoiceDate) {
-                setValidationError('Please select Invoice Date');
-                return false;
-            }
-            if (!fillUpData?.vehicleNumber) {
-                setValidationError('Please select Vehicle Date');
-                return false;
-            }
+        if (!fillUpData?.formType) {
+            setValidationError('Please select Form Type');
+            return false;
         }
+        if (!fillUpData?.quantity || Number(fillUpData?.quantity) <= 0) {
+            setValidationError('Please enter a valid Quantity');
+            return false;
+        }
+        if (Number(fillUpData?.quantity) > data.quantity) {
+            setValidationError(`Quantity cannot be greater than available stock (${data.quantity.toFixed(3)})`);
+            return false;
+        }
+        if (!selectedParty) {
+            setValidationError('Please select or add a Party');
+            return false;
+        }
+        if (!fillUpData?.shipTo || fillUpData?.shipTo.trim().length === 0) {
+            setValidationError('Please enter Ship To address');
+            return false;
+        }
+        if (!fillUpData?.invoiceDate) {
+            setValidationError('Please select Invoice Date');
+            return false;
+        }
+        if (!fillUpData?.invoiceNumber || fillUpData?.invoiceNumber.trim().length === 0) {
+            setValidationError('Please enter Invoice Number');
+            return false;
+        }
+
         return true;
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleBookingSubmit = async () => {
         setValidationError('');
+
         const { party: selectedParty } = getValues();
 
-        if (fillUpData?.invoiceNumber && fillUpData?.invoiceNumber.length > 0 && !validateForm(selectedParty)) {
+        // Validate all fields first
+        if (!validateForm(selectedParty)) {
             return;
         }
 
-        let party;
+        let party = null;
         if (selectedParty && typeof selectedParty.value === "string") {
-            party = {};
-            party['val'] = selectedParty.value;
-
-            if (parties && !parties.some((p) => p._id === selectedParty.value)) {
-                party['type'] = 'name';
-            } else {
-                party['type'] = 'id';
-            }
+            party = {
+                val: selectedParty.value,
+                type: parties && parties.some((p) => p._id === selectedParty.value) ? 'id' : 'name'
+            };
         }
 
-        if (party === null) {
+        if (!party) {
+            setValidationError('Please select or add a Party');
             return;
         }
 
+        // Only close and submit if everything above passed
         close();
         createBookingFromInventory({ ...fillUpData, party }, dispatch);
     };
@@ -299,9 +310,10 @@ const MoveToBooking = ({ data, close }) => {
                     border: '1px solid rgb(239, 83, 80)',
                     position: 'absolute',
                     fontSize: '0.75em',
-                    padding: '0.1rem',
+                    padding: '0.3rem .5rem',
                     fontWeight: '800',
-                    left: '75%',
+                    left: '52%',
+                    top: '75px',
                     transform: 'translateX(-50%)',
                 }}>
                     {validationError}
@@ -413,7 +425,6 @@ const TableView = ({ data }) => {
     }, [data._id, dispatch]);
 
     useEffect(() => {
-        console.log(show)
         if (show === 'Pending') {
             setShowListing(list.filter((i) => i.status === 'Processing'))
         } else {
@@ -582,12 +593,12 @@ const TableView = ({ data }) => {
 
                             {/* Action column */}
                             {item.status === 'Processing' && <td>
-                                <button onClick={() => handleAction(item._id, "Cancelled")}>
-                                    Cancel
-                                </button>
-                                <button onClick={() => handleAction(item._id, "Shipped")}>
-                                    Ship
-                                </button>
+                                {<button style={{ background: 'red', border: 'none', color: 'white', borderRadius: '50%', padding: '0.5rem', cursor: 'pointer', marginRight: '0.5rem' }} title='Cancel' onClick={() => handleAction(item._id, "Cancelled")}>
+                                    <RxCrossCircled />
+                                </button>}
+                                {item.vehicleNumber && <button style={{ background: 'green', border: 'none', color: 'white', borderRadius: '50%', padding: '0.5rem', cursor: 'pointer' }} title='Ship' onClick={() => handleAction(item._id, "Shipped")}>
+                                    <IoMdDoneAll />
+                                </button>}
                             </td>}
                             {item.status === 'Shipped' && <td style={{ color: 'green' }}>
                                 Shipped
