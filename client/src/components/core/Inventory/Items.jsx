@@ -8,6 +8,8 @@ import { LuDownload } from "react-icons/lu";
 import { FiEye, FiEdit } from 'react-icons/fi';
 import { FaPlus } from "react-icons/fa6";
 import { IoCartOutline } from 'react-icons/io5';
+import { MdCancel } from "react-icons/md";
+import { LiaShippingFastSolid } from "react-icons/lia";
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 'services/operations/bookingAPI';
 import { useOverlay } from 'hooks/useOverlay';
@@ -576,7 +578,7 @@ const BookingsSubtable = ({ bookings }) => {
                 <tr style={{ backgroundColor: 'var(--bg-active)' }}>
                     <th style={thStyle}>Order ID</th>
                     <th style={thStyle}>Form Type</th>
-                    <th style={thStyle}>Quantity</th>
+                    <th style={thStyle}>Qty</th>
                     <th style={thStyle}>Party</th>
                     <th style={thStyle}>Booked By</th>
                     <th style={thStyle}>Booking Date</th>
@@ -599,9 +601,9 @@ const BookingsSubtable = ({ bookings }) => {
                         <td style={tdStyle}>{booking.shipTo || '-'}</td>
                         {/* <td style={tdStyle}>{booking.remarks || '-'}</td> */}
                         <td onClick={() => setEditRemark(booking._id)} style={{ overflow: 'visible' }}> {editRemark === booking._id ?
-                            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+                            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', zIndex: 10 }}>
                                 <input
-                                    style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                                    style={{ padding: '.2rem 0.25rem', width: '6.5rem' }}
                                     type={'text'}
                                     value={booking.remarks}
                                     onChange={(e) => changeRemark(booking._id, e.target.value)}
@@ -620,12 +622,13 @@ const BookingsSubtable = ({ bookings }) => {
                                 <input
                                     className='simpleField'
                                     type="text"
+                                    name='vehicleNumber'
                                     placeholder={'Vehicle Number'}
                                     value={booking.vehicleNumber || ""}
                                     onChange={(e) =>
                                         updateVehicle(booking._id, e.target.value)
                                     }
-                                    style={{ width: "120px", height: '2rem', padding: '0' }}
+                                    style={{ width: "120px", height: '1.8rem', padding: '.15rem .25rem' }}
                                 /></td> : <td style={tdStyle}>{booking.vehicleNumber || '-'}</td>
                         }
 
@@ -640,9 +643,14 @@ const BookingsSubtable = ({ bookings }) => {
                                     ? style.statusCancelled
                                     : ''
                             }`}>{booking.status || '-'}</td> */}
-                        {booking.status === 'Processing' && <td style={{ padding: '0' }}><button style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
+                        {booking.status === 'Processing' && <td style={{ padding: '0' }}><button title='shipped' style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
                             booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
-                        }}>{booking.vehicleNumber.length > 0 ? 'Shipped' : 'Cancelled'}</button></td>}
+                        }}>{booking.vehicleNumber.length > 0 ? <LiaShippingFastSolid /> : 'Cancelled'}</button>
+                            {booking.vehicleNumber.length > 0 && <button title='cancel' style={{ padding: '0', height: '2rem', width: '3rem', borderRadius: '0', marginLeft: '0.2rem', backgroundColor: 'var(--danger)' }} className={`btn`} onClick={() => {
+                                handleAction(booking._id, 'Cancelled');
+                            }}><MdCancel /></button>}
+                        </td>}
+
                     </tr>
                 ))
                 }
