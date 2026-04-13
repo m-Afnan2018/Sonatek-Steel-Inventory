@@ -10,7 +10,7 @@ import {
 import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus } from "react-icons/fi";
 
 const Party = () => {
-    // ── Local State ───────────────────────────────────────────────
+    // ── Local State ────
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
@@ -26,11 +26,11 @@ const Party = () => {
     // Delete confirmation
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-    // ── Redux ─────────────────────────────────────────────────────
+    // ── Redux ─────
     const { parties } = useSelector((state) => state.booking);
     const dispatch = useDispatch();
 
-    // ── Initial Fetch ─────────────────────────────────────────────
+    // ── Initial Fetch ─────
     useEffect(() => {
         getAllPartyDetails(dispatch);
     }, [dispatch]);
@@ -39,7 +39,7 @@ const Party = () => {
         if (parties) setLoading(false);
     }, [parties]);
 
-    // ── Filtered List ─────────────────────────────────────────────
+    // ── Filtered List ─────
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
         if (!q) return parties ?? [];
@@ -48,7 +48,7 @@ const Party = () => {
         );
     }, [parties, search]);
 
-    // ── Handlers: Create ─────────────────────────────────────────
+    // ── Handlers: Create ─────
     const handleCreate = async (e) => {
         e.preventDefault();
         if (!newName.trim()) return;
@@ -61,7 +61,7 @@ const Party = () => {
         setSubmitting(false);
     };
 
-    // ── Handlers: Edit ───────────────────────────────────────────
+    // ── Handlers: Edit ────
     const startEdit = (party) => {
         setEditingId(party._id);
         setEditName(party.name);
