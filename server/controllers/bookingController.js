@@ -1595,12 +1595,13 @@ const addParty = async (req, res) => {
 
         const party = new Party({ name });
 
-        await party.save();
+        const savedParty = await party.save();
+        const partyData = { ...savedParty.toObject(), totalBookings: 0 };
 
         res.status(200).json({
             success: true,
             message: "Successfully added the party",
-            party
+            party: partyData
         })
     } catch (err) {
         errorResponse(res, err);

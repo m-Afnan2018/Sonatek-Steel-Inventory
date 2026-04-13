@@ -19,6 +19,21 @@ const bookingSlice = createSlice({
     name: 'booking',
     initialState: initialState,
     reducers: {
+        updateBooking(state, action) {
+            const { bookingId, updates } = action.payload;
+
+            if (state.bookings) {
+                state.bookings = state.bookings.map((booking) =>
+                    booking._id === bookingId ? { ...booking, ...updates } : booking
+                );
+            }
+
+            if (state.incompleteBookings) {
+                state.incompleteBookings = state.incompleteBookings.map((booking) =>
+                    booking._id === bookingId ? { ...booking, ...updates } : booking
+                );
+            }
+        },
         setBestSuggestion(state, action) {
             state.bestSuggestion = action.payload;
         },
@@ -69,7 +84,7 @@ const bookingSlice = createSlice({
         },
         updateParty(state, action) {
             const updated = action.payload;
-            state.parties = state.parties.map(p => p._id === updated._id ? updated : p);
+            state.parties = state.parties.map(p => p._id === updated._id ? { ...p, ...updated } : p);
         },
         deleteParty(state, action) {
             state.parties = state.parties.filter(p => p._id !== action.payload);
@@ -147,6 +162,7 @@ const bookingSlice = createSlice({
 
 export const {
     setBestSuggestion,
+    updateBooking,
     setAllChoices,
     setAllSuggestion,
     setRequirement,

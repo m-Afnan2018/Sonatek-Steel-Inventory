@@ -95,7 +95,6 @@ const Party = () => {
         setSubmitting(false);
     };
 
-    // ── Render ───────────────────────────────────────────────────
     return (
         <div className={style.Warehouse}>
             <h2>Manage Parties</h2>
@@ -263,7 +262,7 @@ const Party = () => {
                                                         >
                                                             <FiEdit2 />
                                                         </button>
-                                                        {party.totalBookings === 0 && <button
+                                                        {(party.totalBookings ?? 0) === 0 && <button
                                                             className={style.deleteBtn}
                                                             onClick={() => askDelete(party._id)}
                                                             title="Delete"
