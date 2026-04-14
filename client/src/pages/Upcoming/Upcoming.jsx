@@ -28,7 +28,8 @@ const Upcoming = () => {
 
     const dispatch = useDispatch();
 
-    const { upcomingItem } = useSelector(state => state.item)
+    const { upcomingItem } = useSelector(state => state.item);
+    console.log("upcomingItem", upcomingItem);
     const { userData } = useSelector(state => state.auth);
 
     useEffect(() => {

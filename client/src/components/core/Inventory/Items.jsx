@@ -29,6 +29,7 @@ const Items = () => {
     const { token } = useSelector((state) => state.auth);
     const [colors, setColors] = useState(null);
 
+    const [bookingList, setBookingList] = useState(null);
     const [showFilters, setShowFilters] = useState(null);
 
     const [filters, setFilters] = useState({
@@ -148,17 +149,20 @@ const Items = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.map((item) => (
-                                    <SingleItem
-                                        key={item._id}
-                                        color={colors.find(i => item.warehouse?._id === i.warehouseId)}
-                                        item={item}
-                                        view={view}
-                                        setView={setView}
-                                        expandedRow={expandedRow}
-                                        setExpandedRow={setExpandedRow}
-                                    />
-                                ))}
+                                {items.filter((item) => (item.remaining > 0
+                                    && bookingList?.status !== 'processing')).map((item) => (
+                                        <SingleItem
+                                            key={item._id}
+                                            color={colors.find(i => item.warehouse?._id === i.warehouseId)}
+                                            item={item}
+                                            view={view}
+                                            setView={setView}
+                                            expandedRow={expandedRow}
+                                            setExpandedRow={setExpandedRow}
+                                            bookingList={bookingList}
+                                            setBookingList={setBookingList}
+                                        />
+                                    ))}
                             </tbody>
                         </table>
                     </div>
@@ -186,13 +190,12 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow }) => {
+const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, bookingList, setBookingList }) => {
     const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [itemDetail, setItemDetail] = useState(item);
     const [isEditing, setIsEditing] = useState(false);
-    const [bookingList, setBookingList] = useState(null);
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [editRemark, setEditRemark] = useState(false);
     const { showOverlay } = useOverlay();
