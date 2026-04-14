@@ -35,8 +35,8 @@ const Upcoming = () => {
     useEffect(() => {
         if (upcomingItem) {
             setColors(generateShipToColors(upcomingItem))
-            setItems(upcomingItem)
-            setLoading(false)
+            setItems(upcomingItem);
+            setLoading(false);
             let sum = 0;
             upcomingItem.forEach(i => {
                 sum += Number(i.originalQuantity);
@@ -63,7 +63,7 @@ const Upcoming = () => {
 
     useEffect(() => {
         getUpcomingItem({}, dispatch);
-        getAllPartyDetails(dispatch)
+        getAllPartyDetails(dispatch);
     }, [dispatch])
 
     return (

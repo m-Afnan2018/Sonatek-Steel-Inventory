@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from 'react-redux';
 import { markForBooking, moveToInventory, unmarkForBooking } from 'services/operations/itemAPI';
+import { createBookingFromUpcoming } from 'services/operations/bookingAPI';
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
@@ -368,6 +369,7 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
         }
 
         close();
+        createBookingFromUpcoming({ ...fillUpData, party }, dispatch);
         markForBooking({ ...fillUpData, party }, dispatch);
     };
 
