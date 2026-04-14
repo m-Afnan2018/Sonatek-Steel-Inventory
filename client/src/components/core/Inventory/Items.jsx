@@ -15,6 +15,7 @@ import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 's
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 import { RxCheck, RxCross2 } from "react-icons/rx";
+import { setUpdateQuantity, updateListViewData, updateListViewListData } from 'slices/itemSlice';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -85,7 +86,8 @@ const Items = () => {
             setItems(listViewList);
             setColors(generateShipToColors(listViewList))
             setLoading(false);
-        }
+        };
+
     }, [listViewList]);
 
     const sortBy = (val) => {
@@ -210,6 +212,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         const warehouse = itemDetail.warehouse?._id;
         let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
         updateItem(Item, dispatch);
+        dispatch(updateListViewData({ updatedItem: itemDetail }))
         setIsEditing(false);
     };
 
@@ -231,61 +234,42 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         }
     };
 
+    function convertItem(data) {
+        return {
+            _id: data._id,
+            item_id: data.item_id,
+            type: data.type,
+            grade: data.grade,
+            form: "Coil",
+            width: data.width,
+            thickness: data.thickness,
+            wagonNumber: data.wagonNumber,
+            currentStatus: "In Stock",
+            originalQuantity: Number(data.originalQuantity),
+            quantity: data.remaining,
+            warehouse: data.warehouse,
+            remark: data.remark,
+            date: data.date,
+            createdAt: data.createdAt,
+            updatedAt: data.createdAt,
+            marking: data.marking,
+        };
+    }
     const handleUpdateQuantity = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.item_id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
         const output = convertItem(itemDetail);
-        console.log(output);
 
         showOverlay(InventoryOptions, {
             type: 'increaseQuantity',
             data: output,
+            onAccept: (updatedItem) => {
+                if (!updatedItem) return;
+                setItemDetail((prev) => ({ ...prev, ...updatedItem }));
+                dispatch(updateListViewData({ updatedItem }))
+            }
         })
     };
 
     const handlePreview = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.item_id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
         const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
@@ -295,35 +279,16 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     };
 
     const handleOrder = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.item_id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
         const output = convertItem(itemDetail);
-
         showOverlay(InventoryOptions, {
             type: 'booking',
             data: output,
-            onAccept: (data, party) => {
-                console.log(data);
+            onAccept: async (data, party) => {
+                if (expandedRow === item._id) {
+                    setLoadingBookings(true);
+                    await getAllBookingByItem({ item: item._id }, dispatch, setBookingList);
+                    setLoadingBookings(false);
+                }
             }
         })
     };
@@ -395,6 +360,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         setEditRemark(false);
     };
 
+
     return (
         <>
             <tr>
@@ -424,14 +390,10 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                     </div>
                 </td>
                 <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
-                    {isEditing
-                        ? renderEditableField('originalQuantity', 'number', '5rem')
-                        : itemDetail.originalQuantity}
+                    {itemDetail.originalQuantity}
                 </td>
                 <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
-                    {isEditing
-                        ? renderEditableField('remaining', 'number', '5rem')
-                        : itemDetail.remaining.toFixed(3)}
+                    {itemDetail.remaining.toFixed(3)}
                 </td>
                 <td onClick={(e) => e.stopPropagation()}>
                     {isEditing
@@ -493,7 +455,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                                 No bookings found for this item
                             </div>
                         ) : (
-                            <BookingsSubtable bookings={bookingList} />
+                            <BookingsSubtable bookings={bookingList} parentItem={item} />
                         )}
                     </td>
                 </tr>
@@ -502,37 +464,39 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     );
 };
 
-const BookingsSubtable = ({ bookings }) => {
+const BookingsSubtable = ({ bookings, parentItem }) => {
     const bookingDate = (date) => {
         return date ? new Date(date).toLocaleDateString() : "-";
     };
 
     const [editRemark, setEditRemark] = useState(null);
+    const [reason, setReason] = useState('');
 
     const [list, setList] = useState(bookings);
 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        setList(bookings);
+    }, [bookings]);
+
     // Handle action buttons
     const handleAction = (id, status) => {
-        const updated = list.map((b) =>
-            b._id === id ? { ...b, status } : b
-        );
-        setList(updated);
+        const vNum = list.find((i) => i._id === id);
 
-        const vNum = (list.filter((i) => i._id === id))[0];
+        // Optimistic update — only change status, preserve all other fields (incl. reason)
+        setList((prev) => prev.map((b) =>
+            b._id === id ? { ...b, status } : b
+        ));
 
         if (status === 'Shipped') {
             shipBooking({ bookingId: id, fieldValue: vNum.vehicleNumber }, dispatch, setList);
         }
 
         if (status === 'Cancelled') {
-            cancelBooking({ bookingId: id, reason: vNum.vehicleNumber }, dispatch, setList)
+            cancelBooking({ bookingId: id, fieldValue: vNum.reason }, dispatch, setList);
+            dispatch(updateListViewListData({ updatedItem: { _id: parentItem._id, remaining: Number(parentItem.remaining) + Number(vNum.quantity) } }));
         }
-
-
-        // CALL API HERE
-        // updateBooking({ id, status }, dispatch);
     };
 
     // Handle action buttons
@@ -630,6 +594,13 @@ const BookingsSubtable = ({ bookings }) => {
         }
         return str;
     }
+
+    function handleReason(id, value) {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, reason: value } : b
+        );
+        setList(updated);
+    }
     return (
         <table className='nestedTable' >
             <thead>
@@ -643,6 +614,7 @@ const BookingsSubtable = ({ bookings }) => {
                     <th style={thStyle}>Ship To</th>
                     <th style={thStyle}>Remarks</th>
                     <th style={thStyle}>Vehicle Number</th>
+                    <th style={thStyle}>Reason</th>
                     <th style={thStyle}>Status</th>
                     <th style={thStyle}>Action</th>
                 </tr>
@@ -692,8 +664,23 @@ const BookingsSubtable = ({ bookings }) => {
                                 /></td> : <td style={tdStyle}>{booking.vehicleNumber || '-'}</td>
                         }
 
+                        {
+                            booking.status === 'Processing' ? <td style={tdStyle}>
+                                <input
+                                    className='simpleField'
+                                    type="text"
+                                    name='reason'
+                                    placeholder={'Reason'}
+                                    value={booking.reason || ""}
+                                    onChange={(e) =>
+                                        handleReason(booking._id, e.target.value)
+                                    }
+                                    style={{ width: "120px", height: '1.8rem', padding: '.15rem .25rem' }}
+                                /></td> : <td style={tdStyle}>{booking.reason || '-'}</td>
+                        }
+
                         <td className={`${style.statusPill}`} style={getStatus(booking)}>
-                            {booking.status || '-'}
+                            <p style={{ fontSize: '10px' }}>{booking.status || '-'}</p>
                         </td>
                         {/* <td className={`${style.statusPill} ${booking.status === 'Processing'
                             ? style.statusProcessing
@@ -703,13 +690,16 @@ const BookingsSubtable = ({ bookings }) => {
                                     ? style.statusCancelled
                                     : ''
                             }`}>{booking.status || '-'}</td> */}
-                        {booking.status === 'Processing' && <td style={{ padding: '0' }}><button title='shipped' style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
-                            booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
-                        }}>{booking.vehicleNumber.length > 0 ? <LiaShippingFastSolid /> : 'Cancelled'}</button>
-                            {booking.vehicleNumber.length > 0 && <button title='cancel' style={{ padding: '0', height: '2rem', width: '3rem', borderRadius: '0', marginLeft: '0.2rem', backgroundColor: 'var(--danger)' }} className={`btn`} onClick={() => {
-                                handleAction(booking._id, 'Cancelled');
-                            }}><MdCancel /></button>}
-                        </td>}
+                        {booking.status === 'Processing' &&
+                            <td style={{ padding: '0' }}>
+                                {booking.vehicleNumber.length > 0 && <button title={booking.vehicleNumber.length > 0 ? 'shipped' : 'cancel'} style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
+                                    booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
+                                }}>{booking.vehicleNumber.length > 0 ? <LiaShippingFastSolid /> : 'Cancel'}</button>
+                                }
+                                {booking.reason?.length > 0 && <button title='cancel' style={{ padding: '0', height: '2rem', width: '3rem', borderRadius: '0', marginLeft: '0.2rem', backgroundColor: 'var(--danger)' }} className={`btn`} onClick={() => {
+                                    handleAction(booking._id, 'Cancelled');
+                                }}><MdCancel /></button>}
+                            </td>}
 
                     </tr>
                 ))

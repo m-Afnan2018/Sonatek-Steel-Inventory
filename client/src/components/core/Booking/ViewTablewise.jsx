@@ -154,7 +154,7 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
+const SingleItem = ({ item, view, setView, allowed, setAllBookings, onItemUpdated }) => {
     const bookingDate = item.bookingDate
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
@@ -174,7 +174,14 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const [value, setValue] = useState('');
     const [edit, setEdit] = useState(false);
 
+    useEffect(() => {
+        if (!edit) {
+            setValue(item.remark || '');
+        }
+    }, [item.remark, edit]);
+
     const handleSave = (e) => {
+        e.stopPropagation();
         updateRemark({ bookingId: item._id, remark: value }, dispatch, setAllBookings)
         setEdit(false);
     };
@@ -184,6 +191,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
         setEdit(false);
         setValue(item.remark);
     };
+
+    // useEffect(() => {
+    //     setAllBookings(prev => prev.map(i => i._id === item._id ? item : i));
+    //     console.log(item);
+    // }, [item]);
 
     const renderEditableField = (inputType = 'text') => (
         <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
@@ -232,7 +244,7 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                 </td>
                 <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
                 <td>{item.shipTo ?? "-"}</td>
-                {edit ? renderEditableField() : <td title={item.remark} onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{turncate(item.remark, 12) ?? "-"}</td>}
+                {edit ? renderEditableField() : <td title={item.remark} onClick={(e) => { e.stopPropagation(); setValue(item.remark || ''); setEdit(true); }}>{turncate(item.remark, 12) ?? "-"}</td>}
                 <td title={item.reason}>{item.reason ?? "-"}</td>
             </tr>
 

@@ -200,7 +200,7 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Thickness x Width x Grade */}
-            <td style={{ display: 'flex' }}>
+            <td style={{ display: 'flex', gap: '0.25rem' }}>
                 {/* Thickness */}
                 <div onClick={() => clickHandler('thickness')}>
                     {select === 'thickness'
@@ -281,6 +281,4 @@ const SingleItem = ({ color, item, setView, view }) => {
         </tr>
     );
 };
-
-
 export default UpcomingDashboard

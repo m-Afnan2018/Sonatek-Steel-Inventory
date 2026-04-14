@@ -157,7 +157,6 @@ const SingleItem = ({ color, setSelection, item, view }) => {
                 <span>{item.width?.name || "-"}</span> X
                 <span>{item.grade?.name || "-"}</span>
             </td>
-
             <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>{item.quantity != null ? Number(item.quantity).toFixed(3) : '-'}</td>
             <td style={{ display: "flex" }}>{item.warehouse === null ? "-" : <p className={style.coloredShipTo} style={{ background: color?.backgroundColor, color: color?.foregroundColor, border: `1px solid ${color?.foregroundColor}` }}>{item.warehouse.name.toLowerCase()}</p>}</td>
 

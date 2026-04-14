@@ -5,7 +5,8 @@ import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from 'react-redux';
 import { RxCrossCircled } from "react-icons/rx";
 import { cancelBooking, createBookingFromInventory, getAllBookingByItem, getAllPartyDetails, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
-import { IoMdDoneAll } from "react-icons/io";
+import { updateBooking } from 'slices/bookingSlice';
+import { setUpdateQuantity, updateListViewListData } from 'slices/itemSlice';
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
@@ -58,7 +59,7 @@ const customStyles = {
     })
 };
 
-const InventoryOptions = ({ data, close, type }) => {
+const InventoryOptions = ({ data, close, type, onAccept }) => {
     return (
         <div
             className={`${style.UpcomingOptions} ${style.InventoryOptions}`}
@@ -95,6 +96,7 @@ const InventoryOptions = ({ data, close, type }) => {
                 {type === 'booking' && <MoveToBooking
                     data={data}
                     close={close}
+                    onAccept={onAccept}
                 />}
                 {type === 'increaseQuantity' && <IncreaseQuantity
                     data={data}
@@ -129,7 +131,11 @@ const IncreaseQuantity = ({ data, close }) => {
 
     const validateForm = () => {
         if (!fillUpData?.updatedQuantity || fillUpData?.updatedQuantity <= 0) {
-            setValidationError('Please select updated Quantity');
+            setValidationError('Please enter a valid quantity');
+            return false;
+        }
+        if (Number(fillUpData.updatedQuantity) <= Number(fillUpData.original)) {
+            setValidationError(`Please enter a quantity greater than the current total (${fillUpData.original})`);
             return false;
         }
         return true;
@@ -141,8 +147,9 @@ const IncreaseQuantity = ({ data, close }) => {
 
         if (!validateForm()) return;
 
+        const res = await increaseQuantity({ ...fillUpData }, dispatch);
+        dispatch(setUpdateQuantity({ item: data._id, updatedQuantity: fillUpData.updatedQuantity }));
         close();
-        increaseQuantity({ ...fillUpData }, dispatch);
     };
 
     return (
@@ -173,7 +180,7 @@ const IncreaseQuantity = ({ data, close }) => {
                 </div>
                 <div>
                     <h2 style={{ width: '50%' }}>Available Quantity:</h2>
-                    <h3 style={{ width: '50%' }}>{fillUpData.available}</h3>
+                    <h3 style={{ width: '50%' }}>{fillUpData.available.toFixed(3)}</h3>
                 </div>
                 <div>
                     <h2 style={{ width: '50%' }}>Updated Quantity:</h2>
@@ -193,7 +200,7 @@ const IncreaseQuantity = ({ data, close }) => {
     );
 };
 
-const MoveToBooking = ({ data, close }) => {
+const MoveToBooking = ({ data, close, onAccept }) => {
     const dispatch = useDispatch();
 
     const [fillUpData, setFillUpData] = useState({
@@ -289,8 +296,13 @@ const MoveToBooking = ({ data, close }) => {
         }
 
         // Only close and submit if everything above passed
+        const result = await createBookingFromInventory({ ...fillUpData, party }, dispatch);
+        if (result) {
+            const newRemaining = Number(data.quantity) - Number(fillUpData.quantity);
+            dispatch(updateListViewListData({ updatedItem: { _id: data._id, remaining: newRemaining } }));
+        }
         close();
-        createBookingFromInventory({ ...fillUpData, party }, dispatch);
+        if (onAccept) onAccept(result);
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") =>
@@ -417,6 +429,7 @@ const TableView = ({ data }) => {
     const [list, setList] = useState([]);
     const [editingRemarkId, setEditingRemarkId] = useState(null); // which remark is being edited
     const [tempRemark, setTempRemark] = useState("");
+    const [reason, setReason] = useState("");
 
     const dispatch = useDispatch();
 
@@ -474,13 +487,21 @@ const TableView = ({ data }) => {
         }
 
         if (status === 'Cancelled') {
-            cancelBooking({ bookingId: id, reason: vNum.vehicleNumber }, dispatch, setList)
+            cancelBooking({ bookingId: id, fieldValue: vNum.reason }, dispatch, setList)
         }
 
+        // CALL API HERE
+        updateBooking({ id, status }, dispatch);
+    };
+    function updateReason(id, value) {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, reason: value } : b
+        );
+        setList(updated);
 
         // CALL API HERE
-        // updateBooking({ id, status }, dispatch);
-    };
+        updateBooking({ id, fieldValue: value }, dispatch);
+    }
 
     if (list === null) return <div>Loading</div>;
     if (list.length === 0) return <div>No Booking Found</div>;
@@ -530,6 +551,7 @@ const TableView = ({ data }) => {
                         <th>Ship To</th>
                         <th>Remarks</th>
                         <th>Vehicle Number</th>
+                        <th>Reason</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -591,13 +613,25 @@ const TableView = ({ data }) => {
                                 {item.status === 'Shipped' && item.vehicleNumber}
                             </td>
 
+                            {/* Reason input */}
+                            <td>
+                                {<input
+                                    type="text"
+                                    value={item.reason || ""}
+                                    onChange={(e) => updateReason(item._id, e.target.value)}
+                                    style={{ width: "120px" }}
+                                />}
+                                {item.reason && '-'}
+
+                            </td>
+
                             {/* Action column */}
                             {item.status === 'Processing' && <td>
-                                {<button style={{ background: 'red', border: 'none', color: 'white', borderRadius: '50%', padding: '0.5rem', cursor: 'pointer', marginRight: '0.5rem' }} title='Cancel' onClick={() => handleAction(item._id, "Cancelled")}>
-                                    <RxCrossCircled />
+                                {item.reason && <button style={{ background: 'red', border: 'none', color: 'white', borderRadius: '5px', padding: '0.5rem', cursor: 'pointer', marginRight: '0.5rem' }} title='Cancel' onClick={() => handleAction(item._id, "Cancelled")}>
+                                    Cancel
                                 </button>}
-                                {item.vehicleNumber && <button style={{ background: 'green', border: 'none', color: 'white', borderRadius: '50%', padding: '0.5rem', cursor: 'pointer' }} title='Ship' onClick={() => handleAction(item._id, "Shipped")}>
-                                    <IoMdDoneAll />
+                                {item.vehicleNumber && <button style={{ background: 'green', border: 'none', color: 'white', borderRadius: '5px', padding: '0.5rem', cursor: 'pointer' }} title='Ship' onClick={() => handleAction(item._id, "Shipped")}>
+                                    Ship
                                 </button>}
                             </td>}
                             {item.status === 'Shipped' && <td style={{ color: 'green' }}>

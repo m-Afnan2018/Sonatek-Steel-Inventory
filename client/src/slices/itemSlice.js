@@ -62,7 +62,7 @@ const itemSlice = createSlice({
             state.listViewList = action.payload;
         },
         updateListViewList(state, action) {
-            const item = action.payload;
+            const { item } = action.payload;
 
             if (item.challanNumber && state.listViewList) {
                 const originalItem = state.listViewList?.find((i) => i._id === item._id);
@@ -115,6 +115,25 @@ const itemSlice = createSlice({
         setTotalQuantity(state, action) {
             state.totalQuantity = action.payload;
         },
+        setUpdateQuantity(state, action) {
+            const { item, updatedQuantity } = action.payload;
+
+            state.listViewList = state.listViewList.map((prev) => {
+                if (prev._id === item) {
+
+                    const newRemaining = Number(updatedQuantity) - (Number(prev.originalQuantity || 0) - prev.remaining);
+
+                    return {
+                        ...prev,
+                        remaining: newRemaining,
+                        originalQuantity: Number(updatedQuantity), // optional
+                    };
+                }
+
+                return prev;
+            });
+        },
+
         updateUpcomingSaveForBooking(state, action) {
             const detail = action.payload;
             state.upcomingItem = state.upcomingItem.map((prev) => {
@@ -123,6 +142,17 @@ const itemSlice = createSlice({
                 }
                 return prev;
             })
+        },
+        updateListViewListData(state, action) {
+            const { updatedItem } = action.payload;
+
+            if (!state.listViewList) return;
+
+            state.listViewList = state.listViewList.map((item) =>
+                item._id === updatedItem._id
+                    ? { ...item, ...updatedItem } // merge to avoid losing fields
+                    : item
+            );
         }
     },
 });
@@ -138,9 +168,12 @@ export const {
     setUpcomingItem,
     setPagination,
     updateListViewList,
+    updateListViewData,
     addUpcomingItem,
     deleteFromUpcomingItem,
     setTotalQuantity,
+    setUpdateQuantity,
+    updateListViewListData,
     updateUpcomingSaveForBooking
 } = itemSlice.actions;
 

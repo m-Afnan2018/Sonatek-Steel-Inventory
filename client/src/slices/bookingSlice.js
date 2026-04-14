@@ -51,6 +51,7 @@ const bookingSlice = createSlice({
         },
         updateBookingStatus(state, action) {
             const { bookingId, status } = action.payload;
+            if (!state.bookings) return;
 
             state.bookings = state.bookings.map(booking => {
                 if (booking._id === bookingId) {
@@ -105,10 +106,13 @@ const bookingSlice = createSlice({
         },
         removeIncompleteBookings(state, action) {
             const bookingId = action.payload;
+            if (!state.incompleteBookings) return;
             state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
         },
         addBooking(state, action) {
             const { bookingId, vehicleNumber, reason, status } = action.payload;
+            if (!bookingId) return;
+
             const item = state.incompleteBookings.find(i => i._id === bookingId);
             function transformBooking(raw) {
                 if (!raw || typeof raw !== "object") return null;

@@ -381,11 +381,11 @@ const SingleItem = ({ color, item, setView, view }) => {
 
             <td className={style.actionCell}>
                 {!isEditing ? <div style={{ gap: '0.25rem' }}>
-                    <span className={style.actionIcon}><FiEye onClick={item.marking ? handleOrder : handleInventory} /></span>
-                    <span className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} onClick={handleInventory} /></span>
-                    <span className={style.actionIcon}><IoCartOutline onClick={handleOrder} /></span>
-                    <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} /></span>
-                    <span className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} onClick={handleDelete} /></span>
+                    <span onClick={item.marking ? handleOrder : handleInventory} className={style.actionIcon}><FiEye /></span>
+                    <span onClick={handleInventory} className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} /></span>
+                    <span onClick={handleOrder} className={style.actionIcon}><IoCartOutline /></span>
+                    <span onClick={handleEditToggle} className={style.actionIcon}><FiEdit /></span>
+                    <span onClick={handleDelete} className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} /></span>
                 </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
                     <span className={style.actionIcon}><RxCheck style={{ color: 'green', fontSize: '1.25rem' }} onClick={handleSave} /></span>
                     <span className={style.actionIcon}><RxCross2 style={{ color: 'red', fontSize: '1.25rem' }} onClick={handleCancel} /></span>
