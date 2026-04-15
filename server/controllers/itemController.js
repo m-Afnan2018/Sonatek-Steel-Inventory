@@ -126,17 +126,17 @@ const updateItem = async (req, res) => {
         }
 
         // If challan fields are present, nest them
-        if (updateData.challanNumber || updateData.challanDate) {
+        if (updateData?.challanNumber || updateData?.challanDate) {
             updateData.challan = {
-                challanNumber: updateData.challanNumber,
-                challanDate: updateData.challanDate
+                challanNumber: updateData?.challanNumber,
+                challanDate: updateData?.challanDate
             };
             delete updateData.challanNumber;
             delete updateData.challanDate;
         }
 
         // If transport fields are present, nest them
-        if (updateData.vehicleNumber || updateData.loader || updateData.transport) {
+        if (updateData?.vehicleNumber || updateData?.loader || updateData?.transport) {
             updateData.transport = {
                 vehicleNumber: updateData.vehicleNumber,
                 loader: updateData.loader,
