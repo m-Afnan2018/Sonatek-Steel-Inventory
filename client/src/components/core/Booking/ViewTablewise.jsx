@@ -10,8 +10,8 @@ const Items = () => {
 
     const [allBookings, setAllBookings] = useState(null);
     const [pagination, setPagination] = useState(null);
-    const [setPage, page] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(null);
 
 
     const dispatch = useDispatch();
@@ -24,7 +24,7 @@ const Items = () => {
         if (bookings) {
             setAllBookings(bookings);
         }
-    }, [bookings])
+    }, [bookings, page, pagination])
 
     useEffect(() => {
         if (userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors')) {
@@ -295,7 +295,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
         (state) => state.varient
     );
 
-    const [currentType, setCurrentType] = useState('Both');
+    const [currentType, setCurrentType] = useState('Cold Rolled');
 
     const dispatch = useDispatch();
 
@@ -305,7 +305,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
             grade: "",
-            type: "",
+            type: "Cold Rolled",
             width: "",
             thickness: "",
             warehouse: "",
@@ -361,7 +361,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
 
 
         getAllBookingsTable(
-            { page: 1, limit: 50, filters: filterPayload },
+            { page: 1, limit: 20, filters: filterPayload },
             setAllBookings,
             setPagination,
             dispatch
@@ -371,7 +371,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
 
     const handleReset = (filters) => {
         getAllBookingsTable(
-            { page: 1, limit: 50, filters: {} },
+            { page: 1, limit: 20, filters: {} },
             setAllBookings,
             setPagination,
             dispatch
@@ -383,13 +383,13 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
     return (
         <form className={style.formBlock} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
-            <div>
+            {/* <div>
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")}>
                     <option value="">All</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
-            </div>
+            </div> */}
 
             {/* Grade */}
             <div>
