@@ -19,6 +19,21 @@ const bookingSlice = createSlice({
     name: 'booking',
     initialState: initialState,
     reducers: {
+        updateBooking(state, action) {
+            const { bookingId, updates } = action.payload;
+
+            if (state.bookings) {
+                state.bookings = state.bookings.map((booking) =>
+                    booking._id === bookingId ? { ...booking, ...updates } : booking
+                );
+            }
+
+            if (state.incompleteBookings) {
+                state.incompleteBookings = state.incompleteBookings.map((booking) =>
+                    booking._id === bookingId ? { ...booking, ...updates } : booking
+                );
+            }
+        },
         setBestSuggestion(state, action) {
             state.bestSuggestion = action.payload;
         },
@@ -36,6 +51,7 @@ const bookingSlice = createSlice({
         },
         updateBookingStatus(state, action) {
             const { bookingId, status } = action.payload;
+            if (!state.bookings) return;
 
             state.bookings = state.bookings.map(booking => {
                 if (booking._id === bookingId) {
@@ -68,6 +84,13 @@ const bookingSlice = createSlice({
             state.parties = action.payload;
         },
         updateParty(state, action) {
+            const updated = action.payload;
+            state.parties = state.parties.map(p => p._id === updated._id ? { ...p, ...updated } : p);
+        },
+        deleteParty(state, action) {
+            state.parties = state.parties.filter(p => p._id !== action.payload);
+        },
+        addParty(state, action) {
             state.parties = [...state.parties, action.payload];
         },
         setIncompleteBookings(state, action) {
@@ -83,16 +106,20 @@ const bookingSlice = createSlice({
         },
         removeIncompleteBookings(state, action) {
             const bookingId = action.payload;
+            if (!state.incompleteBookings) return;
             state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
         },
         addBooking(state, action) {
             const { bookingId, vehicleNumber, reason, status } = action.payload;
+            if (!bookingId) return;
+
             const item = state.incompleteBookings.find(i => i._id === bookingId);
             function transformBooking(raw) {
                 if (!raw || typeof raw !== "object") return null;
 
                 const listView = ({
                     _id: raw._id,
+                    orderId: raw.order_id || "-",
                     bookedBy: raw.bookedBySnapshot?.name,
                     bookingDate: raw.bookingDate,
                     items: raw.items,
@@ -108,9 +135,14 @@ const bookingSlice = createSlice({
             if (item) {
                 state.incompleteBookings = state.incompleteBookings.filter(i => i._id !== bookingId);
                 if (state.bookings) {
-                    state.bookings = [transformBooking(item), ...state.bookings];
+                    const existingIndex = state.bookings.findIndex(b => b._id === bookingId);
+                    if (existingIndex !== -1) {
+                        state.bookings[existingIndex] = { ...state.bookings[existingIndex], ...transformBooking(item) };
+                    } else {
+                        state.bookings = [transformBooking(item), ...state.bookings];
+                    }
                 } else {
-                    state.bookings = [item];
+                    state.bookings = [transformBooking(item)];
                 }
             }
         },
@@ -134,6 +166,7 @@ const bookingSlice = createSlice({
 
 export const {
     setBestSuggestion,
+    updateBooking,
     setAllChoices,
     setAllSuggestion,
     setRequirement,
@@ -143,6 +176,8 @@ export const {
     setOptions,
     setParty,
     updateParty,
+    deleteParty,
+    addParty,
     updateBookingRemark,
     setPagination,
     addIncompleteBookings,

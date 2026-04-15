@@ -4,7 +4,9 @@ import { Controller, useForm } from 'react-hook-form';
 import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from 'react-redux';
 import { RxCrossCircled } from "react-icons/rx";
-import { cancelBooking, createBookingFromInventory, getAllBookingByItem, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
+import { cancelBooking, createBookingFromInventory, getAllBookingByItem, getAllPartyDetails, increaseQuantity, shipBooking } from 'services/operations/bookingAPI';
+import { updateBooking } from 'slices/bookingSlice';
+import { setUpdateQuantity, updateListViewListData } from 'slices/itemSlice';
 
 const tableData = ({ name, value }) => {
     return <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', gap: '0.25rem' }}>
@@ -57,7 +59,7 @@ const customStyles = {
     })
 };
 
-const InventoryOptions = ({ data, close, type }) => {
+const InventoryOptions = ({ data, close, type, onAccept }) => {
     return (
         <div
             className={`${style.UpcomingOptions} ${style.InventoryOptions}`}
@@ -87,13 +89,14 @@ const InventoryOptions = ({ data, close, type }) => {
                     {tableData({ name: 'Date', value: data.date?.slice(0, 10) })}
                     {tableData({ name: 'Wagon Number', value: `${data?.wagonNumber}` })}
                     {tableData({ name: 'Description', value: `${data?.thickness?.name} X ${data?.width?.name} X ${data?.grade?.name}` })}
-                    {tableData({ name: 'Total Quantity', value: data.originalQuantity })}
-                    {tableData({ name: 'Current Quantity', value: data.quantity })}
+                    {tableData({ name: 'Total Quantity', value: data.originalQuantity.toFixed(3) })}
+                    {tableData({ name: 'Current Quantity', value: data.quantity.toFixed(3) })}
                 </section>
 
                 {type === 'booking' && <MoveToBooking
                     data={data}
                     close={close}
+                    onAccept={onAccept}
                 />}
                 {type === 'increaseQuantity' && <IncreaseQuantity
                     data={data}
@@ -127,8 +130,12 @@ const IncreaseQuantity = ({ data, close }) => {
     };
 
     const validateForm = () => {
-        if (!fillUpData?.updatedQuantity) {
-            setValidationError('Please select updated Quantity');
+        if (!fillUpData?.updatedQuantity || fillUpData?.updatedQuantity <= 0) {
+            setValidationError('Please enter a valid quantity');
+            return false;
+        }
+        if (Number(fillUpData.updatedQuantity) <= Number(fillUpData.original)) {
+            setValidationError(`Please enter a quantity greater than the current total (${fillUpData.original})`);
             return false;
         }
         return true;
@@ -138,10 +145,11 @@ const IncreaseQuantity = ({ data, close }) => {
     const handleUpdatedQuantitySubmit = async () => {
         setValidationError('');
 
-        validateForm();
+        if (!validateForm()) return;
 
+        const res = await increaseQuantity({ ...fillUpData }, dispatch);
+        dispatch(setUpdateQuantity({ item: data._id, updatedQuantity: fillUpData.updatedQuantity }));
         close();
-        increaseQuantity({ ...fillUpData }, dispatch);
     };
 
     return (
@@ -155,9 +163,10 @@ const IncreaseQuantity = ({ data, close }) => {
                     border: '1px solid rgb(239, 83, 80)',
                     position: 'absolute',
                     fontSize: '0.75em',
-                    padding: '0.1rem',
+                    padding: '0.3rem 0.5rem',
                     fontWeight: '800',
-                    left: '75%',
+                    top: '75px',
+                    left: '52%',
                     transform: 'translateX(-50%)',
                 }}>
                     {validationError}
@@ -171,7 +180,7 @@ const IncreaseQuantity = ({ data, close }) => {
                 </div>
                 <div>
                     <h2 style={{ width: '50%' }}>Available Quantity:</h2>
-                    <h3 style={{ width: '50%' }}>{fillUpData.available}</h3>
+                    <h3 style={{ width: '50%' }}>{fillUpData.available.toFixed(3)}</h3>
                 </div>
                 <div>
                     <h2 style={{ width: '50%' }}>Updated Quantity:</h2>
@@ -191,7 +200,7 @@ const IncreaseQuantity = ({ data, close }) => {
     );
 };
 
-const MoveToBooking = ({ data, close }) => {
+const MoveToBooking = ({ data, close, onAccept }) => {
     const dispatch = useDispatch();
 
     const [fillUpData, setFillUpData] = useState({
@@ -215,6 +224,13 @@ const MoveToBooking = ({ data, close }) => {
 
     const { parties } = useSelector(state => state.booking);
 
+    // Fetch parties on mount so the selector is populated even after a hard refresh
+    useEffect(() => {
+        if (!parties || parties.length === 0) {
+            getAllPartyDetails(dispatch);
+        }
+    }, [dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const handleChange = (field, e) => {
         setFillUpData((prev) => ({
             ...prev,
@@ -224,62 +240,69 @@ const MoveToBooking = ({ data, close }) => {
     };
 
     const validateForm = (selectedParty) => {
-        if (fillUpData?.invoiceNumber && fillUpData?.invoiceNumber.trim().length > 0) {
-            if (!fillUpData?.formType) {
-                setValidationError('Please select Form Type');
-                return false;
-            }
-            if (!fillUpData?.quantity || fillUpData?.quantity <= 0) {
-                setValidationError('Please enter a valid Quantity');
-                return false;
-            }
-            if (!selectedParty) {
-                setValidationError('Please select or add a Party');
-                return false;
-            }
-            if (!fillUpData?.shipTo || fillUpData?.shipTo.trim().length === 0) {
-                setValidationError('Please enter Ship To address');
-                return false;
-            }
-            if (!fillUpData?.invoiceDate) {
-                setValidationError('Please select Invoice Date');
-                return false;
-            }
-            if (!fillUpData?.vehicleNumber) {
-                setValidationError('Please select Vehicle Date');
-                return false;
-            }
+        if (!fillUpData?.formType) {
+            setValidationError('Please select Form Type');
+            return false;
         }
+        if (!fillUpData?.quantity || Number(fillUpData?.quantity) <= 0) {
+            setValidationError('Please enter a valid Quantity');
+            return false;
+        }
+        if (Number(fillUpData?.quantity) > data.quantity) {
+            setValidationError(`Quantity cannot be greater than available stock (${data.quantity.toFixed(3)})`);
+            return false;
+        }
+        if (!selectedParty) {
+            setValidationError('Please select or add a Party');
+            return false;
+        }
+        if (!fillUpData?.shipTo || fillUpData?.shipTo.trim().length === 0) {
+            setValidationError('Please enter Ship To address');
+            return false;
+        }
+        if (!fillUpData?.invoiceDate) {
+            setValidationError('Please select Invoice Date');
+            return false;
+        }
+        if (!fillUpData?.invoiceNumber || fillUpData?.invoiceNumber.trim().length === 0) {
+            setValidationError('Please enter Invoice Number');
+            return false;
+        }
+
         return true;
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleBookingSubmit = async () => {
         setValidationError('');
+
         const { party: selectedParty } = getValues();
 
-        if (fillUpData?.invoiceNumber && fillUpData?.invoiceNumber.length > 0 && !validateForm(selectedParty)) {
+        // Validate all fields first
+        if (!validateForm(selectedParty)) {
             return;
         }
 
-        let party;
+        let party = null;
         if (selectedParty && typeof selectedParty.value === "string") {
-            party = {};
-            party['val'] = selectedParty.value;
-
-            if (parties && !parties.some((p) => p._id === selectedParty.value)) {
-                party['type'] = 'name';
-            } else {
-                party['type'] = 'id';
-            }
+            party = {
+                val: selectedParty.value,
+                type: parties && parties.some((p) => p._id === selectedParty.value) ? 'id' : 'name'
+            };
         }
 
-        if (party === null) {
+        if (!party) {
+            setValidationError('Please select or add a Party');
             return;
         }
 
+        // Only close and submit if everything above passed
+        const result = await createBookingFromInventory({ ...fillUpData, party }, dispatch);
+        if (result) {
+            const newRemaining = Number(data.quantity) - Number(fillUpData.quantity);
+            dispatch(updateListViewListData({ updatedItem: { _id: data._id, remaining: newRemaining } }));
+        }
         close();
-        createBookingFromInventory({ ...fillUpData, party }, dispatch);
+        if (onAccept) onAccept(result);
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") =>
@@ -299,9 +322,10 @@ const MoveToBooking = ({ data, close }) => {
                     border: '1px solid rgb(239, 83, 80)',
                     position: 'absolute',
                     fontSize: '0.75em',
-                    padding: '0.1rem',
+                    padding: '0.3rem .5rem',
                     fontWeight: '800',
-                    left: '75%',
+                    left: '52%',
+                    top: '75px',
                     transform: 'translateX(-50%)',
                 }}>
                     {validationError}
@@ -405,6 +429,7 @@ const TableView = ({ data }) => {
     const [list, setList] = useState([]);
     const [editingRemarkId, setEditingRemarkId] = useState(null); // which remark is being edited
     const [tempRemark, setTempRemark] = useState("");
+    const [reason, setReason] = useState("");
 
     const dispatch = useDispatch();
 
@@ -413,7 +438,6 @@ const TableView = ({ data }) => {
     }, [data._id, dispatch]);
 
     useEffect(() => {
-        console.log(show)
         if (show === 'Pending') {
             setShowListing(list.filter((i) => i.status === 'Processing'))
         } else {
@@ -463,13 +487,21 @@ const TableView = ({ data }) => {
         }
 
         if (status === 'Cancelled') {
-            cancelBooking({ bookingId: id, reason: vNum.vehicleNumber }, dispatch, setList)
+            cancelBooking({ bookingId: id, fieldValue: vNum.reason }, dispatch, setList)
         }
 
+        // CALL API HERE
+        updateBooking({ id, status }, dispatch);
+    };
+    function updateReason(id, value) {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, reason: value } : b
+        );
+        setList(updated);
 
         // CALL API HERE
-        // updateBooking({ id, status }, dispatch);
-    };
+        updateBooking({ id, fieldValue: value }, dispatch);
+    }
 
     if (list === null) return <div>Loading</div>;
     if (list.length === 0) return <div>No Booking Found</div>;
@@ -519,6 +551,7 @@ const TableView = ({ data }) => {
                         <th>Ship To</th>
                         <th>Remarks</th>
                         <th>Vehicle Number</th>
+                        <th>Reason</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -580,14 +613,26 @@ const TableView = ({ data }) => {
                                 {item.status === 'Shipped' && item.vehicleNumber}
                             </td>
 
+                            {/* Reason input */}
+                            <td>
+                                {<input
+                                    type="text"
+                                    value={item.reason || ""}
+                                    onChange={(e) => updateReason(item._id, e.target.value)}
+                                    style={{ width: "120px" }}
+                                />}
+                                {item.reason && '-'}
+
+                            </td>
+
                             {/* Action column */}
                             {item.status === 'Processing' && <td>
-                                <button onClick={() => handleAction(item._id, "Cancelled")}>
+                                {item.reason && <button style={{ background: 'red', border: 'none', color: 'white', borderRadius: '5px', padding: '0.5rem', cursor: 'pointer', marginRight: '0.5rem' }} title='Cancel' onClick={() => handleAction(item._id, "Cancelled")}>
                                     Cancel
-                                </button>
-                                <button onClick={() => handleAction(item._id, "Shipped")}>
+                                </button>}
+                                {item.vehicleNumber && <button style={{ background: 'green', border: 'none', color: 'white', borderRadius: '5px', padding: '0.5rem', cursor: 'pointer' }} title='Ship' onClick={() => handleAction(item._id, "Shipped")}>
                                     Ship
-                                </button>
+                                </button>}
                             </td>}
                             {item.status === 'Shipped' && <td style={{ color: 'green' }}>
                                 Shipped

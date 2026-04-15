@@ -2,14 +2,17 @@
 .Upcoming {
     padding: 0.25rem;
     background: var(--bg-base) !important;
+    width: 100%;
 }
 
-.Upcoming td input {
+.Upcoming td input,
+.Upcoming td select {
     padding: 0.15rem;
     border: 1px solid var(--border);
     background: var(--bg-elevated);
     color: var(--text-primary);
     border-radius: var(--radius-sm);
+    height: 1.75rem;
 }
 
 .Upcoming td svg {

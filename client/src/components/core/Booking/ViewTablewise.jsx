@@ -52,7 +52,7 @@ const Items = () => {
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
         grade: "",
-        type: "",
+        type: "Cold Rolled",
         width: "",
         thickness: "",
         warehouse: "",
@@ -116,6 +116,7 @@ const Items = () => {
                                     <th style={{ width: '8rem' }}>Vehicle Number</th>
                                     <th style={{ width: '8rem' }}>Ship To</th>
                                     <th style={{ width: '8rem' }}>Remark</th>
+                                    <th style={{ width: '10rem' }}>Reason</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -153,7 +154,7 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
+const SingleItem = ({ item, view, setView, allowed, setAllBookings, onItemUpdated }) => {
     const bookingDate = item.bookingDate
         ? new Date(item.bookingDate).toLocaleDateString()
         : "-";
@@ -161,11 +162,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const dispatch = useDispatch();
 
     const status = {
-        'Pending':    { background: 'var(--warning-muted)',  foreground: 'var(--warning)' },
-        'Processing': { background: 'var(--accent-muted)',   foreground: 'var(--accent)' },
-        'Shipped':    { background: 'var(--info-muted)',     foreground: 'var(--info)' },
-        'Delivered':  { background: 'var(--success-muted)',  foreground: 'var(--success)' },
-        'Cancelled':  { background: 'var(--danger-muted)',   foreground: 'var(--danger)' },
+        'Pending': { background: 'var(--warning-muted)', foreground: 'var(--warning)' },
+        'Processing': { background: 'var(--accent-muted)', foreground: 'var(--accent)' },
+        'Shipped': { background: 'var(--info-muted)', foreground: 'var(--info)' },
+        'Delivered': { background: 'var(--success-muted)', foreground: 'var(--success)' },
+        'Cancelled': { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
     };
 
     const isOpen = view === item._id;
@@ -173,7 +174,14 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
     const [value, setValue] = useState('');
     const [edit, setEdit] = useState(false);
 
+    useEffect(() => {
+        if (!edit) {
+            setValue(item.remark || '');
+        }
+    }, [item.remark, edit]);
+
     const handleSave = (e) => {
+        e.stopPropagation();
         updateRemark({ bookingId: item._id, remark: value }, dispatch, setAllBookings)
         setEdit(false);
     };
@@ -183,6 +191,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
         setEdit(false);
         setValue(item.remark);
     };
+
+    // useEffect(() => {
+    //     setAllBookings(prev => prev.map(i => i._id === item._id ? item : i));
+    //     console.log(item);
+    // }, [item]);
 
     const renderEditableField = (inputType = 'text') => (
         <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
@@ -199,6 +212,11 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
             </div>
         </div>
     );
+
+    function turncate(str, n) {
+        if (!str) return "-";
+        return str.slice(0, n) + (str.length > n ? '...' : '');
+    }
 
     return (
         <>
@@ -226,7 +244,8 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                 </td>
                 <td style={{ fontWeight: '500', textDecoration: 'underline' }}>{item.vehicleNumber ?? "-"}</td>
                 <td>{item.shipTo ?? "-"}</td>
-                {edit ? renderEditableField() : <td onClick={(e) => { e.stopPropagation(); setEdit(true) }}>{item.remark ?? "-"}</td>}
+                {edit ? renderEditableField() : <td title={item.remark} onClick={(e) => { e.stopPropagation(); setValue(item.remark || ''); setEdit(true); }}>{turncate(item.remark, 12) ?? "-"}</td>}
+                <td title={item.reason}>{item.reason ?? "-"}</td>
             </tr>
 
             {isOpen && (
@@ -247,7 +266,9 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings }) => {
                             </thead>
                             <tbody>
                                 {item.items?.map((i) => (
-                                    <tr key={i._id}>
+                                    <tr style={{
+                                        height: '45px'
+                                    }} key={i._id}>
                                         <td>{i.formType}</td>
                                         <td>{i.itemSnapshot.type}</td>
                                         <td>{`${i.itemSnapshot.thickness?.name || "-"} X ${i.itemSnapshot.width?.name || "-"} X ${i.itemSnapshot.grade?.name || "-"}`}</td>
@@ -366,7 +387,6 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")}>
                     <option value="">All</option>
-                    <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
             </div>

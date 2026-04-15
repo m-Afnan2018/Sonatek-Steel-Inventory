@@ -8,7 +8,7 @@ const Filter = ({ filterOptions, setFilterOptions }) => {
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             formType: '',
             width: '',
@@ -35,18 +35,17 @@ const Filter = ({ filterOptions, setFilterOptions }) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={style.filter} style={{ height: filterOptions ? '35rem' : 0 }}>
-            <div>
+            {/* <div>
                 <label htmlFor='grade'>Type:</label>
                 <select
                     id='type'
                     {...register('type', { required: 'Grade is required' })}
                 >
                     <option value=''>Select type:</option>
-                    <option value={'Hot Rolled'}> Hot Rolled </option>
                     <option value={'Cold Rolled'}> Cold Rolled </option>
                 </select>
                 {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-            </div>
+            </div> */}
 
             <div>
                 <label htmlFor='grade'>Grade:</label>

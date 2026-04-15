@@ -22,7 +22,7 @@ const Create = () => {
 
     // eslint-disable-next-line no-unused-vars
     const [filters, setFilters] = useState({
-        type: '',
+        type: 'Cold Rolled',
         grade: '',
         formType: '',
         width: '',
@@ -130,8 +130,7 @@ const SingleItem = ({ color, setSelection, item, view }) => {
     };
 
     const status = {
-        'Cold Rolled': { background: 'var(--info-muted)',   foreground: 'var(--info)' },
-        'Hot Rolled':  { background: 'var(--danger-muted)', foreground: 'var(--danger)' },
+        'Cold Rolled': { background: 'var(--info-muted)', foreground: 'var(--info)' },
     };
 
     return (
@@ -184,7 +183,7 @@ const Filters = ({ setFilters, setItems }) => {
     const { register, handleSubmit, reset } = useForm({
         defaultValues: {
             grade: "",
-            type: "",
+            type: "Cold Rolled",
             width: "",
             thickness: "",
             warehouse: "",
@@ -227,14 +226,13 @@ const Filters = ({ setFilters, setItems }) => {
     return (
         <form className={style.formBlock} onSubmit={handleSubmit(onSubmit)} onChange={handleSubmit(onSubmit)}>
             {/* Type */}
-            <div>
+            {/* <div>
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")} onClick={handleTypeChange}>
                     <option value="">All</option>
-                    <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
-            </div>
+            </div> */}
 
             {/* Grade */}
             <div>

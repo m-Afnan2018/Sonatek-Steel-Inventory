@@ -245,37 +245,37 @@ const SingleItem = ({ color, item, setView, view }) => {
     );
 
     const handleOrder = () => {
-            function convertItem(data) {
-                return {
-                    _id: data._id,
-                    type: data.type,
-                    grade: data.grade,
-                    form: "Coil",
-                    width: data.width,
-                    thickness: data.thickness,
-                    wagonNumber: data.wagonNumber,
-                    currentStatus: "In Stock",
-                    originalQuantity: Number(data.originalQuantity),
-                    quantity: Number(data.currentQuantity),
-                    warehouse: data.warehouse,
-                    remark: data.remark,
-                    date: data.date,
-                    createdAt: data.createdAt,
-                    updatedAt: data.createdAt
-                };
-            }
-    
-            // Usage:
-            const output = convertItem(item);
-    
-            showOverlay(OrderConfirmationOverlay, {
-                range: { min: 0, max: output.quantity.toFixed(3) },
-                data: [output],
-                onAccept: (data, party) => {
-                    bookingItems({ items: data, party }, dispatch, ()=>{})
-                }
-            })
+        function convertItem(data) {
+            return {
+                _id: data._id,
+                type: data.type,
+                grade: data.grade,
+                form: "Coil",
+                width: data.width,
+                thickness: data.thickness,
+                wagonNumber: data.wagonNumber,
+                currentStatus: "In Stock",
+                originalQuantity: Number(data.originalQuantity),
+                quantity: Number(data.currentQuantity),
+                warehouse: data.warehouse,
+                remark: data.remark,
+                date: data.date,
+                createdAt: data.createdAt,
+                updatedAt: data.createdAt
+            };
         }
+
+        // Usage:
+        const output = convertItem(item);
+
+        showOverlay(OrderConfirmationOverlay, {
+            range: { min: 0, max: output.quantity.toFixed(3) },
+            data: [output],
+            onAccept: (data, party) => {
+                bookingItems({ items: data, party }, dispatch, () => { })
+            }
+        })
+    }
 
     return (
         <tr
@@ -314,7 +314,6 @@ const SingleItem = ({ color, item, setView, view }) => {
                             style={{ padding: '0rem', width: '3rem' }}
                         >
                             <option value="">Select</option>
-                            <option value="Hot Rolled">Hot Rolled</option>
                             <option value="Cold Rolled">Cold Rolled</option>
                         </select>
                         <div className={style.inlineButtons}>
@@ -410,7 +409,7 @@ const SingleItem = ({ color, item, setView, view }) => {
             <td>
                 <div>
                     <IoBookmarkOutline style={{ color: 'blue' }} onClick={handleOrder} />
-                </div> 
+                </div>
             </td>
         </tr>
     );
@@ -423,7 +422,7 @@ const Filters = ({ setFilters }) => {
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             formType: '',
             width: '',
@@ -467,18 +466,17 @@ const Filters = ({ setFilters }) => {
         </div>
 
 
-        <div>
+        {/* <div>
             <label htmlFor='type'>Type:</label>
             <select
                 id='type'
                 {...register('type')}
             >
                 <option value=''>All</option>
-                <option value='Hot Rolled'>  Hot Rolled </option>
                 <option value='Cold Rolled'>  Cold Rolled </option>
             </select>
             {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-        </div>
+        </div> */}
 
 
         <div>
@@ -567,9 +565,9 @@ const Filters = ({ setFilters }) => {
                 type='number'
                 step="any"
                 placeholder='Enter quantity'
-                {...register('quantity')}
+                {...register('originalQuantity')}
             />
-            {errors.quantity && <span className={style.error}>{errors.quantity.message}</span>}
+            {errors.originalQuantity && <span className={style.error}>{errors.originalQuantity.message}</span>}
         </div>
 
         <div>

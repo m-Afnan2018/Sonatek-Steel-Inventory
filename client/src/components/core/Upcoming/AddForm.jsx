@@ -14,14 +14,14 @@ const AddForm = () => {
     const { thicknesses, grades, widths, warehouses } = useSelector((state) => state.varient);
     const dispatch = useDispatch();
 
-    const [type, setType] = useState(false);
+    const [type] = useState('Cold Rolled');
     useActiveTheme(); // re-renders this component when dark/light theme toggles
 
     const { showOverlay } = useOverlay()
 
-    const { register, handleSubmit, control, setFocus } = useForm({
+    const { register, handleSubmit, control, setFocus, watch, setValue } = useForm({
         defaultValues: {
-            type: null,
+            type: 'Cold Rolled',
             thickness: null,
             width: null,
             grade: null,
@@ -56,6 +56,7 @@ const AddForm = () => {
         addItem(formattedData, dispatch);
         // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, warehouse: data.warehouse?.label || null }]);
         setFocus("type");
+        setValue("quantity", "");
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") => {
@@ -66,14 +67,12 @@ const AddForm = () => {
         })) || [];
     }
 
-    const typeOption = [{
-        label: 'HR',
-        value: 'Hot Rolled'
-    },
-    {
-        label: 'CR',
-        value: 'Cold Rolled'
-    }]
+    const typeOption = [
+        {
+            label: 'CR',
+            value: 'Cold Rolled'
+        }
+    ]
 
     const handleKeyDown = (e, prevField, nextField) => {
         if (e.key === "Enter") {
@@ -86,6 +85,7 @@ const AddForm = () => {
         if (e.key === 'ArrowRight' && nextField) {
             setFocus(nextField)
         }
+        console.log(e.key)
     };
 
     const handleSelectEnter = (e, field, options = [], prevField = null, nextField = null) => {
@@ -179,8 +179,8 @@ const AddForm = () => {
             backgroundColor: state.isSelected
                 ? getCSSVar('--accent')
                 : state.isFocused
-                ? getCSSVar('--bg-hover')
-                : 'transparent',
+                    ? getCSSVar('--bg-hover')
+                    : 'transparent',
             color: state.isSelected
                 ? '#ffffff'
                 : getCSSVar('--text-primary'),
@@ -188,9 +188,7 @@ const AddForm = () => {
         }),
     };
 
-    const typeChange = (e) => {
-        setType(e.value);
-    }
+
 
     const onBookinging = (data) => {
         let mini = 0;
@@ -222,30 +220,7 @@ const AddForm = () => {
                 />
             </div>
 
-            {/* Type */}
-            <div>
-                <Controller
-                    name="type"
-                    control={control}
-                    render={({ field }) => (
-                        <Select
-                            classNames={{
-                                control: (state) =>
-                                    state.isFocused ? style.test : style.test,
 
-                            }}
-                            {...field}
-                            options={typeOption}
-                            value={field.value}
-                            onChange={(option) => { field.onChange(option); typeChange(option) }}
-                            onKeyDown={(e) => handleSelectEnter(e, field, typeOption, 'date', "width")}
-                            placeholder="Type"
-                            styles={customStyles}
-                            isSearchable
-                        />
-                    )}
-                />
-            </div>
 
             {/* Thickness */}
             <div>
@@ -313,14 +288,55 @@ const AddForm = () => {
             </div>
 
             {/* Quantity */}
-            <div style={{ width: '6rem' }}>
+            <div style={{ width: '6.2rem' }}>
                 <input
-                    style={{ width: '100%', height: '2rem' }}
-                    type="number"
-                    {...register("quantity")}
-                    onKeyDown={(e) => handleKeyDown(e, 'grade', "warehouse")}
+                    style={{ width: '100%', height: '2rem', padding: '1rem' }}
+                    type="text"
+                    inputMode="numeric"
+                    value={watch('quantity') || ''}
+                    onChange={(e) => {
+                        // Strip everything except digits
+                        const digits = e.target.value.replace(/[^0-9]/g, '');
+                        if (digits === '') {
+                            setValue('quantity', '');
+                            return;
+                        }
+                        // Pad to at least 4 digits so we always have X.XXX
+                        const padded = digits.padStart(4, '0');
+                        const intPart = padded.slice(0, padded.length - 3).replace(/^0+(?=\d)/, '') || '0';
+                        const decPart = padded.slice(-3);
+                        setValue('quantity', `${intPart}.${decPart}`);
+                    }}
+                    onKeyDown={(e) => {
+                        // Allow: backspace, delete, tab, escape, arrow keys
+                        const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'];
+                        if (allowed.includes(e.key)) {
+                            if (e.key === 'Backspace' || e.key === 'Delete') {
+                                // Remove last digit from raw digits
+                                const current = watch('quantity') || '';
+                                const digits = current.replace(/[^0-9]/g, '');
+                                const newDigits = digits.slice(0, -1);
+                                if (newDigits === '') {
+                                    setValue('quantity', '');
+                                } else {
+                                    const padded = newDigits.padStart(4, '0');
+                                    const intPart = padded.slice(0, padded.length - 3).replace(/^0+(?=\d)/, '') || '0';
+                                    const decPart = padded.slice(-3);
+                                    setValue('quantity', `${intPart}.${decPart}`);
+                                }
+                                e.preventDefault();
+                                return;
+                            }
+                            handleKeyDown(e, 'grade', 'warehouse');
+                            return;
+                        }
+                        // Block non-digit keys
+                        if (!/^[0-9]$/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    }}
                     placeholder="Quantity"
-                    step={'any'}
+
                 />
             </div>
 

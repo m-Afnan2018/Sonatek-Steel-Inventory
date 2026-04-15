@@ -558,6 +558,7 @@ const getAllBookings = async (req, res) => {
                 formType: firstItem?.formType || "N/A",
                 thickness: firstItem?.thickness?.name || "N/A",
                 vehicleNumber: booking.vehicleNumber || "N/A",
+                reason: booking.reason || "-",
                 wagons: wagonInfo,
             };
         });
@@ -617,6 +618,7 @@ const getMyBookings = async (req, res) => {
                 formType: firstItem?.formType || "N/A",
                 thickness: firstItem?.thickness?.name || "N/A",
                 vehicleNumber: booking.vehicleNumber || "N/A",
+                reason: booking.reason || "-",
                 wagons: wagonInfo,
             };
         });
@@ -785,7 +787,7 @@ const confirmBooking = async (req, res) => {
 
 const cancelBooking = async (req, res) => {
     try {
-        const { bookingId, reason } = req.body;
+        const { bookingId, fieldValue } = req.body;
         if (!bookingId) throw customError("Please select an booking");
 
         // Get booking with item details
@@ -802,18 +804,24 @@ const cancelBooking = async (req, res) => {
             if (!item?._id) continue;
 
             await Item.findByIdAndUpdate(item._id, {
-                $inc: { quantity: quantity, description: reason }  // add back deducted quantity
+                $inc: { quantity: quantity }  // add back deducted quantity
             });
         }
 
         // Update booking status
         booking.status = "Cancelled";
+        booking.reason = fieldValue;
         booking.updatedAt = Date.now();
         await booking.save();
+
+
+        console.log(req.body);
+        console.log("cancelling reason", fieldValue);
 
         res.status(200).json({
             success: true,
             message: "Booking cancelled successfully",
+            reason: fieldValue
         });
     } catch (err) {
         errorResponse(res, err);
@@ -1286,6 +1294,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             status: b.status,
             vehicleNumber: b.vehicleNumber,
             remark: b.description || "-",
+            reason: b.reason || "-",
             shipTo: b.shipTo || "-",
             party: b.partySnapshot?.name || "-",
         }));
@@ -1394,7 +1403,8 @@ const getExcelTablewiseBooking = async (req, res) => {
                     status: b.status,
                     vehicleNumber: b.vehicleNumber,
                     location: item.itemSnapshot?.warehouse?.name || "-",
-                    remark: b.description || '-'
+                    remark: b.description || '-',
+                    reason: b.reason || '-'
                 }
                 listView.push(temp);
             })
@@ -1415,6 +1425,7 @@ const getExcelTablewiseBooking = async (req, res) => {
             { wch: 14 }, // Requirement
             { wch: 12 }, // Status
             { wch: 12 }, // Vehicle Number
+            { wch: 12 }, // Reason
             { wch: 12 }, // Location
         ];
 
@@ -1578,6 +1589,40 @@ const getAllPartyDetails = async (req, res) => {
     }
 };
 
+const addParty = async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        const party = new Party({ name });
+
+        const savedParty = await party.save();
+        const partyData = { ...savedParty.toObject(), totalBookings: 0 };
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully added the party",
+            party: partyData
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
+
+const updateParty = async (req, res) => {
+    try {
+        const { id, name } = req.body;
+
+        const party = await Party.findByIdAndUpdate(id, { name }, { new: true });
+
+        res.status(200).json({
+            success: true,
+            message: "Successfully updated the party",
+            party
+        })
+    } catch (err) {
+        errorResponse(res, err);
+    }
+}
 const getAllBookingsByItem = async (req, res) => {
     try {
         const { item } = req.body;
@@ -1602,6 +1647,7 @@ const getAllBookingsByItem = async (req, res) => {
                 bookingDate: 1,
                 shipTo: 1,
                 description: 1,   // remarks
+                reason: 1,
                 status: 1,
                 vehicleNumber: 1
             }
@@ -1620,6 +1666,7 @@ const getAllBookingsByItem = async (req, res) => {
                 shipTo: b.shipTo || "",
                 status: b.status || null,
                 remarks: b.description || "",
+                reason: b.reason || "",
                 vehicleNumber: b.vehicleNumber || ""
             };
         });
@@ -1656,6 +1703,8 @@ module.exports = {
     getAllBookingDetailsTablewise,
     getAllIncompleteBookingsDetails,
     getAllParty,
+    addParty,
+    updateParty,
     deleteParty,
     getAllPartyDetails,
     getAllBookingsByItem

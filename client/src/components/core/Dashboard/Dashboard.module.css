@@ -117,7 +117,9 @@
 
 .buttonGroup {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
+  justify-content: flex-end;
+
 }
 
 .buttonGroup button {

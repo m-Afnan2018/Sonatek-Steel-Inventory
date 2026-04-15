@@ -19,13 +19,13 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const User       = require('../models/userModel');
-const Warehouse  = require('../models/warehouseModel');
-const Grade      = require('../models/gradeModel');
-const Width      = require('../models/widthModel');
-const Thickness  = require('../models/thicknessModel');
-const Party      = require('../models/partyModel');
-const Item       = require('../models/itemModel');
+const User = require('../models/userModel');
+const Warehouse = require('../models/warehouseModel');
+const Grade = require('../models/gradeModel');
+const Width = require('../models/widthModel');
+const Thickness = require('../models/thicknessModel');
+const Party = require('../models/partyModel');
+const Item = require('../models/itemModel');
 
 const directorEmail = process.argv[2];
 
@@ -37,23 +37,23 @@ if (!directorEmail) {
 // ─── Seed Data ────────────────────────────────────────────────────────────────
 
 const warehouseData = [
-    { name: 'Warehouse A - Navi Mumbai',  address: 'Plot 12, MIDC, Navi Mumbai, MH 400710', phoneNumber: '9876543210' },
-    { name: 'Warehouse B - Pune',         address: '45 Industrial Estate, Bhosari, Pune 411026', phoneNumber: '9823456789' },
-    { name: 'Warehouse C - Surat',        address: 'Survey No. 78, Sachin GIDC, Surat 394230', phoneNumber: '9765432100' },
+    { name: 'Warehouse A - Navi Mumbai', address: 'Plot 12, MIDC, Navi Mumbai, MH 400710', phoneNumber: '9876543210' },
+    { name: 'Warehouse B - Pune', address: '45 Industrial Estate, Bhosari, Pune 411026', phoneNumber: '9823456789' },
+    { name: 'Warehouse C - Surat', address: 'Survey No. 78, Sachin GIDC, Surat 394230', phoneNumber: '9765432100' },
 ];
 
 const gradeData = [
-    { name: 'IS 2062 E250',   type: 'Hot Rolled' },
-    { name: 'IS 2062 E350',   type: 'Hot Rolled' },
-    { name: 'IS 513 CR1',     type: 'Cold Rolled' },
-    { name: 'IS 513 CR2',     type: 'Cold Rolled' },
-    { name: 'IS 513 CR3',     type: 'Cold Rolled' },
-    { name: 'IS 1079 HR',     type: 'Hot Rolled' },
+    { name: 'IS 2062 E250', type: 'Hot Rolled' },
+    { name: 'IS 2062 E350', type: 'Hot Rolled' },
+    { name: 'IS 513 CR1', type: 'Cold Rolled' },
+    { name: 'IS 513 CR2', type: 'Cold Rolled' },
+    { name: 'IS 513 CR3', type: 'Cold Rolled' },
+    { name: 'IS 1079 HR', type: 'Hot Rolled' },
 ];
 
 // Width in mm
 const widthData = [
-    { name: 900,  type: 'Both' },
+    { name: 900, type: 'Both' },
     { name: 1000, type: 'Both' },
     { name: 1200, type: 'Hot Rolled' },
     { name: 1250, type: 'Cold Rolled' },
@@ -63,16 +63,16 @@ const widthData = [
 
 // Thickness in mm
 const thicknessData = [
-    { name: 0.5,  type: 'Cold Rolled' },
-    { name: 0.8,  type: 'Cold Rolled' },
-    { name: 1.0,  type: 'Both' },
-    { name: 1.5,  type: 'Both' },
-    { name: 2.0,  type: 'Both' },
-    { name: 2.5,  type: 'Hot Rolled' },
-    { name: 3.0,  type: 'Hot Rolled' },
-    { name: 4.0,  type: 'Hot Rolled' },
-    { name: 5.0,  type: 'Hot Rolled' },
-    { name: 6.0,  type: 'Hot Rolled' },
+    { name: 0.5, type: 'Cold Rolled' },
+    { name: 0.8, type: 'Cold Rolled' },
+    { name: 1.0, type: 'Both' },
+    { name: 1.5, type: 'Both' },
+    { name: 2.0, type: 'Both' },
+    { name: 2.5, type: 'Hot Rolled' },
+    { name: 3.0, type: 'Hot Rolled' },
+    { name: 4.0, type: 'Hot Rolled' },
+    { name: 5.0, type: 'Hot Rolled' },
+    { name: 6.0, type: 'Hot Rolled' },
 ];
 
 const partyData = [
@@ -159,11 +159,11 @@ function daysAgo(n) {
         // ── 3. Seed reference data ─────────────────────────────────────────
         console.log('\n📦  Seeding reference data...');
 
-        const warehouses  = await Warehouse.insertMany(warehouseData);
-        const grades      = await Grade.insertMany(gradeData);
-        const widths      = await Width.insertMany(widthData);
+        const warehouses = await Warehouse.insertMany(warehouseData);
+        const grades = await Grade.insertMany(gradeData);
+        const widths = await Width.insertMany(widthData);
         const thicknesses = await Thickness.insertMany(thicknessData);
-        const parties     = await Party.insertMany(partyData);
+        const parties = await Party.insertMany(partyData);
 
         console.log(`   • ${warehouses.length} warehouses`);
         console.log(`   • ${grades.length} grades`);
@@ -187,7 +187,7 @@ function daysAgo(n) {
 
         const itemTypes = ['Hot Rolled', 'Cold Rolled', 'Galvanized', 'Color Coated'];
         const itemForms = ['Coil', 'Sheet'];
-        const statuses  = ['In Stock', 'In Stock', 'In Stock', 'Reserved', 'Sold']; // weighted
+        const statuses = ['In Stock', 'In Stock', 'In Stock', 'Reserved', 'Sold']; // weighted
 
         const itemDocs = [];
         for (let i = 0; i < 30; i++) {
@@ -196,8 +196,8 @@ function daysAgo(n) {
             // Pick grade compatible with type
             const compatibleGrades = grades.filter(g =>
                 type === 'Hot Rolled' ? g.type === 'Hot Rolled' :
-                type === 'Cold Rolled' ? g.type === 'Cold Rolled' :
-                true
+                    type === 'Cold Rolled' ? g.type === 'Cold Rolled' :
+                        true
             );
             const grade = compatibleGrades.length ? pick(compatibleGrades) : pick(grades);
 
@@ -212,7 +212,7 @@ function daysAgo(n) {
             const qty = randInt(5, 200);
             const challanNum = `CH-2025-${String(1000 + i).padStart(4, '0')}`;
             const invoiceNum = `INV-2025-${String(2000 + i).padStart(4, '0')}`;
-            const warehouse  = pick(warehouses);
+            const warehouse = pick(warehouses);
 
             itemDocs.push({
                 type,
@@ -222,11 +222,11 @@ function daysAgo(n) {
                 thickness: pick(compatibleThicknesses)._id,
                 wagonNumber: `WGN-${randInt(1000, 9999)}`,
                 challan: {
-                    challanDate:   daysAgo(randInt(10, 120)),
+                    challanDate: daysAgo(randInt(10, 120)),
                     challanNumber: challanNum,
                 },
                 invoice: {
-                    invoiceDate:   daysAgo(randInt(5, 110)),
+                    invoiceDate: daysAgo(randInt(5, 110)),
                     invoiceNumber: invoiceNum,
                 },
                 currentStatus: pick(statuses),
@@ -234,8 +234,8 @@ function daysAgo(n) {
                 quantity: qty,
                 warehouse: warehouse._id,
                 transport: {
-                    vehicleNumber:   `MH${randInt(10,99)} AB ${randInt(1000,9999)}`,
-                    loader:          pick(['Ashok Traders', 'Ramesh Logistics', 'Speed Cargo', 'National Movers']),
+                    vehicleNumber: `MH${randInt(10, 99)} AB ${randInt(1000, 9999)}`,
+                    loader: pick(['Ashok Traders', 'Ramesh Logistics', 'Speed Cargo', 'National Movers']),
                     transporterName: pick(['Fast Freight Co.', 'Sahil Transport', 'Bharat Cargo', 'Hari Om Logistics']),
                 },
                 remark: pick(['', '', 'Prime quality', 'Secondary grade', 'Awaiting inspection']),

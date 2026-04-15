@@ -8,7 +8,11 @@ import {
     hideWarehouse,
     showWarehouse,
     updateWarehouse,
+    deleteWarehouse
 } from "services/operations/warehouseAPI";
+import { FaTrash } from "react-icons/fa";
+import { useOverlay } from "hooks/useOverlay";
+import ConfirmationOverlay from "components/common/Overlay/ConfirmationOverlay";
 
 const Warehouse = () => {
     const [warehouses, setWarehouses] = useState([]);
@@ -29,6 +33,7 @@ const Warehouse = () => {
     const [loadingItems, setLoadingItems] = useState(false);
 
     const dispatch = useDispatch();
+    const { showOverlay } = useOverlay();
 
     useEffect(() => {
         setLoading(true);
@@ -103,6 +108,15 @@ const Warehouse = () => {
         }
     }
 
+    function handleDelete(id) {
+        showOverlay(ConfirmationOverlay, {
+            message: "Are you sure you want to delete this warehouse?",
+            onAccept: () => {
+                deleteWarehouse({ warehouseId: id }, dispatch, warehouses, setWarehouses);
+            }
+        });
+    }
+
     return (
         <div className={style.Warehouse}>
             <h2>Manage Warehouses</h2>
@@ -147,12 +161,12 @@ const Warehouse = () => {
                     <table className={style.table}>
                         <thead>
                             <tr>
-                                <th style={{width: '6rem'}}>Name</th>
-                                <th style={{width: '10rem'}}>Address</th>
-                                <th style={{width: '6rem'}}>Phone</th>
-                                <th style={{width: '5rem'}}>Total Items</th>
-                                <th style={{width: '5rem'}}>Total Qty</th>
-                                <th style={{minWidth: '16rem'}}>Actions</th>
+                                <th style={{ width: '8rem' }}>Name</th>
+                                <th style={{ width: '10rem' }}>Address</th>
+                                <th style={{ width: '8.5rem' }}>Phone</th>
+                                <th style={{ width: '5rem' }}>Total Items</th>
+                                <th style={{ width: '5rem' }}>Total Qty</th>
+                                <th style={{ minWidth: '16rem' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -187,6 +201,10 @@ const Warehouse = () => {
                                                     className={style.inlineInput}
                                                     value={editFields.phoneNumber}
                                                     onChange={(e) => setEditFields((s) => ({ ...s, phoneNumber: e.target.value }))}
+                                                    type="number"
+                                                    pattern="[0-9]{10}"
+                                                    maxLength={12}
+                                                    minLength={10}
                                                 />
                                             ) : <div className={style.cellSecondary}>{c.phoneNumber}</div>}
                                         </td>
@@ -207,6 +225,9 @@ const Warehouse = () => {
                                                     <button className={style.itemsBtn} onClick={() => handleVisibility(c._id, c.visible)}>
                                                         {c.visible ? "Hide" : "Show"}
                                                     </button>
+                                                    {c.totalItems === 0 && <button className={style.itemsBtn} onClick={() => handleDelete(c._id)}>
+                                                        <FaTrash style={{ color: "red" }} />
+                                                    </button>}
                                                 </div>
                                             )}
                                         </td>

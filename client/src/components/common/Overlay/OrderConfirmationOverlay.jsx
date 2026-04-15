@@ -60,7 +60,7 @@ const OrderConfirmationOverlay = ({ data = [], onAccept, close }) => {
             return;
         }
 
-        if(shipTo.length === 0){
+        if (shipTo.length === 0) {
             toast.error("Please enter the Ship To");
             return;
         }

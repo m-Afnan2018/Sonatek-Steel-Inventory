@@ -42,10 +42,10 @@ const Navbar = ({ triggerSidebar, theme, toggleTheme }) => {
         </button>
 
         {/* Notification */}
-        <div className={style.iconBtn} title="Notifications">
+        {/* <div className={style.iconBtn} title="Notifications">
           <IoNotificationsOutline />
           <span className={style.badge} />
-        </div>
+        </div> */}
 
         {/* User */}
         <div className={style.userPill}>

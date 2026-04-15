@@ -214,7 +214,7 @@ const getAllItem = async (req, res) => {
             sortBy = "createdAt",
             order = "desc",
             page = 1,
-            limit = 50,
+            limit = 12,
             filters = null,
         } = req.body;
 
@@ -980,12 +980,13 @@ const increaseQuantity = async (req, res) => {
         itemDoc.originalQuantity = updatedQuantity;
         itemDoc.quantity = itemDoc.quantity + difference;
 
-        itemDoc.save();
+        const updatedItem = await itemDoc.save();
 
         // Returning Response
         res.status(200).json({
             success: true,
-            message: 'Successfully updated'
+            message: 'Successfully updated',
+            updatedQuantity: String(updatedItem.originalQuantity)
         })
     } catch (err) {
         errorResponse(res, err);

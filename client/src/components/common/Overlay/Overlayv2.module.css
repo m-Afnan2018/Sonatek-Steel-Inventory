@@ -1,7 +1,7 @@
 .UpcomingOptions {
     position: relative;
     background-color: var(--bg-surface);
-    width: min(520px, 92vw);
+    width: min(620px, 92vw);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     display: flex;
@@ -70,7 +70,7 @@
     font-weight: 800;
     color: var(--text-primary);
     width: 30%;
-    padding-left: 1rem;
+    /* padding-left: 1rem; */
 }
 
 .fillUpData h3 {
@@ -107,12 +107,13 @@
     justify-content: flex-end;
     align-items: center;
     flex-direction: row;
-    height: 2.5rem;
+    height: 2.7rem;
     border-radius: 100rem;
     overflow: hidden;
     background: var(--bg-elevated);
     border: 1px solid var(--border);
-    width: fit-content;
+    width: 400px;
+    /* width: fit-content; */
 }
 
 .groupBtn>button {
@@ -161,7 +162,7 @@
     padding: 1rem;
     height: 100%;
     border-radius: var(--radius-md);
-    overflow-y: visible;
+    overflow: auto;
     padding: 0;
 }
 

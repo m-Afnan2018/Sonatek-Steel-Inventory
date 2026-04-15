@@ -37,6 +37,25 @@ export async function addWarehouse(params, dispatch, list, setter) {
     }
 }
 
+export async function deleteWarehouse(params, dispatch, list, setWarehouses) {
+    try {
+        dispatch(addLoader("deleteWarehouse"));
+
+        const response = (await apiConnector("DELETE", warehouseEndpoints.DELETE_WAREHOUSE + `/${params.warehouseId}`)).data;
+
+        if (response.success) {
+            setWarehouses(list.filter((c) => c._id !== params.warehouseId));
+
+            dispatch(showSuccess({ id: "deleteWarehouse", message: response.message }));
+        }
+    } catch (err) {
+        dispatch(showError({
+            id: "deleteWarehouse",
+            message: err?.response?.data?.message || "Failed to delete warehouse"
+        }));
+    }
+}
+
 export async function updateWarehouse(params, dispatch, list, setWarehouses) {
     try {
         dispatch(addLoader("updateWarehouse"));

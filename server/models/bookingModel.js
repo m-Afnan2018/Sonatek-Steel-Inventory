@@ -172,6 +172,10 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    reason: {
+        type: String,
+        default: ''
+    },
     deliveryDate: {
         type: Date
     },

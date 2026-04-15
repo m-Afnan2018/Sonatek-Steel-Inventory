@@ -11,11 +11,26 @@ import {
     setIncompleteBookings,
     setOptions,
     setParty,
+    addParty as addPartyAction,
+    updateParty as updatePartyAction,
+    deleteParty as deletePartyAction,
+    updateBooking,
     updateBookingStatus
 } from "slices/bookingSlice";
-import { deleteFromUpcomingItem, setPagination } from "slices/itemSlice";
+import { deleteFromUpcomingItem, setPagination, updateListViewList } from "slices/itemSlice";
 import { addLoader, removeLoader, showError, showSuccess } from "slices/loaderSlice";
 
+const updateBookingInSetter = (setter, bookingId, updates) => {
+    if (!setter) return;
+
+    setter((prev) => {
+        if (!Array.isArray(prev)) return prev;
+
+        return prev.map((booking) =>
+            booking._id === bookingId ? { ...booking, ...updates } : booking
+        );
+    });
+};
 export async function searchOptions(params, dispatch, setter) {
     try {
         dispatch(addLoader("searchOptions"));
@@ -77,16 +92,19 @@ export async function createBookingFromInventory(params, dispatch) {
     try {
         dispatch(addLoader("createBookingFromInventory"));
 
-        const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_UPCOMING, params)).data;
+        const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_INVENTORY, params)).data;
 
         if (response.success) {
-            dispatch(deleteFromUpcomingItem(response.listView._id));
+            if (response.listView) {
+                dispatch(updateListViewList(response.listView));
+            }
+            dispatch(showSuccess({ id: "createBookingFromInventory", message: response.message }));
+            return true;
         }
-
-        dispatch(showSuccess({ id: "createBookingFromInventory", message: response.message }));
     } catch (err) {
         dispatch(showError({ id: "createBookingFromInventory", message: err?.response?.data?.message || "Booking failed" }));
     }
+    return false;
 }
 
 export async function increaseQuantity(params, dispatch) {
@@ -95,9 +113,18 @@ export async function increaseQuantity(params, dispatch) {
 
         const response = (await apiConnector('POST', itemEndpoints.INCREASE_QUANTITY, params)).data;
 
+        if (response.success && response.listView) {
+            dispatch(updateListViewList(response.listView));
+        }
+        if (response.listView) {
+            dispatch(updateListViewList(response.listView));
+        }
+
         dispatch(showSuccess({ id: "increaseQuantity", message: response.message }));
+        return response.listView || null;
     } catch (err) {
         dispatch(showError({ id: "increaseQuantity", message: err?.response?.data?.message || "Booking failed" }));
+        return null;
     }
 }
 
@@ -155,15 +182,24 @@ export async function cancelBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("cancelBooking"));
 
-        const response = (await apiConnector('PATCH', bookingEndpoints.CANCEL_BOOKING, params)).data;
+        const reason = params.fieldValue ?? params.reason ?? '';
+        const payload = { bookingId: params.bookingId, fieldValue: reason };
+        const response = (await apiConnector('PATCH', bookingEndpoints.CANCEL_BOOKING, payload)).data;
 
         if (response.success) {
+            dispatch(updateBooking({
+                bookingId: params.bookingId,
+                updates: { status: 'Cancelled', reason: response.reason ?? reason }
+            }));
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Cancelled' }));
-            dispatch(addBooking({ bookingId: params.bookingId, reason: params.fieldValue, status: "Cancelled" }));
+            dispatch(addBooking({ bookingId: params.bookingId, reason: response.reason ?? reason, status: "Cancelled" }));
             dispatch(removeIncompleteBookings(params.bookingId))
         }
 
-        setter((prev) => prev.filter(i => i._id === params.bookingId));
+        updateBookingInSetter(setter, params.bookingId, {
+            status: 'Cancelled',
+            reason: response.reason ?? reason
+        });
 
         dispatch(showSuccess({ id: "cancelBooking", message: response.message }));
     } catch (err) {
@@ -175,22 +211,23 @@ export async function shipBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("shipBooking"));
 
-        const response = (await apiConnector('PATCH', bookingEndpoints.SHIPPED_BOOKING, params)).data;
+        const vehicleNumber = params.fieldValue ?? params.vehicleNumber ?? '';
+        const payload = { bookingId: params.bookingId, fieldValue: vehicleNumber };
+        const response = (await apiConnector('PATCH', bookingEndpoints.SHIPPED_BOOKING, payload)).data;
 
         if (response.success) {
+            dispatch(updateBooking({
+                bookingId: params.bookingId,
+                updates: { status: 'Shipped', vehicleNumber }
+            }));
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Shipped' }));
-            dispatch(addBooking({ bookingId: params.bookingId, vehicleNumber: params.fieldValue, status: "Cancelled" }));
-            // dispatch(removeIncompleteBookings(params.bookingId))
+            dispatch(addBooking({ bookingId: params.bookingId, vehicleNumber, status: "Shipped" }));
         }
 
-        if (setter) {
-            setter((prev) => prev.map(i => {
-                if (i._id === params.bookingId) {
-                    return { ...i, status: 'Shipped' }
-                }
-                return i;
-            }));
-        }
+        updateBookingInSetter(setter, params.bookingId, {
+            status: 'Shipped',
+            vehicleNumber
+        });
 
         dispatch(showSuccess({ id: "shipBooking", message: response.message }));
     } catch (err) {
@@ -204,18 +241,12 @@ export async function updateRemark(params, dispatch, setter) {
 
         const response = (await apiConnector('POST', bookingEndpoints.UPDATE_REMARK, params)).data;
 
-        // if (response.success) {
-        //     dispatch(updateBookingStatus({ bookingId: params.bookingId, remark: params.remark }));
-        // }
+        dispatch(updateBooking({
+            bookingId: params.bookingId,
+            updates: { remark: params.remark }
+        }));
 
-        if (setter) {
-            setter((prev) => prev.map(i => {
-                if (i._id === params.bookingId) {
-                    return { ...i, remark: params.remark }
-                }
-                return i;
-            }));
-        }
+        updateBookingInSetter(setter, params.bookingId, { remark: params.remark });
 
         dispatch(showSuccess({ id: "updateRemark", message: response.message }));
     } catch (err) {
@@ -227,18 +258,22 @@ export async function confirmBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("confirmBooking"));
 
-        const response = (await apiConnector('PATCH', bookingEndpoints.CONFIRM_BOOKING, params)).data;
+        const orderId = params.orderId ?? params.fieldValue ?? '';
+        const payload = { bookingId: params.bookingId, orderId };
+        const response = (await apiConnector('PATCH', bookingEndpoints.CONFIRM_BOOKING, payload)).data;
 
         if (response.success) {
+            dispatch(updateBooking({
+                bookingId: params.bookingId,
+                updates: { status: 'Processing', orderId }
+            }));
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Processing' }));
         }
 
-        setter((prev) => prev.map(i => {
-            if (i._id === params.bookingId) {
-                return { ...i, status: 'Processing' }
-            }
-            return i;
-        }));
+        updateBookingInSetter(setter, params.bookingId, {
+            status: 'Processing',
+            orderId
+        });
 
         dispatch(showSuccess({ id: "confirmBooking", message: response.message }));
     } catch (err) {
@@ -250,13 +285,24 @@ export async function deliverBooking(params, dispatch, setter) {
     try {
         dispatch(addLoader("deliverBooking"));
 
-        const response = (await apiConnector('PATCH', bookingEndpoints.DELIVER_BOOKING, params)).data;
+        const vehicleNumber = params.vehicle_number ?? params.fieldValue ?? params.description ?? '';
+        const response = (await apiConnector('PATCH', bookingEndpoints.DELIVER_BOOKING, {
+            bookingId: params.bookingId,
+            vehicle_number: vehicleNumber
+        })).data;
 
         if (response.success) {
+            dispatch(updateBooking({
+                bookingId: params.bookingId,
+                updates: { status: 'Delivered', vehicleNumber }
+            }));
             dispatch(updateBookingStatus({ bookingId: params.bookingId, status: 'Delivered' }));
         }
 
-        setter((prev) => prev.filter(i => i._id === params.bookingId));
+        updateBookingInSetter(setter, params.bookingId, {
+            status: 'Delivered',
+            vehicleNumber
+        });
 
         dispatch(showSuccess({ id: "deliverBooking", message: response.message }));
     } catch (err) {
@@ -366,15 +412,56 @@ export async function getAllPartyDetails(dispatch) {
     }
 }
 
-export async function deleteParty(dispatch) {
+export async function createParty(params, dispatch) {
     try {
-        dispatch(addLoader("deleteParty"));
+        dispatch(addLoader("createParty"));
 
-        const response = (await apiConnector('POST', bookingEndpoints.ADD_PARTY)).data;
+        const response = (await apiConnector('POST', bookingEndpoints.ADD_PARTY, params)).data;
 
+        if (response.success) {
+            dispatch(addPartyAction(response.party));
+        }
 
-        dispatch(showSuccess({ id: "deleteParty", message: response.message }));
+        dispatch(showSuccess({ id: "createParty", message: response.message }));
+        return response.success;
     } catch (err) {
-        dispatch(showError({ id: "deleteParty", message: err?.response?.data?.message || "Failed to fetch bookings" }));
+        dispatch(showError({ id: "createParty", message: err?.response?.data?.message || "Failed to add party" }));
+        return false;
+    }
+}
+
+export async function editParty(params, dispatch) {
+    try {
+        dispatch(addLoader("editParty"));
+
+        const response = (await apiConnector('PATCH', bookingEndpoints.UPDATE_PARTY, params)).data;
+
+        if (response.success) {
+            dispatch(updatePartyAction(response.party));
+        }
+
+        dispatch(showSuccess({ id: "editParty", message: response.message }));
+        return response.success;
+    } catch (err) {
+        dispatch(showError({ id: "editParty", message: err?.response?.data?.message || "Failed to update party" }));
+        return false;
+    }
+}
+
+export async function removeParty(params, dispatch) {
+    try {
+        dispatch(addLoader("removeParty"));
+
+        const response = (await apiConnector('DELETE', bookingEndpoints.DELETE_PARTY, params)).data;
+
+        if (response.success) {
+            dispatch(deletePartyAction(params.id));
+        }
+
+        dispatch(showSuccess({ id: "removeParty", message: response.message }));
+        return response.success;
+    } catch (err) {
+        dispatch(showError({ id: "removeParty", message: err?.response?.data?.message || "Failed to delete party" }));
+        return false;
     }
 }

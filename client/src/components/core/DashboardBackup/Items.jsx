@@ -237,8 +237,6 @@ const Filters = ({ setFilters }) => {
             <div>
                 <label htmlFor="type">Type:</label>
                 <select id="type" {...register("type")}>
-                    <option value="">All</option>
-                    <option value="Hot Rolled">Hot Rolled</option>
                     <option value="Cold Rolled">Cold Rolled</option>
                 </select>
             </div>

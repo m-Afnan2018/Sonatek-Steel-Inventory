@@ -16,7 +16,7 @@ const AddItemForm = ({ close }) => {
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             formType: '',
             width: '',
@@ -96,18 +96,11 @@ const AddItemForm = ({ close }) => {
                         <label className={style.radioButton}>
                             <input
                                 type='radio'
-                                value='Hot Rolled'
-                                {...register('type', { required: 'Type is required' })}
-                            />
-                            <span className={style.radioLabel}>Hot Rolled</span>
-                        </label>
-                        <label className={style.radioButton}>
-                            <input
-                                type='radio'
                                 value='Cold Rolled'
+                                defaultChecked
                                 {...register('type', { required: 'Type is required' })}
                             />
-                            <span className={style.radioLabel}>Cold Rolled</span>
+                            <span className={style.radioLabel}>Cold Rolled (CR)</span>
                         </label>
                     </div>
                     {errors.type && <span className={style.error}>{errors.type.message}</span>}

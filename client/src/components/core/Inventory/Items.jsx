@@ -5,13 +5,17 @@ import { getAllItem, updateItem } from 'services/operations/itemAPI';
 import { useForm } from 'react-hook-form';
 import { generateShipToColors } from 'utils/colorHandler';
 import { LuDownload } from "react-icons/lu";
-import { FiEye } from 'react-icons/fi';
+import { FiEye, FiEdit } from 'react-icons/fi';
 import { FaPlus } from "react-icons/fa6";
 import { IoCartOutline } from 'react-icons/io5';
+import { MdCancel } from "react-icons/md";
+import { LiaShippingFastSolid } from "react-icons/lia";
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 'services/operations/bookingAPI';
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
+import { RxCheck, RxCross2 } from "react-icons/rx";
+import { setUpdateQuantity, updateListViewData, updateListViewListData } from 'slices/itemSlice';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -23,12 +27,12 @@ const Items = () => {
     const [sortType, setSortType] = useState(null)
     const { listViewList, totalQuantity, pagination } = useSelector(state => state.item);
     const { token } = useSelector((state) => state.auth);
-    const [colors, setColors] = useState(null)
+    const [colors, setColors] = useState(null);
 
     const [showFilters, setShowFilters] = useState(null);
 
     const [filters, setFilters] = useState({
-        type: '',
+        type: 'Cold Rolled',
         grade: '',
         formType: '',
         width: '',
@@ -39,11 +43,16 @@ const Items = () => {
         warehouse: '',
     })
 
+    // Track the latest query params so pagination always sends the same filters/search/sort
+    const currentParams = React.useRef({ search: '', filters: null, sortBy: null, order: 'desc' });
+
     const dispatch = useDispatch();
 
     const onSearch = (e) => {
         e.preventDefault();
-        getAllItem({ search: search }, dispatch);
+        const params = { search, filters, sortBy: sortType, order };
+        currentParams.current = params;
+        getAllItem({ ...params, page: 1 }, dispatch);
     }
 
     const onDownload = async () => {
@@ -77,21 +86,27 @@ const Items = () => {
             setItems(listViewList);
             setColors(generateShipToColors(listViewList))
             setLoading(false);
-        }
+        };
+
     }, [listViewList]);
 
     const sortBy = (val) => {
-        setOrder(order === 'asc' ? 'desc' : 'asc');
+        const newOrder = order === 'asc' ? 'desc' : 'asc';
+        setOrder(newOrder);
         setSortType(val);
-        getAllItem({ search, filters, sortBy: val, order: order }, dispatch);
+        const params = { search, filters, sortBy: val, order: newOrder };
+        currentParams.current = params;
+        getAllItem({ ...params, page: 1 }, dispatch);
     }
 
     const nextPage = () => {
-        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page + 1 }, dispatch);
+        const nextPageNum = (pagination?.page ?? 1) + 1;
+        getAllItem({ ...currentParams.current, page: nextPageNum }, dispatch);
     }
 
     const prevPage = () => {
-        getAllItem({ search, filters, sortBy: sortType, order: order, page: pagination?.page - 1 }, dispatch);
+        const prevPageNum = Math.max(1, (pagination?.page ?? 2) - 1);
+        getAllItem({ ...currentParams.current, page: prevPageNum }, dispatch);
     }
 
     return (
@@ -111,7 +126,7 @@ const Items = () => {
                 <button type="submit" className={style.searchButton}>Search</button>
                 <button onClick={(e) => { e.preventDefault(); setShowFilters(!showFilters) }} className={style.searchButton}>Filter</button>
             </form>
-            <Filters setFilters={setFilters} showFilters={showFilters} />
+            <Filters setFilters={setFilters} showFilters={showFilters} currentParams={currentParams} search={search} />
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -152,11 +167,19 @@ const Items = () => {
 
             <div className={style.controlsRow}>
                 <div className={style.paginationControls}>
-                    {pagination?.page > 1 && <button onClick={prevPage}>Prev</button>}
+                    <button
+                        onClick={prevPage}
+                        disabled={!pagination || pagination.page <= 1}
+                        style={{ opacity: (!pagination || pagination.page <= 1) ? 0.4 : 1, cursor: (!pagination || pagination.page <= 1) ? 'not-allowed' : 'pointer' }}
+                    >Prev</button>
                     <div className={style.paginationInfo}>
-                        Page {pagination?.page} of {pagination?.totalPages || 1}
+                        Page {pagination?.page ?? 1} of {pagination?.totalPages ?? 1}
                     </div>
-                    {pagination?.page < (pagination?.totalPages || 1) && <button onClick={nextPage}>Next</button>}
+                    <button
+                        onClick={nextPage}
+                        disabled={!pagination || pagination.page >= (pagination.totalPages ?? 1)}
+                        style={{ opacity: (!pagination || pagination.page >= (pagination.totalPages ?? 1)) ? 0.4 : 1, cursor: (!pagination || pagination.page >= (pagination.totalPages ?? 1)) ? 'not-allowed' : 'pointer' }}
+                    >Next</button>
                 </div>
             </div>
         </div>
@@ -164,40 +187,38 @@ const Items = () => {
 };
 
 const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow }) => {
-    const challanDate = item.challanDate
-        ? new Date(item.challanDate).toLocaleDateString()
-        : '-';
-
     const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
-    const [select, setSelect] = useState('');
-    const [value, setValue] = useState('');
+    const [itemDetail, setItemDetail] = useState(item);
+    const [isEditing, setIsEditing] = useState(false);
     const [bookingList, setBookingList] = useState(null);
     const [loadingBookings, setLoadingBookings] = useState(false);
+    const [editRemark, setEditRemark] = useState(false);
     const { showOverlay } = useOverlay();
 
-    const clickHandler = (type) => {
-        setSelect(type);
-        setValue(item[type]);
+    useEffect(() => setItemDetail(prev => ({ ...prev, ...item })), [item]);
+
+    const handleEditToggle = (e) => {
+        e.stopPropagation();
+        setIsEditing(true);
     };
 
     const handleSave = (e) => {
         e.stopPropagation();
-        const grade = item.grade._id;
-        const thickness = item.thickness._id;
-        const width = item.width._id;
-        const warehouse = item.warehouse?._id;
-        let Item = { ...item, grade, thickness, width, warehouse: warehouse };
-        let updatedItem = { ...Item, [select]: value };
-        updateItem(updatedItem, dispatch);
-        setSelect('');
+        const grade = itemDetail.grade._id;
+        const thickness = itemDetail.thickness._id;
+        const width = itemDetail.width._id;
+        const warehouse = itemDetail.warehouse?._id;
+        let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
+        updateItem(Item, dispatch);
+        dispatch(updateListViewData({ updatedItem: itemDetail }))
+        setIsEditing(false);
     };
 
     const handleCancel = (e) => {
         e.stopPropagation();
-        setValue(item[select]);
-        setSelect('');
+        setIsEditing(false);
     };
 
     const toggleSubtable = async (e) => {
@@ -213,61 +234,43 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         }
     };
 
+    function convertItem(data) {
+        return {
+            _id: data._id,
+            item_id: data.item_id,
+            type: data.type,
+            grade: data.grade,
+            form: "Coil",
+            width: data.width,
+            thickness: data.thickness,
+            wagonNumber: data.wagonNumber,
+            currentStatus: "In Stock",
+            originalQuantity: Number(data.originalQuantity),
+            quantity: data.remaining,
+            warehouse: data.warehouse,
+            remark: data.remark,
+            date: data.date,
+            createdAt: data.createdAt,
+            updatedAt: data.createdAt,
+            marking: data.marking,
+        };
+    }
     const handleUpdateQuantity = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
-        const output = convertItem(item);
+        const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
             type: 'increaseQuantity',
             data: output,
+            onAccept: (updatedItem) => {
+                if (!updatedItem) return;
+                setItemDetail((prev) => ({ ...prev, ...updatedItem }));
+                dispatch(updateListViewData({ updatedItem }))
+            }
         })
     };
 
     const handlePreview = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
-        const output = convertItem(item);
+        const output = convertItem(itemDetail);
 
         showOverlay(InventoryOptions, {
             type: 'logs',
@@ -276,105 +279,169 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     };
 
     const handleOrder = () => {
-        function convertItem(data) {
-            return {
-                _id: data._id,
-                item_id: data.id,
-                type: data.type,
-                grade: data.grade,
-                form: "Coil",
-                width: data.width,
-                thickness: data.thickness,
-                wagonNumber: data.wagonNumber,
-                currentStatus: "In Stock",
-                originalQuantity: Number(data.originalQuantity),
-                quantity: data.remaining,
-                warehouse: data.warehouse,
-                remark: data.remark,
-                date: data.date,
-                createdAt: data.createdAt,
-                updatedAt: data.createdAt,
-                marking: data.marking,
-            };
-        }
-
-        const output = convertItem(item);
-
+        const output = convertItem(itemDetail);
         showOverlay(InventoryOptions, {
             type: 'booking',
             data: output,
-            onAccept: (data, party) => {
-                console.log(data);
+            onAccept: async (data, party) => {
+                if (expandedRow === item._id) {
+                    setLoadingBookings(true);
+                    await getAllBookingByItem({ item: item._id }, dispatch, setBookingList);
+                    setLoadingBookings(false);
+                }
             }
         })
     };
 
-    const renderEditableField = (type, inputType = 'text') => (
-        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-            <input
-                style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
-                type={inputType}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            />
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
-            </div>
-        </div>
-    );
+    const renderDropdownField = (type, options) => {
+        const valueSetter = (val) => {
+            const option = options.find(i => i._id === val);
+            setItemDetail((prev) => ({ ...prev, [type]: option }));
+        };
 
-    const renderDropdownField = (type, options) => (
-        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
-            <select
-                style={{ padding: '0rem', width: '3rem' }}
-                value={value?._id}
-                onChange={(e) => setValue(e.target.value)}
-                autoFocus
-            >
-                <option value="">Select</option>
-                {options.map((opt) => (
-                    <option key={opt._id} value={opt._id}>
-                        {opt.name || opt.value}
-                    </option>
-                ))}
-            </select>
-            <div className={style.inlineButtons}>
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleCancel}>Cancel</button>
+        return (
+            <div onClick={(e) => e.stopPropagation()}>
+                <select
+                    style={{ width: 'auto', padding: '0.15rem' }}
+                    value={itemDetail[type]?._id || ""}
+                    onChange={(e) => valueSetter(e.target.value)}
+                >
+                    <option value="" disabled>Select</option>
+                    {options.map((opt) => (
+                        <option key={opt._id} value={opt._id}>
+                            {opt.name || opt.value}
+                        </option>
+                    ))}
+                </select>
             </div>
+        );
+    };
+
+    const renderEditableField = (type, inputType = 'text', size = '8rem') => {
+        const valueSetter = (val) => {
+            setItemDetail((prev) => ({ ...prev, [type]: val }));
+        }
+
+        return <div onClick={(e) => e.stopPropagation()}>
+            <input
+                style={{ width: size, padding: '0.15rem' }}
+                type={inputType}
+                value={itemDetail[type] || ''}
+                onChange={(e) => valueSetter(e.target.value)}
+            />
         </div>
-    );
+    };
+
+    const changeRemark = (value) => {
+        setItemDetail((prev) => ({ ...prev, remark: value }));
+    };
+
+    const handleUpdateRemark = (e) => {
+        const grade = itemDetail.grade._id;
+        const thickness = itemDetail.thickness._id;
+        const width = itemDetail.width._id;
+        const warehouse = itemDetail.warehouse?._id;
+        const payload = { ...itemDetail, grade, thickness, width, warehouse };
+        updateItem(payload, dispatch);
+        setEditRemark(false);
+    };
+
+    const handleUpdateRemarkKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            handleUpdateRemark(id);
+            setEditRemark(null);
+        }
+    };
+
+    const cancelRemark = (e) => {
+        e.stopPropagation();
+        // Revert remark to the original item value
+        setItemDetail((prev) => ({ ...prev, remark: item.remark }));
+        setEditRemark(false);
+    };
+
 
     return (
         <>
             <tr>
-                <td className={style.idCell}>{item.item_id}</td>
-                <td>{challanDate || '-'}</td>
-                <td>{`${item.thickness?.name} X ${item.width?.name} X ${item.grade?.name}`}</td>
-                <td className={style.numCell}>{item.originalQuantity}</td>
-                <td className={style.numCell}>{item.remaining}</td>
-                <td>{item.warehouse?.name || '-'}</td>
-                <td onClick={() => clickHandler('remark')}>
-                    {select === 'remark'
-                        ? renderEditableField('remark')
-                        : item.remark || '-'}
+                <td className={style.idCell}>{itemDetail.item_id}</td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderEditableField('challanDate', 'date', '8rem')
+                        : itemDetail.challanDate ? new Date(itemDetail.challanDate).toLocaleDateString() : '-'}
+                </td>
+                <td style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('thickness', thicknesses)
+                            : <span style={{ width: '3rem' }}>{itemDetail.thickness?.name}</span>}
+                    </div>
+                    X
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('width', widths)
+                            : <span style={{ width: '3rem' }}>{itemDetail.width?.name}</span>}
+                    </div>
+                    X
+                    <div>
+                        {isEditing
+                            ? renderDropdownField('grade', grades)
+                            : <span style={{ width: '3rem' }}>{itemDetail.grade?.name}</span>}
+                    </div>
+                </td>
+                <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
+                    {itemDetail.originalQuantity}
+                </td>
+                <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
+                    {itemDetail.remaining.toFixed(3)}
+                </td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    {isEditing
+                        ? renderDropdownField('warehouse', warehouses)
+                        : itemDetail.warehouse?.name || '-'}
+                </td>
+                <td
+                    title={itemDetail.remark || ''}
+                    onClick={(e) => { e.stopPropagation(); if (!isEditing) setEditRemark(true); }}
+                    style={{ overflow: 'visible', cursor: 'pointer' }}
+                >
+                    {editRemark ?
+                        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', zIndex: 10 }}>
+                            <input
+                                style={{ padding: '.2rem 0.25rem', width: '6.5rem' }}
+                                type='text'
+                                value={itemDetail.remark || ''}
+                                onChange={(e) => changeRemark(e.target.value)}
+                                onKeyDown={(e) => handleUpdateRemarkKeyDown(e, itemDetail._id)}
+                                autoFocus
+                            />
+                            <div className={style.inlineButtons}>
+                                <button type="button" onClick={handleUpdateRemark}>Save</button>
+                                <button type="button" onClick={cancelRemark}>Cancel</button>
+                            </div>
+                        </div>
+                        : itemDetail.remark || '-'}
                 </td>
 
                 <td className={style.actionCell}>
-                    <span className={style.actionIcon} onClick={handlePreview} title="View details">
-                        <FiEye />
-                    </span>
-                    <span className={style.actionIcon} onClick={handleUpdateQuantity} title="View details">
-                        <FaPlus />
-                    </span>
-                    <IoCartOutline onClick={handleOrder} style={{ cursor: 'pointer' }} title="Quick Order" />
-                    {expandedRow === item._id ? (
-                        <MdExpandLess onClick={toggleSubtable} title="Hide Bookings" />
-                    ) : (
-                        <MdExpandMore onClick={toggleSubtable} title="Show Bookings" />
-                    )}
+                    {!isEditing ? <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                        <span className={style.actionIcon} onClick={handlePreview} title="View details">
+                            <FiEye />
+                        </span>
+                        <span className={style.actionIcon} onClick={handleUpdateQuantity} title="Update Stock">
+                            <FaPlus />
+                        </span>
+                        <IoCartOutline className={style.actionIcon} onClick={handleOrder} style={{ cursor: 'pointer', padding: '0.35rem', height: '30px', width: '30px' }} title="Quick Order" />
+                        <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} title="Edit Item" /></span>
+                        {expandedRow === item._id ? (
+                            <MdExpandLess className={style.actionIcon} onClick={toggleSubtable} style={{ padding: '0.35rem', height: '30px', width: '30px', cursor: 'pointer' }} title="Hide Bookings" />
+                        ) : (
+                            <MdExpandMore className={style.actionIcon} onClick={toggleSubtable} style={{ padding: '0.35rem', height: '30px', width: '30px', cursor: 'pointer' }} title="Show Bookings" />
+                        )}
+                    </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
+                        <span className={style.actionIcon}><RxCheck style={{ color: 'green', fontSize: '1.25rem' }} onClick={handleSave} /></span>
+                        <span className={style.actionIcon}><RxCross2 style={{ color: 'red', fontSize: '1.25rem' }} onClick={handleCancel} /></span>
+                    </div>}
                 </td>
             </tr>
 
@@ -388,7 +455,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
                                 No bookings found for this item
                             </div>
                         ) : (
-                            <BookingsSubtable bookings={bookingList} />
+                            <BookingsSubtable bookings={bookingList} parentItem={item} />
                         )}
                     </td>
                 </tr>
@@ -397,37 +464,39 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
     );
 };
 
-const BookingsSubtable = ({ bookings }) => {
+const BookingsSubtable = ({ bookings, parentItem }) => {
     const bookingDate = (date) => {
         return date ? new Date(date).toLocaleDateString() : "-";
     };
 
     const [editRemark, setEditRemark] = useState(null);
+    const [reason, setReason] = useState('');
 
     const [list, setList] = useState(bookings);
 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        setList(bookings);
+    }, [bookings]);
+
     // Handle action buttons
     const handleAction = (id, status) => {
-        const updated = list.map((b) =>
-            b._id === id ? { ...b, status } : b
-        );
-        setList(updated);
+        const vNum = list.find((i) => i._id === id);
 
-        const vNum = (list.filter((i) => i._id === id))[0];
+        // Optimistic update — only change status, preserve all other fields (incl. reason)
+        setList((prev) => prev.map((b) =>
+            b._id === id ? { ...b, status } : b
+        ));
 
         if (status === 'Shipped') {
             shipBooking({ bookingId: id, fieldValue: vNum.vehicleNumber }, dispatch, setList);
         }
 
         if (status === 'Cancelled') {
-            cancelBooking({ bookingId: id, reason: vNum.vehicleNumber }, dispatch, setList)
+            cancelBooking({ bookingId: id, fieldValue: vNum.reason }, dispatch, setList);
+            dispatch(updateListViewListData({ updatedItem: { _id: parentItem._id, remaining: Number(parentItem.remaining) + Number(vNum.quantity) } }));
         }
-
-
-        // CALL API HERE
-        // updateBooking({ id, status }, dispatch);
     };
 
     // Handle action buttons
@@ -435,8 +504,14 @@ const BookingsSubtable = ({ bookings }) => {
         const vNum = (list.filter((i) => i._id === id))[0];
 
         // updateRemark(id, vNum.remark);
-        updateRemark({bookingId: id, remark: vNum.remarks}, dispatch);
+        updateRemark({ bookingId: id, remark: vNum.remarks }, dispatch);
         setEditRemark(null)
+    };
+    const handleUpdateRemarkKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            handleUpdateRemark(id);
+            setEditRemark(null);
+        }
     };
 
     const updateVehicle = (id, value) => {
@@ -513,24 +588,38 @@ const BookingsSubtable = ({ bookings }) => {
             return status.cancelled;
     }
 
+    function turncate(str, len) {
+        if (str.length > len) {
+            return str.slice(0, len) + '...';
+        }
+        return str;
+    }
+
+    function handleReason(id, value) {
+        const updated = list.map((b) =>
+            b._id === id ? { ...b, reason: value } : b
+        );
+        setList(updated);
+    }
     return (
         <table className='nestedTable' >
             <thead>
                 <tr style={{ backgroundColor: 'var(--bg-active)' }}>
                     <th style={thStyle}>Order ID</th>
                     <th style={thStyle}>Form Type</th>
-                    <th style={thStyle}>Quantity</th>
+                    <th style={thStyle}>Qty</th>
                     <th style={thStyle}>Party</th>
                     <th style={thStyle}>Booked By</th>
                     <th style={thStyle}>Booking Date</th>
                     <th style={thStyle}>Ship To</th>
                     <th style={thStyle}>Remarks</th>
                     <th style={thStyle}>Vehicle Number</th>
+                    <th style={thStyle}>Reason</th>
                     <th style={thStyle}>Status</th>
                     <th style={thStyle}>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style={{ position: 'relative' }}>
                 {list.map((booking, index) => (
                     <tr key={booking._id || index}>
                         <td style={tdStyle}>{booking.order_id || '-'}</td>
@@ -541,13 +630,14 @@ const BookingsSubtable = ({ bookings }) => {
                         <td style={tdStyle}>{bookingDate(booking.bookingDate)}</td>
                         <td style={tdStyle}>{booking.shipTo || '-'}</td>
                         {/* <td style={tdStyle}>{booking.remarks || '-'}</td> */}
-                        <td onClick={() => setEditRemark(booking._id)} style={{overflow: 'visible'}}> {editRemark === booking._id ?
-                            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+                        <td title={booking.remarks} onClick={() => setEditRemark(booking._id)} style={{ overflow: 'visible' }}> {editRemark === booking._id ?
+                            <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', zIndex: 10 }}>
                                 <input
-                                    style={{ padding: '0rem 0.25rem', width: '6.25rem' }}
+                                    style={{ padding: '.2rem 0.25rem', width: '6.5rem' }}
                                     type={'text'}
                                     value={booking.remarks}
                                     onChange={(e) => changeRemark(booking._id, e.target.value)}
+                                    onKeyDown={(e) => handleUpdateRemarkKeyDown(e, booking._id)}
                                     autoFocus
                                 />
                                 <div className={style.inlineButtons}>
@@ -555,25 +645,42 @@ const BookingsSubtable = ({ bookings }) => {
                                     <button type="button" onClick={() => cancelRemark(booking._id)}>Cancel</button>
                                 </div>
                             </div>
-                            : booking.remarks || '-'}
+                            : turncate(booking.remarks, 12) || '-'}
 
                         </td>
+
                         {
                             booking.status === 'Processing' ? <td style={tdStyle}>
                                 <input
                                     className='simpleField'
                                     type="text"
+                                    name='vehicleNumber'
                                     placeholder={'Vehicle Number'}
                                     value={booking.vehicleNumber || ""}
                                     onChange={(e) =>
                                         updateVehicle(booking._id, e.target.value)
                                     }
-                                    style={{ width: "120px", height: '2rem', padding: '0' }}
+                                    style={{ width: "120px", height: '1.8rem', padding: '.15rem .25rem' }}
                                 /></td> : <td style={tdStyle}>{booking.vehicleNumber || '-'}</td>
                         }
 
+                        {
+                            booking.status === 'Processing' ? <td style={tdStyle}>
+                                <input
+                                    className='simpleField'
+                                    type="text"
+                                    name='reason'
+                                    placeholder={'Reason'}
+                                    value={booking.reason || ""}
+                                    onChange={(e) =>
+                                        handleReason(booking._id, e.target.value)
+                                    }
+                                    style={{ width: "120px", height: '1.8rem', padding: '.15rem .25rem' }}
+                                /></td> : <td style={tdStyle}>{booking.reason || '-'}</td>
+                        }
+
                         <td className={`${style.statusPill}`} style={getStatus(booking)}>
-                            {booking.status || '-'}
+                            <p style={{ fontSize: '10px' }}>{booking.status || '-'}</p>
                         </td>
                         {/* <td className={`${style.statusPill} ${booking.status === 'Processing'
                             ? style.statusProcessing
@@ -583,9 +690,17 @@ const BookingsSubtable = ({ bookings }) => {
                                     ? style.statusCancelled
                                     : ''
                             }`}>{booking.status || '-'}</td> */}
-                        {booking.status === 'Processing' && <td style={{ padding: '0' }}><button style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
-                            booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
-                        }}>{booking.vehicleNumber.length > 0 ? 'Shipped' : 'Cancelled'}</button></td>}
+                        {booking.status === 'Processing' &&
+                            <td style={{ padding: '0' }}>
+                                {booking.vehicleNumber.length > 0 && <button title={booking.vehicleNumber.length > 0 ? 'shipped' : 'cancel'} style={{ padding: '0', height: '2rem', width: '5rem', borderRadius: '0' }} className={`btn ${booking.vehicleNumber.length > 0 ? 'success' : 'error'}`} onClick={() => {
+                                    booking.vehicleNumber.length > 0 ? handleAction(booking._id, 'Shipped') : handleAction(booking._id, 'Cancelled');
+                                }}>{booking.vehicleNumber.length > 0 ? <LiaShippingFastSolid /> : 'Cancel'}</button>
+                                }
+                                {booking.reason?.length > 0 && <button title='cancel' style={{ padding: '0', height: '2rem', width: '3rem', borderRadius: '0', marginLeft: '0.2rem', backgroundColor: 'var(--danger)' }} className={`btn`} onClick={() => {
+                                    handleAction(booking._id, 'Cancelled');
+                                }}><MdCancel /></button>}
+                            </td>}
+
                     </tr>
                 ))
                 }
@@ -594,14 +709,14 @@ const BookingsSubtable = ({ bookings }) => {
     );
 };
 
-const Filters = ({ setFilters, showFilters }) => {
+const Filters = ({ setFilters, showFilters, currentParams, search }) => {
     const { grades, thicknesses, warehouses, widths } = useSelector(state => state.varient)
     const dispatch = useDispatch();
     const [currentType, setCurrentType] = useState('Both');
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             formType: '',
             width: '',
@@ -622,12 +737,20 @@ const Filters = ({ setFilters, showFilters }) => {
         } else {
             setCurrentType(curr);
         }
-        getAllItem({ filters }, dispatch);
+        // Sync currentParams ref so pagination carries the latest filters
+        if (currentParams) {
+            currentParams.current = { ...currentParams.current, filters, search: search ?? '' };
+        }
+        getAllItem({ filters, search: search ?? '', page: 1 }, dispatch);
     }
 
     const handleReset = () => {
         reset()
-        getAllItem({}, dispatch);
+        // Clear currentParams ref on reset
+        if (currentParams) {
+            currentParams.current = { search: '', filters: null, sortBy: null, order: 'desc' };
+        }
+        getAllItem({ page: 1 }, dispatch);
     }
 
     return <form className={style.formBlock} onChange={handleSubmit(onSubmit)} style={{ height: showFilters ? '12rem' : '0', padding: showFilters ? '1rem' : '0' }}>
@@ -644,18 +767,17 @@ const Filters = ({ setFilters, showFilters }) => {
             {errors.grade && <span className={style.error}>{errors.remaining.message}</span>}
         </div>
 
-        <div>
+        {/* <div>
             <label htmlFor='type'>Type:</label>
             <select
                 id='type'
                 {...register('type')}
             >
                 <option value=''>All</option>
-                <option value='Hot Rolled'>  Hot Rolled </option>
                 <option value='Cold Rolled'>  Cold Rolled </option>
             </select>
             {errors.grade && <span className={style.error}>{errors.grade.message}</span>}
-        </div>
+        </div> */}
 
         <div>
             <label htmlFor='grade'>Grade:</label>

@@ -25,7 +25,7 @@ const SearchForm = () => {
     } = useForm({
         defaultValues: {
             quantity: '',
-            type: '',
+            type: 'Cold Rolled',
             grade: '',
             thickness: '',
             width: '',
@@ -70,7 +70,7 @@ const SearchForm = () => {
                 </div> */}
 
                 {/* Type */}
-                <div>
+                {/* <div>
                     <label>Type:</label>
                     <select
                         {...register('type', {
@@ -78,16 +78,15 @@ const SearchForm = () => {
                         })}
                     >
                         <option value="">Select Type</option>
-                        <option value="Hot Rolled">Hot Rolled</option>
                         <option value="Cold Rolled">Cold Rolled</option>
                     </select>
                     {errors.type && (
                         <span className={style.error}>{errors.type.message}</span>
                     )}
-                </div>
+                </div> */}
 
                 {/* Form Type */}
-                {/* <div>
+                <div>
                     <label>Form Type:</label>
                     <select
                         {...register('formType', {
@@ -101,7 +100,7 @@ const SearchForm = () => {
                     {errors.formType && (
                         <span className={style.error}>{errors.formType.message}</span>
                     )}
-                </div> */}
+                </div>
 
                 {/* Grade */}
                 <div>

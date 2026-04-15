@@ -24,6 +24,28 @@ const addWarehouse = async (req, res) => {
     }
 }
 
+const deleteWarehouse = async (req, res) => {
+    try {
+        const { warehouseId } = req.params;
+        if (!warehouseId) {
+            throw customError("Warehouse ID is required", 400);
+        }
+
+        const warehouse = await Warehouse.findByIdAndDelete(warehouseId);
+        if (!warehouse) {
+            throw customError("Warehouse not found", 404);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Warehouse deleted successfully',
+            warehouse
+        });
+    } catch (err) {
+        return errorResponse(res, err)
+    }
+}
+
 const updateWarehouse = async (req, res) => {
     try {
         const { warehouseId, name, address, phoneNumber } = req.body;
@@ -227,6 +249,7 @@ const getAllWarehouseDetails = async (req, res) => {
 
 module.exports = {
     addWarehouse,
+    deleteWarehouse,
     updateWarehouse,
     getAllWarehouses,
     showWarehouse,
