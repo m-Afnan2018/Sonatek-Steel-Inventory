@@ -5,13 +5,15 @@ import { useForm } from 'react-hook-form';
 import { getAllBookingsTable, updateRemark } from 'services/operations/bookingAPI';
 import { LuDownload } from "react-icons/lu";
 
+const PAGE_SIZE = 20;
+
 const Items = () => {
     const [view, setView] = useState(null);
 
     const [allBookings, setAllBookings] = useState(null);
     const [pagination, setPagination] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(null);
+    const [page, setPage] = useState(1);
 
 
     const dispatch = useDispatch();
@@ -24,7 +26,7 @@ const Items = () => {
         if (bookings) {
             setAllBookings(bookings);
         }
-    }, [bookings, page, pagination])
+    }, [bookings])
 
     useEffect(() => {
         if (userData && (userData.role === 'admin' || userData.role === 'accountant' || userData.role === 'directors')) {
@@ -37,9 +39,9 @@ const Items = () => {
     useEffect(() => {
         if (allowed) {
             // getAllBookings(dispatch);
-            getAllBookingsTable({}, setAllBookings, setPagination, dispatch);
+            getAllBookingsTable({ page: 1, limit: PAGE_SIZE }, setAllBookings, setPagination, dispatch);
         } else {
-            getAllBookingsTable({ bookedBy: userData.userId }, setAllBookings, setPagination, dispatch);
+            getAllBookingsTable({ page: 1, limit: PAGE_SIZE, filters: { bookedBy: userData.userId } }, setAllBookings, setPagination, dispatch);
         }
     }, [allowed, dispatch, userData.userId])
 
@@ -89,13 +91,40 @@ const Items = () => {
         }
     };
 
+    const handlePageChange = (newPage) => {
+        // 1. Force the page to be a Number to prevent "1" + 1 = "11" bug
+        const targetPage = Number(newPage);
+        setPage(targetPage);
+
+        // 2. Clean the filters by removing any empty strings ("")
+        let cleanFilters = {};
+        Object.keys(filters).forEach((key) => {
+            if (filters[key] !== null && filters[key] !== "") {
+                cleanFilters[key] = filters[key];
+            }
+        });
+
+        // 3. Apply role-based restrictions
+        if (!allowed && userData?.userId) {
+            cleanFilters.bookedBy = userData.userId;
+        }
+
+        // 4. Fetch the data
+        getAllBookingsTable(
+            { page: targetPage, limit: PAGE_SIZE, filters: cleanFilters },
+            setAllBookings,
+            setPagination,
+            dispatch
+        );
+    };
+
     return (
         <div className={style.staffContainer}>
             {/* <h3 className={style.heading}>Order Report</h3> */}
             <h3 className={style.heading}>Inventory Items
                 <span style={{ marginLeft: 'auto', cursor: 'pointer' }}><LuDownload onClick={onDownload} /></span>
             </h3>
-            <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} />
+            <Filters allowed={allowed} setFilters={setFilters} setAllBookings={setAllBookings} setPagination={setPagination} filters={filters} setPage={setPage} />
             {allBookings !== null && <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>
@@ -136,15 +165,14 @@ const Items = () => {
                 <button onClick={onDownload}>Download</button>
 
                 <div className={style.paginationControls}>
-                    {pagination?.page > 1 && <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    {pagination?.page > 1 && <button onClick={() => handlePageChange(pagination.page - 1)}>
                         Prev
                     </button>}
                     <div className={style.paginationInfo}>
                         Page {pagination?.page} of {pagination?.totalPages || 1}
                     </div>
                     {pagination?.page < pagination?.totalPages && <button
-                        onClick={() => setPage((p) => (p < (pagination?.totalPages || 1) ? p + 1 : p))}
-                        disabled={page >= (pagination?.totalPages || 1)}
+                        onClick={() => handlePageChange(pagination.page + 1)}
                     >
                         Next
                     </button>}
@@ -290,7 +318,7 @@ const SingleItem = ({ item, view, setView, allowed, setAllBookings, onItemUpdate
     );
 };
 
-const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }) => {
+const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, setPage }) => {
     const { grades, thicknesses, warehouses, widths } = useSelector(
         (state) => state.varient
     );
@@ -337,12 +365,13 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
                 setCurrentType(data.type);
             }
             getAllBookingsTable(
-                { page: 1, limit: 50, filters: { type: data.type } },
+                { page: 1, limit: PAGE_SIZE, filters: { type: data.type } },
                 setAllBookings,
                 setPagination,
                 dispatch
             );
-            setFilters({ type: data.type })
+            setFilters({ type: data.type });
+            setPage(1);
             return;
         }
         if (data.grade) filterPayload.grade = data.grade;
@@ -358,10 +387,10 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
         if (data.toDate) filterPayload.toDate = data.toDate;
 
         setFilters(filterPayload);
-
+        setPage(1)
 
         getAllBookingsTable(
-            { page: 1, limit: 20, filters: filterPayload },
+            { page: 1, limit: PAGE_SIZE, filters: filterPayload },
             setAllBookings,
             setPagination,
             dispatch
@@ -371,13 +400,14 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed }
 
     const handleReset = (filters) => {
         getAllBookingsTable(
-            { page: 1, limit: 20, filters: {} },
+            { page: 1, limit: PAGE_SIZE, filters: {} },
             setAllBookings,
             setPagination,
             dispatch
         );
         reset();
         setFilters({});
+        setPage(1)
     };
 
     return (
