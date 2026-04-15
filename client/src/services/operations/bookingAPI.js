@@ -78,9 +78,9 @@ export async function createBookingFromUpcoming(params, dispatch) {
 
         const response = (await apiConnector('POST', bookingEndpoints.PLACE_BOOKING_FROM_UPCOMING, params)).data;
 
-        if (response.success) {
-            dispatch(deleteFromUpcomingItem(response.listView._id));
-        }
+        // if (response.success) {
+        //     dispatch(deleteFromUpcomingItem(response.listView._id));
+        // }
 
         dispatch(showSuccess({ id: "createBookingFromUpcoming", message: response.message }));
     } catch (err) {

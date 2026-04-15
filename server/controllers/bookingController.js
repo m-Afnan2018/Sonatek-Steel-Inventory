@@ -743,8 +743,8 @@ const shippedBooking = async (req, res) => {
     try {
         const { bookingId, fieldValue } = req.body;
 
-        if (!bookingId) {
-            throw customError("Please select any one booking");
+        if (!bookingId || !fieldValue) {
+            throw customError("Please select any one booking and vehicle number.");
         }
 
         const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Shipped', vehicleNumber: fieldValue });
@@ -788,7 +788,7 @@ const confirmBooking = async (req, res) => {
 const cancelBooking = async (req, res) => {
     try {
         const { bookingId, fieldValue } = req.body;
-        if (!bookingId) throw customError("Please select an booking");
+        if (!bookingId || !fieldValue) throw customError("Please select an booking and provide a reason");
 
         // Get booking with item details
         const booking = await Booking.findById(bookingId).populate('items.item');

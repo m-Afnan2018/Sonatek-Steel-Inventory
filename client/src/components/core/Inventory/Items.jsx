@@ -15,7 +15,7 @@ import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 's
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 import { RxCheck, RxCross2 } from "react-icons/rx";
-import { setUpdateQuantity, updateListViewData, updateListViewListData } from 'slices/itemSlice';
+import { updateListViewListData } from 'slices/itemSlice';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -29,6 +29,7 @@ const Items = () => {
     const { token } = useSelector((state) => state.auth);
     const [colors, setColors] = useState(null);
 
+    const [bookingList, setBookingList] = useState(null);
     const [showFilters, setShowFilters] = useState(null);
 
     const [filters, setFilters] = useState({
@@ -148,17 +149,20 @@ const Items = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.map((item) => (
-                                    <SingleItem
-                                        key={item._id}
-                                        color={colors.find(i => item.warehouse?._id === i.warehouseId)}
-                                        item={item}
-                                        view={view}
-                                        setView={setView}
-                                        expandedRow={expandedRow}
-                                        setExpandedRow={setExpandedRow}
-                                    />
-                                ))}
+                                {items.filter((item) => (item.remaining > 0
+                                    && bookingList?.status !== 'processing')).map((item) => (
+                                        <SingleItem
+                                            key={item._id}
+                                            color={colors.find(i => item.warehouse?._id === i.warehouseId)}
+                                            item={item}
+                                            view={view}
+                                            setView={setView}
+                                            expandedRow={expandedRow}
+                                            setExpandedRow={setExpandedRow}
+                                            bookingList={bookingList}
+                                            setBookingList={setBookingList}
+                                        />
+                                    ))}
                             </tbody>
                         </table>
                     </div>
@@ -186,13 +190,12 @@ const Items = () => {
     );
 };
 
-const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow }) => {
+const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, bookingList, setBookingList }) => {
     const { grades, thicknesses, widths, warehouses } = useSelector(state => state.varient);
     const dispatch = useDispatch();
 
     const [itemDetail, setItemDetail] = useState(item);
     const [isEditing, setIsEditing] = useState(false);
-    const [bookingList, setBookingList] = useState(null);
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [editRemark, setEditRemark] = useState(false);
     const { showOverlay } = useOverlay();
@@ -212,7 +215,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
         const warehouse = itemDetail.warehouse?._id;
         let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
         updateItem(Item, dispatch);
-        dispatch(updateListViewData({ updatedItem: itemDetail }))
+        dispatch(updateListViewListData({ updatedItem: itemDetail }))
         setIsEditing(false);
     };
 
@@ -264,7 +267,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow })
             onAccept: (updatedItem) => {
                 if (!updatedItem) return;
                 setItemDetail((prev) => ({ ...prev, ...updatedItem }));
-                dispatch(updateListViewData({ updatedItem }))
+                dispatch(updateListViewListData({ updatedItem }))
             }
         })
     };
@@ -590,7 +593,7 @@ const BookingsSubtable = ({ bookings, parentItem }) => {
 
     function turncate(str, len) {
         if (str.length > len) {
-            return str.slice(0, len) + '...';
+            return str?.slice(0, len) + '...';
         }
         return str;
     }

@@ -43,7 +43,7 @@ const Pending = () => {
                         bookings.map((booking) => {
                             return (
                                 <tr key={booking._id} >
-                                    <td>{}</td>
+                                    <td>{ }</td>
                                 </tr>
                             );
                         })

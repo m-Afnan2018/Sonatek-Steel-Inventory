@@ -64,10 +64,10 @@ const itemSlice = createSlice({
         updateListViewList(state, action) {
             const { item } = action.payload;
 
-            if (item.challanNumber && state.listViewList) {
+            if (item?.challanNumber && state.listViewList) {
                 const originalItem = state.listViewList?.find((i) => i._id === item._id);
                 if (originalItem) {
-                    state.listViewList = state.listViewList.map((i) => {
+                    state.listViewList = state.listViewList?.map((i) => {
                         if (i._id === item._id) {
                             return item;
                         }
@@ -78,11 +78,11 @@ const itemSlice = createSlice({
                 }
                 state.upcomingItem = state.upcomingItem.filter((i) => i._id !== item._id);
             } else {
-                if (item.challanNumber) {
+                if (item?.challanNumber) {
                     state.upcomingItem = state.upcomingItem.filter((i) => i._id !== item._id);
                 }
                 state.upcomingItem = state.upcomingItem.map((i) => {
-                    if (i._id === item._id) {
+                    if (i._id === item?._id) {
                         return item;
                     }
                     return i;
@@ -148,7 +148,7 @@ const itemSlice = createSlice({
 
             if (!state.listViewList) return;
 
-            state.listViewList = state.listViewList.map((item) =>
+            state.listViewList = state.listViewList?.map((item) =>
                 item._id === updatedItem._id
                     ? { ...item, ...updatedItem } // merge to avoid losing fields
                     : item
