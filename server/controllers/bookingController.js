@@ -743,8 +743,8 @@ const shippedBooking = async (req, res) => {
     try {
         const { bookingId, fieldValue } = req.body;
 
-        if (!bookingId) {
-            throw customError("Please select any one booking");
+        if (!bookingId || !fieldValue) {
+            throw customError("Please select any one booking and vehicle number.");
         }
 
         const booking = await Booking.findByIdAndUpdate(bookingId, { status: 'Shipped', vehicleNumber: fieldValue });

@@ -113,7 +113,7 @@ const bookingSlice = createSlice({
             const { bookingId, vehicleNumber, reason, status } = action.payload;
             if (!bookingId) return;
 
-            const item = state.incompleteBookings.find(i => i._id === bookingId);
+            const item = state.incompleteBookings?.find(i => i._id === bookingId);
             function transformBooking(raw) {
                 if (!raw || typeof raw !== "object") return null;
 
