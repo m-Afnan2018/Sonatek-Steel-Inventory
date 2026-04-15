@@ -148,7 +148,7 @@ const itemSlice = createSlice({
 
             if (!state.listViewList) return;
 
-            state.listViewList = state.listViewList.map((item) =>
+            state.listViewList = state.listViewList?.map((item) =>
                 item._id === updatedItem._id
                     ? { ...item, ...updatedItem } // merge to avoid losing fields
                     : item

@@ -15,7 +15,7 @@ import { cancelBooking, getAllBookingByItem, shipBooking, updateRemark } from 's
 import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 import { RxCheck, RxCross2 } from "react-icons/rx";
-import { setUpdateQuantity, updateListViewData, updateListViewListData } from 'slices/itemSlice';
+import { updateListViewListData } from 'slices/itemSlice';
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -215,7 +215,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
         const warehouse = itemDetail.warehouse?._id;
         let Item = { ...itemDetail, grade, thickness, width, warehouse: warehouse };
         updateItem(Item, dispatch);
-        dispatch(updateListViewData({ updatedItem: itemDetail }))
+        dispatch(updateListViewListData({ updatedItem: itemDetail }))
         setIsEditing(false);
     };
 
@@ -267,7 +267,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
             onAccept: (updatedItem) => {
                 if (!updatedItem) return;
                 setItemDetail((prev) => ({ ...prev, ...updatedItem }));
-                dispatch(updateListViewData({ updatedItem }))
+                dispatch(updateListViewListData({ updatedItem }))
             }
         })
     };
@@ -593,7 +593,7 @@ const BookingsSubtable = ({ bookings, parentItem }) => {
 
     function turncate(str, len) {
         if (str.length > len) {
-            return str.slice(0, len) + '...';
+            return str?.slice(0, len) + '...';
         }
         return str;
     }
