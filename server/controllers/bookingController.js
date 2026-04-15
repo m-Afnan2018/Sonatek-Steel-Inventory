@@ -788,7 +788,7 @@ const confirmBooking = async (req, res) => {
 const cancelBooking = async (req, res) => {
     try {
         const { bookingId, fieldValue } = req.body;
-        if (!bookingId) throw customError("Please select an booking");
+        if (!bookingId || !fieldValue) throw customError("Please select an booking and provide a reason");
 
         // Get booking with item details
         const booking = await Booking.findById(bookingId).populate('items.item');
