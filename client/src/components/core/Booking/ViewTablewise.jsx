@@ -6,6 +6,19 @@ import { getAllBookingsTable, updateRemark } from 'services/operations/bookingAP
 import { LuDownload } from "react-icons/lu";
 
 const PAGE_SIZE = 20;
+const DEFAULT_FILTERS = {
+    grade: "",
+    type: "",
+    width: "",
+    thickness: "",
+    warehouse: "",
+    formType: "",
+    status: "",
+    bookedBy: "",
+    party: "",
+    fromDate: "",
+    toDate: "",
+};
 
 const Items = () => {
     const [view, setView] = useState(null);
@@ -52,18 +65,7 @@ const Items = () => {
     }, [allBookings])
 
     // eslint-disable-next-line no-unused-vars
-    const [filters, setFilters] = useState({
-        grade: "",
-        type: "Cold Rolled",
-        width: "",
-        thickness: "",
-        warehouse: "",
-        formType: "",
-        status: "",
-        bookedBy: "",
-        fromDate: "",
-        toDate: "",
-    })
+    const [filters, setFilters] = useState(DEFAULT_FILTERS)
 
     const onDownload = async () => {
         try {
@@ -323,68 +325,28 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
         (state) => state.varient
     );
 
-    const [currentType, setCurrentType] = useState('Cold Rolled');
+    const [currentType, setCurrentType] = useState('Both');
 
     const dispatch = useDispatch();
+    const { userData } = useSelector((state) => state.auth);
 
     const { allUsers } = useSelector(state => state.user);
     const { parties } = useSelector(state => state.booking);
 
     const { register, handleSubmit, reset } = useForm({
-        defaultValues: {
-            grade: "",
-            type: "Cold Rolled",
-            width: "",
-            thickness: "",
-            warehouse: "",
-            formType: "",
-            status: "",
-            bookedBy: "",
-            fromDate: "",
-            toDate: "",
-        },
+        defaultValues: DEFAULT_FILTERS,
     });
 
     const onSubmit = (data) => {
-        let filterPayload = {};
-        if (data.type !== filters.type) {
-            reset({
-                grade: "",
-                width: "",
-                thickness: "",
-                warehouse: "",
-                formType: "",
-                status: "",
-                bookedBy: "",
-                fromDate: "",
-                toDate: "",
-            });
-            if (data.type === '') {
-                setCurrentType('Both')
-            } else {
-                setCurrentType(data.type);
-            }
-            getAllBookingsTable(
-                { page: 1, limit: PAGE_SIZE, filters: { type: data.type } },
-                setAllBookings,
-                setPagination,
-                dispatch
-            );
-            setFilters({ type: data.type });
-            setPage(1);
-            return;
+        const filterPayload = Object.fromEntries(
+            Object.entries(data).filter(([, value]) => value !== "" && value !== null && value !== undefined)
+        );
+
+        setCurrentType(data.type || 'Both');
+
+        if (!allowed && userData?.userId) {
+            filterPayload.bookedBy = userData.userId;
         }
-        if (data.grade) filterPayload.grade = data.grade;
-        if (data.type) filterPayload.type = data.type;
-        if (data.width) filterPayload.width = data.width;
-        if (data.thickness) filterPayload.thickness = data.thickness;
-        if (data.warehouse) filterPayload.warehouse = data.warehouse;
-        if (data.formType) filterPayload.formType = data.formType;
-        if (data.status) filterPayload.status = data.status;
-        if (data.bookedBy) filterPayload.bookedBy = data.bookedBy;
-        if (data.party) filterPayload.party = data.party;
-        if (data.fromDate) filterPayload.fromDate = data.fromDate;
-        if (data.toDate) filterPayload.toDate = data.toDate;
 
         setFilters(filterPayload);
         setPage(1)
@@ -399,14 +361,19 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
 
 
     const handleReset = (filters) => {
+        const resetFilters = !allowed && userData?.userId
+            ? { bookedBy: userData.userId }
+            : {};
+
         getAllBookingsTable(
-            { page: 1, limit: PAGE_SIZE, filters: {} },
+            { page: 1, limit: PAGE_SIZE, filters: resetFilters },
             setAllBookings,
             setPagination,
             dispatch
         );
-        reset();
-        setFilters({});
+        reset(DEFAULT_FILTERS);
+        setCurrentType('Both');
+        setFilters(resetFilters);
         setPage(1)
     };
 
@@ -426,7 +393,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
                 <label htmlFor="grade">Grade:</label>
                 <select id="grade" {...register("grade")}>
                     <option value="">All</option>
-                    {grades?.map((grade) => ((currentType === 'Both' || currentType === grade.type) &&
+                    {grades?.map((grade) => ((currentType === 'Both' || grade.type === 'Both' || currentType === grade.type) &&
                         <option key={grade._id} value={grade._id}>
                             {grade.name}
                         </option>
@@ -439,7 +406,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
                 <label htmlFor="width">Width:</label>
                 <select id="width" {...register("width")}>
                     <option value="">All</option>
-                    {widths?.map((width) => ((currentType === 'Both' || currentType === width.type) &&
+                    {widths?.map((width) => ((currentType === 'Both' || width.type === 'Both' || currentType === width.type) &&
                         <option key={width._id} value={width._id}>
                             {width.value || width.name}
                         </option>
@@ -452,7 +419,7 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
                 <label htmlFor="thickness">Thickness:</label>
                 <select id="thickness" {...register("thickness")}>
                     <option value="">All</option>
-                    {thicknesses?.map((thickness) => ((currentType === 'Both' || currentType === thickness.type) &&
+                    {thicknesses?.map((thickness) => ((currentType === 'Both' || thickness.type === 'Both' || currentType === thickness.type) &&
                         <option key={thickness._id} value={thickness._id}>
                             {thickness.value || thickness.name}
                         </option>
@@ -517,8 +484,8 @@ const Filters = ({ setFilters, setAllBookings, setPagination, filters, allowed, 
                 <label htmlFor="formType">Status:</label>
                 <select id="formType" {...register("formType")}>
                     <option value="">All</option>
-                    <option value="Sheet">Sheet</option>a
-                    <option value="Coil">Coil</option>a
+                    <option value="Sheet">Sheet</option>
+                    <option value="Coil">Coil</option>
                 </select>
             </div>
 
