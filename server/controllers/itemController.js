@@ -996,96 +996,270 @@ const increaseQuantity = async (req, res) => {
 // const xlsx = require('xlsx');
 const xlsx = require('xlsx');
 const getNextIndex = require("../utils/counerHandler");
+const HOT_COLD_TYPES = new Set(['Hot Rolled', 'Cold Rolled']);
+
+function normalizeHeader(value = '') {
+    return String(value)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '');
+}
+
+function cleanCell(value) {
+    if (value === undefined || value === null) {
+        return null;
+    }
+
+    const normalized = String(value).replace(/\s+/g, ' ').trim();
+    return normalized === '' ? null : normalized;
+}
+
+function normalizeNumber(value) {
+    if (value === undefined || value === null || value === '') {
+        return null;
+    }
+
+    const normalized = Number(String(value).replace(/,/g, '').trim());
+    return Number.isNaN(normalized) ? null : normalized;
+}
+
+function parseDateValue(value) {
+    if (!value) {
+        return null;
+    }
+
+    if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'number') {
+        const parsed = xlsx.SSF.parse_date_code(value);
+        if (!parsed) {
+            return null;
+        }
+
+        return new Date(parsed.y, parsed.m - 1, parsed.d, parsed.H || 0, parsed.M || 0, Math.floor(parsed.S || 0));
+    }
+
+    const normalized = cleanCell(value);
+    if (!normalized) {
+        return null;
+    }
+
+    const dotDateMatch = normalized.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
+    if (dotDateMatch) {
+        const [, day, month, year] = dotDateMatch;
+        const fullYear = year.length === 2 ? `20${year}` : year;
+        const parsedDate = new Date(Number(fullYear), Number(month) - 1, Number(day));
+        return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+    }
+
+    const parsedDate = new Date(normalized);
+    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function parseMaterialDescription(description = '') {
+    const normalized = cleanCell(description);
+
+    if (!normalized) {
+        return { gradeName: null, thicknessValue: null, widthValue: null };
+    }
+
+    const standardMatch = normalized.match(/^([\d.]+)\s*(?:x|\*)\s*([\d.]+)\s*(?:x|\*)\s*(.+)$/i);
+    if (standardMatch) {
+        return {
+            thicknessValue: normalizeNumber(standardMatch[1]),
+            widthValue: normalizeNumber(standardMatch[2]),
+            gradeName: cleanCell(standardMatch[3]),
+        };
+    }
+
+    const trailingDimensionMatch = normalized.match(/(.+?)\s+([\d.]+)\s*(?:x|\*)\s*([\d.]+)$/i);
+    if (trailingDimensionMatch) {
+        return {
+            gradeName: cleanCell(trailingDimensionMatch[1]),
+            thicknessValue: normalizeNumber(trailingDimensionMatch[2]),
+            widthValue: normalizeNumber(trailingDimensionMatch[3]),
+        };
+    }
+
+    return { gradeName: null, thicknessValue: null, widthValue: null };
+}
+
+function getHeaderIndexMap(headerRow = []) {
+    const normalizedHeaders = headerRow.map((header) => normalizeHeader(header));
+    const findIndex = (candidates) => normalizedHeaders.findIndex((header) => candidates.includes(header));
+
+    const mapping = {
+        wagonNumber: findIndex(['wagonno', 'wagonnumber']),
+        challanDate: findIndex(['challandate', 'invdate']),
+        challanNumber: findIndex(['challanno', 'challannumber', 'gstinv']),
+        materialDescription: findIndex(['materialdescription', 'description', 'materialdesc']),
+        quantity: findIndex(['quantity', 'weight', 'invqty']),
+        shipTo: findIndex(['shipto', 'warehouses']),
+        vehicle: findIndex(['vehicle', 'vehicleno']),
+        loader: findIndex(['loader']),
+        transport: findIndex(['transport', 'transporter']),
+        remark: findIndex(['remark', 'remarks']),
+    };
+
+    return mapping.materialDescription >= 0 && mapping.quantity >= 0 ? mapping : null;
+}
+
+function extractRowsFromWorkbook(workbook) {
+    const extractedRows = [];
+
+    workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const rows = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: null });
+
+        if (!rows.length) {
+            return;
+        }
+
+        const headerRowIndex = rows.findIndex((row) => {
+            const headerMap = getHeaderIndexMap(row);
+            return headerMap && normalizeHeader(row[headerMap.materialDescription]) === 'materialdescription';
+        });
+
+        if (headerRowIndex < 0) {
+            return;
+        }
+
+        const headerMap = getHeaderIndexMap(rows[headerRowIndex]);
+        if (!headerMap) {
+            return;
+        }
+
+        let previousRowData = {
+            wagonNumber: null,
+            challanDate: null,
+            challanNumber: null,
+            vehicleNumber: null,
+            loader: null,
+            transporterName: null,
+        };
+
+        rows.slice(headerRowIndex + 1).forEach((row) => {
+            const description = cleanCell(row[headerMap.materialDescription]);
+            const quantity = normalizeNumber(row[headerMap.quantity]);
+
+            if (!description || !quantity || quantity <= 0) {
+                return;
+            }
+
+            const normalizedDescription = description.toLowerCase();
+            if (normalizedDescription.startsWith('date ') || normalizedDescription.startsWith('dated ')) {
+                return;
+            }
+
+            const wagonNumber = cleanCell(row[headerMap.wagonNumber]);
+            const challanDate = parseDateValue(row[headerMap.challanDate]);
+            const challanNumber = cleanCell(row[headerMap.challanNumber]);
+            const shipTo = cleanCell(row[headerMap.shipTo]);
+            const vehicleNumber = cleanCell(row[headerMap.vehicle]);
+            const loader = cleanCell(row[headerMap.loader]);
+            const transporterName = cleanCell(row[headerMap.transport]);
+            const remark = cleanCell(row[headerMap.remark]);
+            const isSameWagon = wagonNumber && previousRowData.wagonNumber && wagonNumber === previousRowData.wagonNumber;
+
+            const normalizedRow = {
+                description,
+                quantity,
+                shipTo,
+                remark,
+                wagonNumber: wagonNumber || previousRowData.wagonNumber,
+                challanDate: challanDate || (isSameWagon ? previousRowData.challanDate : null),
+                challanNumber: challanNumber || (isSameWagon ? previousRowData.challanNumber : null),
+                vehicleNumber: vehicleNumber || (isSameWagon ? previousRowData.vehicleNumber : null),
+                loader: loader || (isSameWagon ? previousRowData.loader : null),
+                transporterName: transporterName || (isSameWagon ? previousRowData.transporterName : null),
+            };
+
+            previousRowData = {
+                wagonNumber: normalizedRow.wagonNumber,
+                challanDate: normalizedRow.challanDate,
+                challanNumber: normalizedRow.challanNumber,
+                vehicleNumber: normalizedRow.vehicleNumber,
+                loader: normalizedRow.loader,
+                transporterName: normalizedRow.transporterName,
+            };
+
+            extractedRows.push(normalizedRow);
+        });
+    });
+
+    return extractedRows;
+}
 const uploadCSV = async (req, res) => {
     try {
-        const { file } = req.files;
+        const file = req?.files?.file;
         if (!file) return errorResponse(res, "No file uploaded");
 
-        // Read Excel file
         const workbook = xlsx.readFile(file.tempFilePath);
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(sheet);
-        // res.status(200).json({
-        //     success: true,
-        //     data
-        // })
-        // return;
-
-        // Prepare all items
+        const extractedRows = extractRowsFromWorkbook(workbook);
         const itemsToInsert = [];
+        let skippedRows = 0;
 
+        for (const row of extractedRows) {
+            const { gradeName, thicknessValue, widthValue } = parseMaterialDescription(row.description);
 
-        for (const row of data) {
-            // Parse challan date
-            const challanDate = row["CHALLAN-DATE"]
-                ? new Date(row["CHALLAN-DATE"])
-                : null;
+            if (!gradeName || thicknessValue === null || widthValue === null) {
+                skippedRows += 1;
+                continue;
+            }
 
-            // Get variant refs by name (or create if not found)
-            const gradeName = extractGradeFromDescription(row["MATERIAL-DESCRIPTION"]);
-            const thicknessValue = extractThickness(row["MATERIAL-DESCRIPTION"]);
-            const widthValue = extractWidth(row["MATERIAL-DESCRIPTION"]);
+            const itemType = detectMaterialType(row.description);
 
             let grade = await Grade.findOne({ name: gradeName });
             let thickness = await Thickness.findOne({ name: thicknessValue });
             let width = await Width.findOne({ name: widthValue });
-            let warehouse = await Warehouse.findOne({ name: row["SHIP-TO"] });
+            let warehouse = row.shipTo ? await Warehouse.findOne({ name: row.shipTo }) : null;
             if (!grade && gradeName) {
                 grade = await Grade.create({
-                    name: gradeName
+                    name: gradeName,
+                    ...(HOT_COLD_TYPES.has(itemType) ? { type: itemType } : {}),
                 })
             }
-            if (!thickness && thicknessValue) {
+            if (!thickness && thicknessValue !== null) {
                 thickness = await Thickness.create({
                     name: thicknessValue
                 })
             }
-            if (!width && widthValue) {
+            if (!width && widthValue !== null) {
                 width = await Width.create({
                     name: widthValue
                 })
             }
-            if (!warehouse && row["SHIP-TO"]) {
+            if (!warehouse && row.shipTo) {
                 warehouse = await Warehouse.create({
-                    name: row["SHIP-TO"]
+                    name: row.shipTo
                 })
             }
-            // if (!grade || !thickness || !width) {
-            //     // console.warn(`Skipped row - variant not found:`, row);
-            //     continue;
-            // }
 
-            // Parse transport detail
-            const vehicleNumber = row["VEHICLE"]
-                ? row["VEHICLE"]
-                : null;
-            const loader = row["LOADER"]
-                ? row["LOADER"]
-                : null;
-            const transporterName = row["TRANSPORT"]
-                ? row["TRANSPORT"]
-                : null;
+            if (!grade || !thickness || !width) {
+                skippedRows += 1;
+                continue;
+            }
 
             itemsToInsert.push({
-                type: grade.type,
+                type: itemType,
                 grade: grade._id,
                 thickness: thickness._id,
                 width: width._id,
-                wagonNumber: row["WAGON-NO."] || null,
+                wagonNumber: row.wagonNumber || null,
                 challan: {
-                    challanDate,
-                    challanNumber: row["CHALLAN-NO."],
+                    challanDate: row.challanDate,
+                    challanNumber: row.challanNumber || null,
                 },
-                originalQuantity: Number(row["QUANTITY"] || 0),
-                quantity: Number(row["QUANTITY"] || 0),
+                originalQuantity: row.quantity,
+                quantity: row.quantity,
                 warehouse: warehouse ? warehouse._id : null,
                 transport: {
-                    vehicleNumber: row["VEHICLE"] || null,
-                    loader: row["LOADER"] || null,
-                    transporterName: row["TRANSPORT"] || null,
+                    vehicleNumber: row.vehicleNumber || null,
+                    loader: row.loader || null,
+                    transporterName: row.transporterName || null,
                 },
-                remark: row["REMARK"]
+                remark: row.remark || ""
             });
         }
 
@@ -1103,22 +1277,25 @@ const uploadCSV = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Successfully added the items",
-            length: itemsToInsert.length
+            length: itemsToInsert.length,
+            data: {
+                inserted: itemsToInsert.length,
+                skipped: skippedRows,
+            }
         });
 
     } catch (err) {
+        console.log(err)
         errorResponse(res, err);
     }
 };
 
 // 🔍 Helper to detect material type
 function detectMaterialType(description = '') {
-    const parts = desc.split('X').map(p => p.trim());
-    let grade = parts[2] || '';
-    const lower = description.toLowerCase();
-    if (lower.includes('hot')) return 'Hot Rolled';
-    if (lower.includes('cold')) return 'Cold Rolled';
-    if (lower.includes('galvanized')) return 'Galvanized';
+    const lower = String(description).toLowerCase();
+    if (/\bcr[\d\w/-]*\b/.test(lower) || lower.includes('cold')) return 'Cold Rolled';
+    if (/\bhr[\d\w/-]*\b/.test(lower) || lower.includes('hot')) return 'Hot Rolled';
+    if (lower.includes('galvanized') || lower.includes('gp')) return 'Galvanized';
     if (lower.includes('color')) return 'Color Coated';
     if (lower.includes('stainless')) return 'Stainless Steel';
     if (lower.includes('aluminum')) return 'Aluminum';
