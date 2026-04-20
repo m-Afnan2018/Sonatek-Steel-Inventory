@@ -40,6 +40,7 @@ export const itemEndpoints = {
     MOVE_TO_INVENTORY: `${BASE_URL}/item/moveToInventory`,
     GET_MARKED_ITEM: `${BASE_URL}/item/getMarkedItem`,
     INCREASE_QUANTITY: `${BASE_URL}/item/increaseQuantity`,
+    CHECK_DUPLICATE_ITEM: `${BASE_URL}/item/checkDuplicateItem`,
 }
 
 export const bookingEndpoints = {

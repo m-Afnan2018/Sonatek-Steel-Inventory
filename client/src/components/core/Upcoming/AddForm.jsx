@@ -4,7 +4,7 @@ import style from "./Upcoming.module.css";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { addItem } from "services/operations/itemAPI";
+import { addItem, checkDuplicateItem } from "services/operations/itemAPI";
 import toast from "react-hot-toast";
 import { useOverlay } from "hooks/useOverlay";
 import { bookingItems } from "services/operations/bookingAPI";
@@ -29,7 +29,7 @@ const AddForm = () => {
         },
     });
 
-    const onSubmit = (data, e) => {
+    const onSubmit = async (data, e) => {
         // Basic validation
         if (!data.thickness?.value) return toast.error("Please select thickness");
         if (!data.width?.value) return toast.error("Please select a width");
@@ -52,6 +52,18 @@ const AddForm = () => {
             warehouse: data.warehouse?.value || null,
             date: data.date
         };
+
+        // Check if an identical upcoming item already exists in DB
+        const isDuplicate = await checkDuplicateItem({
+            grade: formattedData.grade,
+            width: formattedData.width,
+            thickness: formattedData.thickness,
+            quantity: formattedData.quantity,
+        });
+
+        if (isDuplicate) {
+            toast.error("This item already exists in the upcoming list");
+        }
 
         addItem(formattedData, dispatch);
         // setCurrentData((prev) => [...prev, { ...formattedData, thickness: data.thickness?.label, width: data.width?.label, grade: data.grade?.label, warehouse: data.warehouse?.label || null }]);

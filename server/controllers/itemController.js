@@ -1537,6 +1537,32 @@ const getExcelItem = async (req, res) => {
     }
 };
 
+const checkDuplicateItem = async (req, res) => {
+    try {
+        const { grade, width, thickness, quantity } = req.body;
+
+        if (!grade || !width || !thickness || !quantity) {
+            throw customError('grade, width, thickness and quantity are required', 400);
+        }
+
+        // Only check among upcoming items (no challan assigned yet)
+        const duplicate = await Item.findOne({
+            grade,
+            width,
+            thickness,
+            quantity: Number(quantity),
+            'challan.challanNumber': null,
+        });
+
+        return res.status(200).json({
+            success: true,
+            isDuplicate: !!duplicate,
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
 module.exports = {
     addItem,
     updateItem,
@@ -1557,5 +1583,6 @@ module.exports = {
     unmarkForBooking,
     getMarkedItem,
     moveToInventory,
-    increaseQuantity
+    increaseQuantity,
+    checkDuplicateItem
 }

@@ -59,6 +59,20 @@ export async function addItem(data, dispatch) {
     }
 }
 
+/**
+ * Returns true if an upcoming item with the same grade, width, thickness
+ * and quantity already exists in the DB. No Redux side-effects.
+ */
+export async function checkDuplicateItem(data) {
+    try {
+        const response = (await apiConnector('POST', itemEndpoints.CHECK_DUPLICATE_ITEM, data)).data;
+        return response.isDuplicate === true;
+    } catch (err) {
+        // On error, allow the submission to proceed (fail-open)
+        return false;
+    }
+}
+
 export async function updateItem(params, dispatch) {
     try {
         dispatch(addLoader("updateItem"));
