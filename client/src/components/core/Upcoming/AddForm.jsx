@@ -60,7 +60,6 @@ const AddForm = () => {
     };
 
     const toOptions = (arr, labelField = "name", valueField = "_id") => {
-        console.log(arr)
         return arr?.map((i) => ({
             label: i[labelField] || i.value,
             value: i[valueField] || i.label,
@@ -308,6 +307,9 @@ const AddForm = () => {
                         setValue('quantity', `${intPart}.${decPart}`);
                     }}
                     onKeyDown={(e) => {
+                        // Allow Ctrl/Meta combos (paste, copy, cut, select-all, etc.)
+                        if (e.ctrlKey || e.metaKey) return;
+
                         // Allow: backspace, delete, tab, escape, arrow keys
                         const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'];
                         if (allowed.includes(e.key)) {
