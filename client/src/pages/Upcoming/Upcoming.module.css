@@ -184,7 +184,7 @@
     font-weight: 600;
     padding: 10px;
     border-bottom: 1px solid var(--border);
-    text-align: left;
+    text-align: center;
     white-space: nowrap;
 }
 
@@ -193,6 +193,7 @@
     border-bottom: 1px solid var(--border-subtle);
     vertical-align: middle;
     color: var(--text-secondary);
+    text-align: center;
 }
 
 .table tbody tr {

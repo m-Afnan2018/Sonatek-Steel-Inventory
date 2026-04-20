@@ -12,8 +12,57 @@ import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 import { getAllPartyDetails } from 'services/operations/bookingAPI';
 import { FaRegTrashCan } from "react-icons/fa6";
 import { FiEye, FiEdit } from 'react-icons/fi';
+import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { MdOutlineWarehouse } from 'react-icons/md';
 import { IoCartOutline } from 'react-icons/io5';
+
+
+const getUpcomingSortValue = (item, sortKey) => {
+    switch (sortKey) {
+        case 'id':
+            return Number(item.id ?? 0);
+        case 'date':
+            return item.date ? new Date(item.date).getTime() : 0;
+        case 'description':
+            return `${item.thickness?.name ?? ''} ${item.width?.name ?? ''} ${item.grade?.name ?? ''}`.trim().toLowerCase();
+        case 'quantity':
+            return Number(item.originalQuantity ?? 0);
+        case 'wagonNumber':
+            return (item.wagonNumber ?? '').toString().toLowerCase();
+        case 'warehouse':
+            return (item.warehouse?.name ?? '').toLowerCase();
+        default:
+            return '';
+    }
+};
+
+const sortUpcomingItems = (items, sortKey, order) => {
+    const direction = order === 'asc' ? 1 : -1;
+
+    return [...items].sort((firstItem, secondItem) => {
+        const firstValue = getUpcomingSortValue(firstItem, sortKey);
+        const secondValue = getUpcomingSortValue(secondItem, sortKey);
+
+        if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+            return (firstValue - secondValue) * direction;
+        }
+
+        return firstValue.toString().localeCompare(secondValue.toString(), undefined, {
+            numeric: true,
+            sensitivity: 'base',
+        }) * direction;
+    });
+};
+
+const renderSortIcon = (activeSort, columnSort, order) => {
+    if (activeSort !== columnSort) {
+        return null;
+    }
+
+    return order === 'asc'
+        ? <HiSortAscending style={{ marginLeft: '0.35rem', display: 'inline-block', verticalAlign: 'middle' }} />
+        : <HiSortDescending style={{ marginLeft: '0.35rem', display: 'inline-block', verticalAlign: 'middle' }} />;
+};
 
 const Upcoming = () => {
     const [loading, setLoading] = useState(true);
@@ -21,21 +70,23 @@ const Upcoming = () => {
     const [view, setView] = useState(null);
     const [count, setCount] = useState(null);
     const [colors, setColors] = useState(null);
-
-
+    const [order, setOrder] = useState('desc');
+    const [sortType, setSortType] = useState(null)
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
-
     const dispatch = useDispatch();
 
     const { upcomingItem } = useSelector(state => state.item);
-    console.log("upcomingItem", upcomingItem);
     const { userData } = useSelector(state => state.auth);
 
     useEffect(() => {
         if (upcomingItem) {
+            const nextItems = sortType
+                ? sortUpcomingItems(upcomingItem, sortType, order)
+                : upcomingItem;
+
             setColors(generateShipToColors(upcomingItem))
-            setItems(upcomingItem);
+            setItems(nextItems);
             setLoading(false);
             let sum = 0;
             upcomingItem.forEach(i => {
@@ -43,7 +94,7 @@ const Upcoming = () => {
             });
             setCount(sum)
         }
-    }, [upcomingItem])
+    }, [order, sortType, upcomingItem])
 
 
     const inputRef = useRef();
@@ -60,6 +111,11 @@ const Upcoming = () => {
             return;
         }
     };
+    const sortBy = (val) => {
+        const newOrder = sortType === val && order === 'asc' ? 'desc' : 'asc';
+        setOrder(newOrder);
+        setSortType(val);
+    }
 
     useEffect(() => {
         getUpcomingItem({}, dispatch);
@@ -104,12 +160,12 @@ const Upcoming = () => {
                                 <tr>
                                     {/* <th>Type</th> */}
                                     <th style={{ width: "6px" }}></th>
-                                    <th style={{ width: "5%" }}>S.ID</th>
-                                    <th style={{ width: "15%" }}>Date</th>
-                                    <th style={{ width: "20%", textAlign: "center" }}>Description</th>
-                                    <th style={{ width: "10%" }}>Quantity</th>
-                                    <th style={{ width: "10%" }}>Wagon</th>
-                                    <th style={{ width: "10%", textAlign: "center" }}>Warehouse</th>
+                                    <th style={{ width: "5%" }} onClick={() => sortBy('id')}>S.ID{renderSortIcon(sortType, 'id', order)}</th>
+                                    <th style={{ width: "15%" }} onClick={() => sortBy('date')}>Date{renderSortIcon(sortType, 'date', order)}</th>
+                                    <th style={{ width: "20%", textAlign: "center" }} onClick={() => sortBy('description')}>Description{renderSortIcon(sortType, 'description', order)}</th>
+                                    <th style={{ width: "10%" }} onClick={() => sortBy('quantity')}>Quantity{renderSortIcon(sortType, 'quantity', order)}</th>
+                                    <th style={{ width: "10%" }} onClick={() => sortBy('wagonNumber')}>Wagon{renderSortIcon(sortType, 'wagonNumber', order)}</th>
+                                    <th style={{ width: "10%", textAlign: "center" }} onClick={() => sortBy('warehouse')}>Warehouse{renderSortIcon(sortType, 'warehouse', order)}</th>
                                     <th style={{ width: "20%", textAlign: "center" }}>Party</th>
                                     <th style={{ width: "20%", textAlign: "center" }}>Remarks</th>
                                     <th style={{ width: "10%" }}>Action</th>

@@ -30,10 +30,13 @@ const UploadCSV = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
+            const inserted = res.data?.data?.inserted ?? res.data?.length ?? 0;
+            const skipped = res.data?.data?.skipped ?? 0;
+
             toast.dismiss();
             toast.success("File uploaded successfully!");
 
-            setResult(res.data?.data || { inserted: 0 });
+            setResult({ inserted, skipped });
             setFile(null);
         } catch (err) {
             toast.dismiss();
@@ -46,7 +49,7 @@ const UploadCSV = () => {
     return (
         <div className="p-6 max-w-md mx-auto bg-white shadow-md rounded-2xl mt-10 border">
             <h2 className="text-2xl font-semibold mb-4 text-center">
-                📦 Upload Items CSV/Excel
+                Upload Items CSV/Excel
             </h2>
 
             <input
@@ -70,7 +73,7 @@ const UploadCSV = () => {
 
             {result && (
                 <div className="mt-5 bg-green-50 p-3 rounded-md text-sm text-green-700 border border-green-300">
-                    ✅ {result.inserted} items uploaded successfully!
+                    {result.inserted} items created successfully{result.skipped > 0 ? `, ${result.skipped} rows skipped.` : "!"}
                 </div>
             )}
         </div>
