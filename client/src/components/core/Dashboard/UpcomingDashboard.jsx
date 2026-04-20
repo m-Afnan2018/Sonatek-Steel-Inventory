@@ -200,7 +200,7 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Thickness x Width x Grade */}
-            <td style={{ display: 'flex', gap: '0.25rem' }}>
+            <td style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem' }}>
                 {/* Thickness */}
                 <div onClick={() => clickHandler('thickness')}>
                     {select === 'thickness'
@@ -252,7 +252,7 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Warehouse */}
-            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex' }}>
+            <td onClick={() => clickHandler('warehouse')} style={{ display: 'flex', justifyContent: 'center' }}>
                 {select === 'warehouse' ? (
                     <div onClick={() => clickHandler('warehouse')}>
                         {select === 'warehouse'

@@ -182,7 +182,7 @@
   color: var(--text-muted);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
@@ -226,6 +226,7 @@
   font-weight: 600;
   text-transform: capitalize;
   white-space: nowrap;
+  margin: auto;
 }
 
 /* Inline edit buttons */
