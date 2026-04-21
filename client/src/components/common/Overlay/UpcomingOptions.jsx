@@ -103,6 +103,16 @@ const UpcomingOptions = ({ data, close, type }) => {
     const [handleBookingSubmit, setHandleBookingSubmit] = useState(() => () => { });
     const [handleInventorySubmit, setHandleInventorySubmit] = useState(() => () => { });
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                close?.();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [close]);
+
     return (
         <div
             className={style.UpcomingOptions}

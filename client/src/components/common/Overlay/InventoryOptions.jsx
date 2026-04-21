@@ -60,6 +60,15 @@ const customStyles = {
 };
 
 const InventoryOptions = ({ data, close, type, onAccept }) => {
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                close?.();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [close]);
     return (
         <div
             className={`${style.UpcomingOptions} ${style.InventoryOptions}`}
