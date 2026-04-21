@@ -1036,8 +1036,8 @@ function parseDateValue(value) {
         if (!parsed) {
             return null;
         }
-
-        return new Date(parsed.y, parsed.m - 1, parsed.d, parsed.H || 0, parsed.M || 0, Math.floor(parsed.S || 0));
+        // Use Date.UTC to ensure the string version starts with the correct date
+        return new Date(Date.UTC(parsed.y, parsed.m - 1, parsed.d));
     }
 
     const normalized = cleanCell(value);
@@ -1045,14 +1045,24 @@ function parseDateValue(value) {
         return null;
     }
 
-    const dotDateMatch = normalized.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/);
-    if (dotDateMatch) {
-        const [, day, month, year] = dotDateMatch;
+    // Match dd.mm.yyyy, dd-mm-yyyy, or dd/mm/yyyy
+    const dmyMatch = normalized.match(/^(\d{1,2})[\.\-\/](\d{1,2})[\.\-\/](\d{2,4})$/);
+    if (dmyMatch) {
+        const [, day, month, year] = dmyMatch;
         const fullYear = year.length === 2 ? `20${year}` : year;
-        const parsedDate = new Date(Number(fullYear), Number(month) - 1, Number(day));
-        return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+        const d = new Date(Date.UTC(Number(fullYear), Number(month) - 1, Number(day)));
+        return Number.isNaN(d.getTime()) ? null : d;
     }
 
+    // Match yyyy-mm-dd or yyyy/mm/dd
+    const ymdMatch = normalized.match(/^(\d{4})[\-\/](\d{1,2})[\-\/](\d{1,2})$/);
+    if (ymdMatch) {
+        const [, year, month, day] = ymdMatch;
+        const d = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+        return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    // Fallback for other formats
     const parsedDate = new Date(normalized);
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
@@ -1100,6 +1110,7 @@ function getHeaderIndexMap(headerRow = []) {
         loader: findIndex(['loader']),
         transport: findIndex(['transport', 'transporter']),
         remark: findIndex(['remark', 'remarks']),
+        date: findIndex(['date']),
     };
 
     return mapping.materialDescription >= 0 && mapping.quantity >= 0 ? mapping : null;
@@ -1160,6 +1171,8 @@ function extractRowsFromWorkbook(workbook) {
             const loader = cleanCell(row[headerMap.loader]);
             const transporterName = cleanCell(row[headerMap.transport]);
             const remark = cleanCell(row[headerMap.remark]);
+            // Read the standalone DATE column (may be -1 if template has no such column)
+            const itemDate = headerMap.date >= 0 ? parseDateValue(row[headerMap.date]) : null;
             const isSameWagon = wagonNumber && previousRowData.wagonNumber && wagonNumber === previousRowData.wagonNumber;
 
             const normalizedRow = {
@@ -1167,6 +1180,8 @@ function extractRowsFromWorkbook(workbook) {
                 quantity,
                 shipTo,
                 remark,
+                // Only carry itemDate forward — never inherit from previous row
+                itemDate: itemDate || null,
                 wagonNumber: wagonNumber || previousRowData.wagonNumber,
                 challanDate: challanDate || (isSameWagon ? previousRowData.challanDate : null),
                 challanNumber: challanNumber || (isSameWagon ? previousRowData.challanNumber : null),
@@ -1241,14 +1256,14 @@ const uploadCSV = async (req, res) => {
                 continue;
             }
 
-            itemsToInsert.push({
+            const itemPayload = {
                 type: itemType,
                 grade: grade._id,
                 thickness: thickness._id,
                 width: width._id,
                 wagonNumber: row.wagonNumber || null,
                 challan: {
-                    challanDate: row.challanDate,
+                    challanDate: row.challanDate || null,
                     challanNumber: row.challanNumber || null,
                 },
                 originalQuantity: row.quantity,
@@ -1260,7 +1275,20 @@ const uploadCSV = async (req, res) => {
                     transporterName: row.transporterName || null,
                 },
                 remark: row.remark || ""
-            });
+            };
+
+            // Only set `date` when the CSV actually provided a value.
+            // If we omit the key entirely, Mongoose will NOT apply the Date.now default
+            // because insertMany bypasses pre-save hooks — leaving date as undefined/null.
+            // When a value IS present we set it explicitly.
+            if (row.itemDate) {
+                itemPayload.date = row.itemDate;
+            } else {
+                // Explicitly set to null so the column is clear (no stale default)
+                itemPayload.date = null;
+            }
+
+            itemsToInsert.push(itemPayload);
         }
 
         if (!itemsToInsert.length) {
@@ -1323,7 +1351,7 @@ const downloadTemplate = async (req, res) => {
     try {
         // 🧾 Define headers (as the first row)
         const headers = [
-            ["WAGON-NO.", "CHALLAN-DATE", "CHALLAN-NO.", "MATERIAL-DESCRIPTION", "QUANTITY", "SHIP-TO", "VEHICLE", "LOADER", "TRANSPORT", "REMARK"]];
+            ["WAGON-NO.", "CHALLAN-DATE", "CHALLAN-NO.", "MATERIAL-DESCRIPTION", "QUANTITY", "SHIP-TO", "VEHICLE", "LOADER", "TRANSPORT", "REMARK", "DATE"]];
 
         // 📄 Create worksheet from headers
         const worksheet = xlsx.utils.aoa_to_sheet(headers);
