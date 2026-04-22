@@ -415,7 +415,7 @@ const SingleItem = ({ color, item, setView, view }) => {
             </td>
 
             {/* Warehouse */}
-            <td onClick={(e) => e.stopPropagation()}>
+            <td style={{ display: "flex", justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
                 {isEditing ? (
                     <div>
                         {renderDropdownField('warehouse', warehouses)}
@@ -438,11 +438,11 @@ const SingleItem = ({ color, item, setView, view }) => {
 
             <td className={style.actionCell}>
                 {!isEditing ? <div style={{ gap: '0.25rem' }}>
-                    <span onClick={item.marking ? handleOrder : handleInventory} className={style.actionIcon}><FiEye /></span>
-                    <span onClick={handleInventory} className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} /></span>
-                    <span onClick={handleOrder} className={style.actionIcon}><IoCartOutline /></span>
-                    <span onClick={handleEditToggle} className={style.actionIcon}><FiEdit /></span>
-                    <span onClick={handleDelete} className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} /></span>
+                    <span title='Edit Item' onClick={handleEditToggle} className={style.actionIcon}><FiEdit /></span>
+                    <span title={item.marking ? 'View Order' : 'View Item Detail'} onClick={item.marking ? handleOrder : handleInventory} className={style.actionIcon}><FiEye /></span>
+                    <span title={item.marking ? 'Move to Inventory' : 'Update Stock'} onClick={handleInventory} className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} /></span>
+                    <span title='Order' onClick={handleOrder} className={style.actionIcon}><IoCartOutline /></span>
+                    <span title='Delete' onClick={handleDelete} className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} /></span>
                 </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
                     <span className={style.actionIcon}><RxCheck style={{ color: 'green', fontSize: '1.25rem' }} onClick={handleSave} /></span>
                     <span className={style.actionIcon}><RxCross2 style={{ color: 'red', fontSize: '1.25rem' }} onClick={handleCancel} /></span>

@@ -16,6 +16,23 @@ import { useOverlay } from 'hooks/useOverlay';
 import InventoryOptions from 'components/common/Overlay/InventoryOptions';
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { updateListViewListData } from 'slices/itemSlice';
+import { HiSortAscending, HiSortDescending } from "react-icons/hi";
+
+const DEFAULT_FILTERS = {
+    type: '',
+    grade: '',
+    formType: '',
+    width: '',
+    thickness: '',
+    wagonNumber: '',
+    challanNumber: '',
+    challanDate: '',
+    quantity: '',
+    warehouse: '',
+    remaining: '',
+    fromDate: '',
+    toDate: '',
+};
 
 const Items = () => {
     const [items, setItems] = useState([]);
@@ -32,20 +49,10 @@ const Items = () => {
     const [bookingList, setBookingList] = useState(null);
     const [showFilters, setShowFilters] = useState(null);
 
-    const [filters, setFilters] = useState({
-        type: 'Cold Rolled',
-        grade: '',
-        formType: '',
-        width: '',
-        thickness: '',
-        wagonNumber: '',
-        challanNumber: '',
-        challanDate: '',
-        warehouse: '',
-    })
+    const [filters, setFilters] = useState(DEFAULT_FILTERS)
 
     // Track the latest query params so pagination always sends the same filters/search/sort
-    const currentParams = React.useRef({ search: '', filters: null, sortBy: null, order: 'desc' });
+    const currentParams = React.useRef({ search: '', filters: {}, sortBy: null, order: 'desc' });
 
     const dispatch = useDispatch();
 
@@ -110,6 +117,16 @@ const Items = () => {
         getAllItem({ ...currentParams.current, page: prevPageNum }, dispatch);
     }
 
+    const renderSortIcon = (activeSort, columnSort, order) => {
+        if (activeSort !== columnSort) {
+            return null;
+        }
+
+        return order === 'asc'
+            ? <HiSortAscending style={{ marginLeft: '0.35rem', display: 'inline-block', verticalAlign: 'middle' }} />
+            : <HiSortDescending style={{ marginLeft: '0.35rem', display: 'inline-block', verticalAlign: 'middle' }} />;
+    };
+
     return (
         <div className={style.staffContainer}>
             <h3 className={style.heading}>Inventory Items
@@ -138,12 +155,12 @@ const Items = () => {
                         <table className={style.table}>
                             <thead>
                                 <tr>
-                                    <th onClick={() => sortBy('item_id')}>ID</th>
-                                    <th onClick={() => sortBy('challan.challanDate')}>Challan date</th>
-                                    <th onClick={() => sortBy('materialDescription')}>Material Description</th>
-                                    <th onClick={() => sortBy('quantity')}>Quantity</th>
-                                    <th onClick={() => sortBy('available')}>Available</th>
-                                    <th onClick={() => sortBy('warehouse')}>Warehouse</th>
+                                    <th onClick={() => sortBy('item_id')}>ID{renderSortIcon(sortType, 'item_id', order)}</th>
+                                    <th onClick={() => sortBy('challan.challanDate')}>Challan date{renderSortIcon(sortType, 'challan.challanDate', order)}</th>
+                                    <th onClick={() => sortBy('materialDescription')}>Material Description{renderSortIcon(sortType, 'materialDescription', order)}</th>
+                                    <th onClick={() => sortBy('quantity')}>Quantity{renderSortIcon(sortType, 'quantity', order)}</th>
+                                    <th onClick={() => sortBy('available')}>Available{renderSortIcon(sortType, 'available', order)}</th>
+                                    <th onClick={() => sortBy('warehouse')}>Warehouse{renderSortIcon(sortType, 'warehouse', order)}</th>
                                     <th onClick={() => sortBy('remark')}>Remark</th>
                                     <th>Actions</th>
                                 </tr>
@@ -256,8 +273,13 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
             createdAt: data.createdAt,
             updatedAt: data.createdAt,
             marking: data.marking,
-        };
-    }
+            challanDate: data.challanDate,
+            coilNumber: data.coilNumber,
+            vehicleNumber: data.vehicleNumber,
+            transporter: data.transporterName,
+            loader: data.loader
+        }
+    };
     const handleUpdateQuantity = () => {
         const output = convertItem(itemDetail);
 
@@ -266,12 +288,12 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
             data: output,
             onAccept: (updatedItem) => {
                 if (!updatedItem) return;
+
                 setItemDetail((prev) => ({ ...prev, ...updatedItem }));
                 dispatch(updateListViewListData({ updatedItem }))
             }
         })
     };
-
     const handlePreview = () => {
         const output = convertItem(itemDetail);
 
@@ -373,7 +395,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
                         ? renderEditableField('challanDate', 'date', '8rem')
                         : itemDetail.challanDate ? new Date(itemDetail.challanDate).toLocaleDateString() : '-'}
                 </td>
-                <td style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
+                <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
                     <div>
                         {isEditing
                             ? renderDropdownField('thickness', thicknesses)
@@ -428,6 +450,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
 
                 <td className={style.actionCell}>
                     {!isEditing ? <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                        <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} title="Edit Item" /></span>
                         <span className={style.actionIcon} onClick={handlePreview} title="View details">
                             <FiEye />
                         </span>
@@ -435,7 +458,6 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
                             <FaPlus />
                         </span>
                         <IoCartOutline className={style.actionIcon} onClick={handleOrder} style={{ cursor: 'pointer', padding: '0.35rem', height: '30px', width: '30px' }} title="Quick Order" />
-                        <span className={style.actionIcon}><FiEdit onClick={handleEditToggle} title="Edit Item" /></span>
                         {expandedRow === item._id ? (
                             <MdExpandLess className={style.actionIcon} onClick={toggleSubtable} style={{ padding: '0.35rem', height: '30px', width: '30px', cursor: 'pointer' }} title="Hide Bookings" />
                         ) : (
@@ -718,23 +740,16 @@ const Filters = ({ setFilters, showFilters, currentParams, search }) => {
     const [currentType, setCurrentType] = useState('Both');
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
-        defaultValues: {
-            type: 'Cold Rolled',
-            grade: '',
-            formType: '',
-            width: '',
-            thickness: '',
-            wagonNumber: '',
-            challanNumber: '',
-            challanDate: '',
-            quantity: '',
-            warehouse: '',
-        }
+        defaultValues: DEFAULT_FILTERS
     })
 
-    const onSubmit = (filters) => {
+    const onSubmit = (values) => {
+        const filters = Object.fromEntries(
+            Object.entries(values).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+        );
+
         setFilters(filters)
-        const curr = filters.type;
+        const curr = values.type;
         if (curr === '') {
             setCurrentType('Both')
         } else {
@@ -748,12 +763,14 @@ const Filters = ({ setFilters, showFilters, currentParams, search }) => {
     }
 
     const handleReset = () => {
-        reset()
+        reset(DEFAULT_FILTERS)
+        setFilters({})
+        setCurrentType('Both')
         // Clear currentParams ref on reset
         if (currentParams) {
-            currentParams.current = { search: '', filters: null, sortBy: null, order: 'desc' };
+            currentParams.current = { ...currentParams.current, search: search ?? '', filters: {} };
         }
-        getAllItem({ page: 1 }, dispatch);
+        getAllItem({ search: search ?? '', filters: {}, page: 1 }, dispatch);
     }
 
     return <form className={style.formBlock} onChange={handleSubmit(onSubmit)} style={{ height: showFilters ? '12rem' : '0', padding: showFilters ? '1rem' : '0' }}>
@@ -789,7 +806,7 @@ const Filters = ({ setFilters, showFilters, currentParams, search }) => {
                 {...register('grade')}
             >
                 <option value=''>All</option>
-                {grades && grades.map((grade) => ((currentType === 'Both' || currentType === grade.type) &&
+                {grades && grades.map((grade) => ((currentType === 'Both' || grade.type === 'Both' || currentType === grade.type) &&
                     <option key={grade._id} value={grade._id}>
                         {grade.name}
                     </option>
@@ -805,7 +822,7 @@ const Filters = ({ setFilters, showFilters, currentParams, search }) => {
                 {...register('width')}
             >
                 <option value=''>All</option>
-                {widths && widths.map((width) => ((currentType === 'Both' || currentType === width.type) &&
+                {widths && widths.map((width) => ((currentType === 'Both' || width.type === 'Both' || currentType === width.type) &&
                     <option key={width._id} value={width._id}>
                         {width.value || width.name}
                     </option>
@@ -821,7 +838,7 @@ const Filters = ({ setFilters, showFilters, currentParams, search }) => {
                 {...register('thickness')}
             >
                 <option value=''>All</option>
-                {thicknesses && thicknesses.map((thickness) => ((currentType === 'Both' || currentType === thickness.type) &&
+                {thicknesses && thicknesses.map((thickness) => ((currentType === 'Both' || thickness.type === 'Both' || currentType === thickness.type) &&
                     <option key={thickness._id} value={thickness._id}>
                         {thickness.value || thickness.name}
                     </option>
