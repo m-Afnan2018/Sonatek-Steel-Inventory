@@ -17,31 +17,31 @@ const NAV_LINKS = [
   {
     section: 'Overview',
     items: [
-      { to: '/', label: 'Dashboard', icon: <MdOutlineDashboard />, roles: ['admin','inventory_associate','agent','accountant','director'] },
+      { to: '/', label: 'Dashboard', icon: <MdOutlineDashboard />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
     ],
   },
   {
     section: 'Inventory',
     items: [
-      { to: '/manage-upcoming',   label: 'Upcoming',   icon: <MdEvent />,             roles: ['admin','inventory_associate','agent','accountant','director'] },
-      { to: '/manage-inventory',  label: 'Inventory',  icon: <MdOutlineInventory2 />, roles: ['admin','inventory_associate','agent','accountant','director'] },
-      { to: '/manage-varient',    label: 'Variants',   icon: <TbCodeVariablePlus />,  roles: ['admin','director'] },
-      { to: '/manage-warehouses', label: 'Warehouses', icon: <IoLocationOutline />,   roles: ['admin','director'] },
+      { to: '/manage-upcoming', label: 'Upcoming', icon: <MdEvent />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
+      { to: '/manage-inventory', label: 'Inventory', icon: <MdOutlineInventory2 />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
+      { to: '/manage-bookings', label: 'Bookings', icon: <RiShoppingCartLine />, roles: ['admin', 'agent', 'accountant', 'director'] },
+      { to: '/sales-report', label: 'Sales Report', icon: <HiOutlineDocumentReport />, roles: ['admin', 'accountant', 'director'] },
     ],
   },
   {
     section: 'Commerce',
     items: [
-      { to: '/manage-bookings', label: 'Bookings',    icon: <RiShoppingCartLine />,     roles: ['admin','agent','accountant','director'] },
-      { to: '/manage-party',    label: 'Parties',     icon: <PiConfettiLight />,         roles: ['admin','director','accountant'] },
-      { to: '/sales-report',    label: 'Sales Report',icon: <HiOutlineDocumentReport />, roles: ['admin','accountant','director'] },
+      { to: '/manage-warehouses', label: 'Warehouses', icon: <IoLocationOutline />, roles: ['admin', 'director'] },
+      { to: '/manage-varient', label: 'Variants', icon: <TbCodeVariablePlus />, roles: ['admin', 'director'] },
+      { to: '/manage-party', label: 'Parties', icon: <PiConfettiLight />, roles: ['admin', 'director', 'accountant'] },
     ],
   },
   {
     section: 'Admin',
     items: [
-      { to: '/manage-users',   label: 'Users',   icon: <LuUsersRound />,   roles: ['admin','director'] },
-      { to: '/manage-account', label: 'Account', icon: <FaRegUserCircle />, roles: ['admin','inventory_associate','agent','accountant','director'] },
+      { to: '/manage-users', label: 'Users', icon: <LuUsersRound />, roles: ['admin', 'director'] },
+      { to: '/manage-account', label: 'Account', icon: <FaRegUserCircle />, roles: ['admin', 'inventory_associate', 'agent', 'accountant', 'director'] },
     ],
   },
 ];
