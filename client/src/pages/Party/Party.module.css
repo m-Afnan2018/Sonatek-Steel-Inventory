@@ -94,8 +94,8 @@
 
 .formGroup {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .formGroup label {
@@ -123,6 +123,19 @@
 
 .form input::placeholder {
     color: var(--text-muted);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+}
+
+.errorMsg {
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
 }
 
 .formActions {
@@ -250,6 +263,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    position: relative;
 }
 
 .editBtn,

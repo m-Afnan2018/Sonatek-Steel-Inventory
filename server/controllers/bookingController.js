@@ -1300,6 +1300,8 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             shipTo: b.shipTo || "-",
             party: b.partySnapshot?.name || "-",
             owner: b.partySnapshot?.owner || "-",
+            phone: b.partySnapshot?.phone || "-",
+            address: b.partySnapshot?.address || "-",
         }));
 
         res.status(200).json({
@@ -1398,6 +1400,8 @@ const getExcelTablewiseBooking = async (req, res) => {
                     order_id: b.order_id,
                     party: b.partySnapshot?.name || "-",
                     owner: b.partySnapshot?.owner || "-",
+                    phone: b.partySnapshot?.phone || "-",
+                    address: b.partySnapshot?.address || "-",
                     bookedBy: b.bookedBySnapshot?.name,
                     bookingDate: b.bookingDate,
                     form: item.itemSnapshot?.formType || "-",
@@ -1595,9 +1599,8 @@ const getAllPartyDetails = async (req, res) => {
 
 const addParty = async (req, res) => {
     try {
-        const { name, owner } = req.body;
-
-        const party = new Party({ name, owner });
+        const { name, owner, phone, address } = req.body;
+        const party = new Party({ name, owner, phone, address });
 
         const savedParty = await party.save();
         const partyData = { ...savedParty.toObject(), totalBookings: 0 };
@@ -1614,9 +1617,9 @@ const addParty = async (req, res) => {
 
 const updateParty = async (req, res) => {
     try {
-        const { id, name, owner } = req.body;
+        const { id, name, owner, phone, address } = req.body;
 
-        const party = await Party.findByIdAndUpdate(id, { name, owner }, { new: true });
+        const party = await Party.findByIdAndUpdate(id, { name, owner, phone, address }, { new: true });
 
         res.status(200).json({
             success: true,
@@ -1648,6 +1651,8 @@ const getAllBookingsByItem = async (req, res) => {
                 "items.quantity": 1,
                 "partySnapshot.name": 1,
                 "partySnapshot.owner": 1,
+                "partySnapshot.phone": 1,
+                "partySnapshot.address": 1,
                 "bookedBySnapshot.name": 1,
                 bookingDate: 1,
                 shipTo: 1,
@@ -1667,6 +1672,8 @@ const getAllBookingsByItem = async (req, res) => {
                 quantity: b.items?.[0]?.quantity || null,
                 party: b.partySnapshot?.name || null,
                 owner: b.partySnapshot?.owner || null,
+                phone: b.partySnapshot?.phone || null,
+                address: b.partySnapshot?.address || null,
                 bookedBy: b.bookedBySnapshot?.name || null,
                 bookingDate: b.bookingDate,
                 shipTo: b.shipTo || "",
