@@ -1,4 +1,4 @@
-import { apiConnector } from "services/apiConnector";
+import { apiConnector, axiosInstance } from "services/apiConnector";
 import { bookingEndpoints, itemEndpoints } from "services/apis";
 import {
     addBooking,
@@ -427,6 +427,56 @@ export async function createParty(params, dispatch) {
     } catch (err) {
         dispatch(showError({ id: "createParty", message: err?.response?.data?.message || "Failed to add party" }));
         return false;
+    }
+}
+
+export async function downloadPartyTemplate() {
+    try {
+        const token = sessionStorage.getItem('id');
+        const response = await axiosInstance({
+            method: 'GET',
+            url: bookingEndpoints.DOWNLOAD_PARTY_TEMPLATE,
+            responseType: 'blob',
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            withCredentials: true,
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Party-Template.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+export async function importParties(file, dispatch) {
+    try {
+        dispatch(addLoader("importParties"));
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = (await apiConnector('POST', bookingEndpoints.IMPORT_PARTIES, formData)).data;
+
+        if (response.success) {
+            dispatch(setParty(response.parties));
+        }
+
+        dispatch(showSuccess({ id: "importParties", message: response.message }));
+        return response;
+    } catch (err) {
+        dispatch(showError({ id: "importParties", message: err?.response?.data?.message || "Failed to import parties" }));
+        return {
+            success: false,
+            message: err?.response?.data?.message || "Failed to import parties",
+            skippedRows: [],
+        };
     }
 }
 

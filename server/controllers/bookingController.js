@@ -1560,31 +1560,31 @@ const deleteParty = async (req, res) => {
     }
 }
 
+const getPartiesWithBookingCounts = async () => {
+    const parties = await Party.find();
+    const bookingCounts = await Booking.aggregate([
+        {
+            $group: {
+                _id: "$partySnapshot.party_id",
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+
+    const countsMap = bookingCounts.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+    }, {});
+
+    return parties.map(party => ({
+        ...party.toObject(),
+        totalBookings: countsMap[party._id] || 0
+    }));
+};
+
 const getAllPartyDetails = async (req, res) => {
     try {
-        const parties = await Party.find();
-
-        // Count bookings for each party
-        const bookingCounts = await Booking.aggregate([
-            {
-                $group: {
-                    _id: "$partySnapshot.party_id", // change this according to your schema
-                    count: { $sum: 1 }
-                }
-            }
-        ]);
-
-        // Convert aggregation result to a lookup object
-        const countsMap = bookingCounts.reduce((acc, item) => {
-            acc[item._id] = item.count;
-            return acc;
-        }, {});
-
-        // Attach booking count to each party
-        const partiesWithCounts = parties.map(party => ({
-            ...party.toObject(),
-            totalBookings: countsMap[party._id] || 0
-        }));
+        const partiesWithCounts = await getPartiesWithBookingCounts();
 
         res.status(200).json({
             success: true,
@@ -1614,6 +1614,138 @@ const addParty = async (req, res) => {
         errorResponse(res, err);
     }
 }
+
+const normalizeHeader = (value) => String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const normalizeCell = (value) => {
+    if (value === null || value === undefined) return "";
+    return String(value).trim();
+};
+
+const downloadPartyTemplate = async (req, res) => {
+    try {
+        const rows = [
+            ["Party Name", "Owner", "Phone", "Address"],
+            ["ABC Steel Traders", "Rahul Sharma", "9876543210", "Industrial Area, Delhi"],
+        ];
+
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+        worksheet["!cols"] = [
+            { wch: 28 },
+            { wch: 24 },
+            { wch: 18 },
+            { wch: 40 },
+        ];
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Parties");
+
+        const buffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "buffer",
+        });
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", "attachment; filename=party-template.xlsx");
+        res.send(buffer);
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const importParties = async (req, res) => {
+    try {
+        const file = req.files?.file;
+        if (!file) throw customError("Please upload an Excel file", 400);
+
+        const workbook = XLSX.readFile(file.tempFilePath);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+        if (rows.length < 2) {
+            throw customError("The uploaded file does not contain any party rows", 400);
+        }
+
+        const headerIndexes = rows[0].reduce((acc, header, index) => {
+            acc[normalizeHeader(header)] = index;
+            return acc;
+        }, {});
+
+        const getColumnIndex = (...keys) => {
+            for (const key of keys) {
+                if (headerIndexes[key] !== undefined) return headerIndexes[key];
+            }
+            return -1;
+        };
+
+        const columns = {
+            name: getColumnIndex("partyname", "name", "party"),
+            owner: getColumnIndex("owner", "ownername"),
+            phone: getColumnIndex("phone", "phonenumber", "mobile", "mobilenumber"),
+            address: getColumnIndex("address"),
+        };
+
+        if (columns.name === -1) {
+            throw customError("Template must include a Party Name column", 400);
+        }
+
+        const existingParties = await Party.find({}, { owner: 1 });
+        const existingOwners = new Set(existingParties.map((party) => party.owner.trim().toLowerCase()));
+        const fileOwners = new Set();
+        const partiesToCreate = [];
+        const skippedRows = [];
+
+        rows.slice(1).forEach((row, index) => {
+            const rowNumber = index + 2;
+            const name = normalizeCell(row[columns.name]);
+            const owner = columns.owner === -1 ? "" : normalizeCell(row[columns.owner]);
+            const phone = columns.phone === -1 ? "" : normalizeCell(row[columns.phone]).replace(/\D/g, "");
+            const address = columns.address === -1 ? "" : normalizeCell(row[columns.address]);
+            const ownerKey = owner.toLowerCase();
+
+            if (!name && !owner && !phone && !address) return;
+
+            if (!owner) {
+                skippedRows.push({ row: rowNumber, reason: "Party Owner is required" });
+                return;
+            }
+
+            if (phone && !/^\d{10,15}$/.test(phone)) {
+                skippedRows.push({ row: rowNumber, reason: "Phone must contain 10 to 15 digits" });
+                return;
+            }
+
+            if (existingOwners.has(ownerKey) || fileOwners.has(ownerKey)) {
+                skippedRows.push({ row: rowNumber, reason: "Duplicate owner name" });
+                return;
+            }
+
+            fileOwners.add(ownerKey);
+            partiesToCreate.push({ name, owner, phone, address });
+        });
+
+        const createdParties = partiesToCreate.length
+            ? await Party.insertMany(partiesToCreate)
+            : [];
+
+        const partyData = await getPartiesWithBookingCounts();
+
+        res.status(200).json({
+            success: true,
+            message: `Imported ${createdParties.length} parties`,
+            importedCount: createdParties.length,
+            skippedRows,
+            parties: partyData,
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
 
 const updateParty = async (req, res) => {
     try {
@@ -1717,6 +1849,8 @@ module.exports = {
     getAllIncompleteBookingsDetails,
     getAllParty,
     addParty,
+    downloadPartyTemplate,
+    importParties,
     updateParty,
     deleteParty,
     getAllPartyDetails,

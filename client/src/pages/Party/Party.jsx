@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import style from "./Party.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
     getAllPartyDetails,
     createParty,
+    downloadPartyTemplate,
     editParty,
+    importParties,
     removeParty,
 } from "services/operations/bookingAPI";
-import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDownload, FiUpload } from "react-icons/fi";
 
 const Party = () => {
     // ── Local State ────
@@ -21,6 +23,9 @@ const Party = () => {
     const [newPhone, setNewPhone] = useState("");
     const [newAddress, setNewAddress] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [importing, setImporting] = useState(false);
+    const [importResult, setImportResult] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Inline edit
     const [editingId, setEditingId] = useState(null);
@@ -142,6 +147,37 @@ const Party = () => {
         setSubmitting(false);
     };
 
+    const handleDownloadTemplate = async () => {
+        setFormError("");
+        const ok = await downloadPartyTemplate();
+        if (!ok) setFormError("Unable to download party template");
+    };
+
+    const handleImportClick = () => {
+        setFormError("");
+        setImportResult(null);
+        fileInputRef.current?.click();
+    };
+
+    const handleImportFile = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+
+        const isExcelFile = /\.(xlsx|xls|csv)$/i.test(file.name);
+        if (!isExcelFile) {
+            setFormError("Please upload an .xlsx, .xls, or .csv file");
+            return;
+        }
+
+        setImporting(true);
+        setFormError("");
+        const result = await importParties(file, dispatch);
+        setImportResult(result);
+        if (!result.success) setFormError(result.message);
+        setImporting(false);
+    };
+
     return (
         <div className={style.Warehouse}>
             <h2>Manage Parties</h2>
@@ -170,10 +206,62 @@ const Party = () => {
                             Add Party
                         </button>
                     )}
+                    <button
+                        className={style.secondaryBtn}
+                        onClick={handleDownloadTemplate}
+                        type="button"
+                    >
+                        <FiDownload style={{ marginRight: "6px" }} />
+                        Template
+                    </button>
+                    <button
+                        className={style.addBtn}
+                        onClick={handleImportClick}
+                        type="button"
+                        disabled={importing}
+                    >
+                        <FiUpload style={{ marginRight: "6px" }} />
+                        {importing ? "Importing..." : "Import Excel"}
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        className={style.fileInput}
+                        onChange={handleImportFile}
+                    />
                 </div>
             </div>
 
+            {importResult?.success && (
+                <div className={style.importSummary}>
+                    <strong>{importResult.importedCount || 0} parties imported.</strong>
+                    {importResult.skippedRows?.length > 0 && (
+                        <span>
+                            {" "}
+                            {importResult.skippedRows.length} rows skipped. First issue:
+                            row {importResult.skippedRows[0].row} - {importResult.skippedRows[0].reason}
+                        </span>
+                    )}
+                    {!importing && (
+                        <button
+                            className={style.importCloseBtn}
+                            onClick={() => {
+                                setImportResult(null);
+                            }}
+                            type="button"
+                        >
+                            <FiX />
+                        </button>
+                    )}
+                </div>
+            )}
+
             {/* ── Add Form ── */}
+            {formError && !showForm && (
+                <p className={style.errorMsg}>{formError}</p>
+            )}
+
             {showForm && (
                 <form className={style.form} onSubmit={handleCreate}>
                     <div className={style.formGrid}>
