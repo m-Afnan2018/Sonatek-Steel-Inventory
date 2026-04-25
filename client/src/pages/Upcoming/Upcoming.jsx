@@ -440,7 +440,7 @@ const SingleItem = ({ color, item, setView, view }) => {
                 {!isEditing ? <div style={{ gap: '0.25rem' }}>
                     <span title='Edit Item' onClick={handleEditToggle} className={style.actionIcon}><FiEdit /></span>
                     <span title={item.marking ? 'View Order' : 'View Item Detail'} onClick={item.marking ? handleOrder : handleInventory} className={style.actionIcon}><FiEye /></span>
-                    <span title={item.marking ? 'Move to Inventory' : 'Update Stock'} onClick={handleInventory} className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} /></span>
+                    <span title={item.marking ? 'Move to Inventory' : 'Update Inventory'} onClick={handleInventory} className={style.actionIcon}><MdOutlineWarehouse style={{ cursor: item.marking ? 'not-allowed' : 'pointer' }} /></span>
                     <span title='Order' onClick={handleOrder} className={style.actionIcon}><IoCartOutline /></span>
                     <span title='Delete' onClick={handleDelete} className={style.actionIcon}><FaRegTrashCan style={{ color: 'red' }} /></span>
                 </div> : <div style={{ gap: '0.5rem', display: 'flex' }}>
