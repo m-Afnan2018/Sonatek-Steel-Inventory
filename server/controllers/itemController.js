@@ -223,12 +223,22 @@ const getAllItem = async (req, res) => {
 
         // 🔍 Search
         if (search) {
+            const numericSearch = Number(search);
             query.$or = [
                 { type: { $regex: search, $options: "i" } },
                 { wagonNumber: { $regex: search, $options: "i" } },
                 { formType: { $regex: search, $options: "i" } },
                 { "challan.challanNumber": { $regex: search, $options: "i" } },
             ];
+
+            // If the search term is a valid number, also match quantity fields
+            if (!isNaN(numericSearch) && search.trim() !== '') {
+                query.$or.push(
+                    { quantity: numericSearch },
+                    { originalQuantity: numericSearch },
+                    { item_id: numericSearch },
+                );
+            }
         }
 
         // 🎯 Filters
