@@ -17,11 +17,13 @@ const Party = () => {
     // Add form
     const [showForm, setShowForm] = useState(false);
     const [newName, setNewName] = useState("");
+    const [newOwner, setNewOwner] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
     // Inline edit
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState("");
+    const [editOwner, setEditOwner] = useState("");
 
     // Delete confirmation
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
@@ -44,7 +46,8 @@ const Party = () => {
         const q = search.trim().toLowerCase();
         if (!q) return parties ?? [];
         return (parties ?? []).filter((p) =>
-            (p.name || "").toLowerCase().includes(q)
+            (p.name || "").toLowerCase().includes(q) ||
+            (p.owner || "").toLowerCase().includes(q)
         );
     }, [parties, search]);
 
@@ -53,9 +56,10 @@ const Party = () => {
         e.preventDefault();
         if (!newName.trim()) return;
         setSubmitting(true);
-        const ok = await createParty({ name: newName.trim() }, dispatch);
+        const ok = await createParty({ name: newName.trim(), owner: newOwner.trim() }, dispatch);
         if (ok) {
             setNewName("");
+            setNewOwner("");
             setShowForm(false);
         }
         setSubmitting(false);
@@ -65,20 +69,23 @@ const Party = () => {
     const startEdit = (party) => {
         setEditingId(party._id);
         setEditName(party.name);
+        setEditOwner(party.owner || "");
         setConfirmDeleteId(null);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
         setEditName("");
+        setEditOwner("");
     };
 
     const saveEdit = async (id) => {
         if (!editName.trim()) return;
         setSubmitting(true);
-        await editParty({ id, name: editName.trim() }, dispatch);
+        await editParty({ id, name: editName.trim(), owner: editOwner.trim() }, dispatch);
         setEditingId(null);
         setEditName("");
+        setEditOwner("");
         setSubmitting(false);
     };
 
@@ -129,14 +136,24 @@ const Party = () => {
             {/* ── Add Form ── */}
             {showForm && (
                 <form className={style.form} onSubmit={handleCreate}>
-                    <div className={style.formRow}>
+                    <div className={style.formGroup}>
+                        <label>Party Name</label>
                         <input
                             type="text"
-                            placeholder="Party Name"
+                            placeholder="Enter party name"
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             required
                             autoFocus
+                        />
+                    </div>
+                    <div className={style.formGroup}>
+                        <label>Owner</label>
+                        <input
+                            type="text"
+                            placeholder="Enter owner name"
+                            value={newOwner}
+                            onChange={(e) => setNewOwner(e.target.value)}
                         />
                     </div>
                     <div className={style.formActions}>
@@ -148,6 +165,7 @@ const Party = () => {
                             onClick={() => {
                                 setShowForm(false);
                                 setNewName("");
+                                setNewOwner("");
                             }}
                         >
                             Cancel
@@ -166,6 +184,7 @@ const Party = () => {
                             <tr>
                                 <th style={{ width: "2rem" }}>#</th>
                                 <th>Name</th>
+                                <th>Owner</th>
                                 <th style={{ width: "6rem" }}>Total Bookings</th>
                                 <th style={{ width: "10rem" }}>Actions</th>
                             </tr>
@@ -173,7 +192,7 @@ const Party = () => {
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className={style.noData}>
+                                    <td colSpan={5} className={style.noData}>
                                         No parties found
                                     </td>
                                 </tr>
@@ -187,7 +206,7 @@ const Party = () => {
                                             </td>
 
                                             {/* Name — inline edit */}
-                                            <td>
+                                             <td>
                                                 {editingId === party._id ? (
                                                     <input
                                                         className={style.inlineInput}
@@ -200,6 +219,23 @@ const Party = () => {
                                                 ) : (
                                                     <span className={style.cellPrimary}>
                                                         {party.name || "—"}
+                                                    </span>
+                                                )}
+                                            </td>
+
+                                            {/* Owner — inline edit */}
+                                            <td>
+                                                {editingId === party._id ? (
+                                                    <input
+                                                        className={style.inlineInput}
+                                                        value={editOwner}
+                                                        onChange={(e) =>
+                                                            setEditOwner(e.target.value)
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <span className={style.cellPrimary}>
+                                                        {party.owner || "—"}
                                                     </span>
                                                 )}
                                             </td>

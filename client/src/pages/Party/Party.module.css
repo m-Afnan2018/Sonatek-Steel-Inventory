@@ -82,30 +82,43 @@
 /* Form */
 .form {
     margin: 1rem 0 1.25rem;
-    padding: 12px;
+    padding: 16px;
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.formRow {
+.formGroup {
     display: flex;
-    flex: 1;
-    gap: 12px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
 }
 
-.form input {
+.formGroup label {
+    min-width: 120px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.formGroup input {
+    flex: 1;
     padding: 10px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--bg-elevated);
     color: var(--text-primary);
-    min-width: 190px;
     font-size: 14px;
+    outline: none;
+}
+
+.formGroup input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
 }
 
 .form input::placeholder {

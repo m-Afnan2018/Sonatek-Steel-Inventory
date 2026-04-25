@@ -867,6 +867,7 @@ const getAllBookingsDetails = async (req, res) => {
         // Fetch all bookings with related details populated
         let bookings = await Booking.find(query)
             .populate("bookedBy", "firstName lastName email role")
+            .populate("party")
             .populate({
                 path: "items.item",
                 select: "type formType grade thickness width wagonNumber challan quantity currentStatus",
@@ -938,6 +939,7 @@ const getAllIncompleteBookingsDetails = async (req, res) => {
         // Fetch all bookings with related details populated
         let bookings = await Booking.find(query)
             .populate("bookedBy", "firstName lastName email role")
+            .populate("party")
             .populate({
                 path: "items.item",
                 select: "type formType grade thickness width wagonNumber challan quantity currentStatus",
@@ -1297,6 +1299,7 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             reason: b.reason || "-",
             shipTo: b.shipTo || "-",
             party: b.partySnapshot?.name || "-",
+            owner: b.partySnapshot?.owner || "-",
         }));
 
         res.status(200).json({
@@ -1394,6 +1397,7 @@ const getExcelTablewiseBooking = async (req, res) => {
                 let temp = {
                     order_id: b.order_id,
                     party: b.partySnapshot?.name || "-",
+                    owner: b.partySnapshot?.owner || "-",
                     bookedBy: b.bookedBySnapshot?.name,
                     bookingDate: b.bookingDate,
                     form: item.itemSnapshot?.formType || "-",
@@ -1591,9 +1595,9 @@ const getAllPartyDetails = async (req, res) => {
 
 const addParty = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, owner } = req.body;
 
-        const party = new Party({ name });
+        const party = new Party({ name, owner });
 
         const savedParty = await party.save();
         const partyData = { ...savedParty.toObject(), totalBookings: 0 };
@@ -1610,9 +1614,9 @@ const addParty = async (req, res) => {
 
 const updateParty = async (req, res) => {
     try {
-        const { id, name } = req.body;
+        const { id, name, owner } = req.body;
 
-        const party = await Party.findByIdAndUpdate(id, { name }, { new: true });
+        const party = await Party.findByIdAndUpdate(id, { name, owner }, { new: true });
 
         res.status(200).json({
             success: true,
@@ -1643,6 +1647,7 @@ const getAllBookingsByItem = async (req, res) => {
                 "items.formType": 1,
                 "items.quantity": 1,
                 "partySnapshot.name": 1,
+                "partySnapshot.owner": 1,
                 "bookedBySnapshot.name": 1,
                 bookingDate: 1,
                 shipTo: 1,
@@ -1661,6 +1666,7 @@ const getAllBookingsByItem = async (req, res) => {
                 formType: b.items?.[0]?.formType || null,
                 quantity: b.items?.[0]?.quantity || null,
                 party: b.partySnapshot?.name || null,
+                owner: b.partySnapshot?.owner || null,
                 bookedBy: b.bookedBySnapshot?.name || null,
                 bookingDate: b.bookingDate,
                 shipTo: b.shipTo || "",

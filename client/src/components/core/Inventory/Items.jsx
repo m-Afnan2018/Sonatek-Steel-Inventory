@@ -401,7 +401,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
                     <div>
                         {isEditing
                             ? renderEditableField('challanNumber', 'text', '8rem')
-                            : <span style={{ width: '3rem' }}>{itemDetail.challanNumber}</span>}
+                            : itemDetail?.challanNumber ? <span style={{ width: '3rem' }}>{itemDetail.challanNumber}</span> : '-'}
                     </div>
                 </td>
                 <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>

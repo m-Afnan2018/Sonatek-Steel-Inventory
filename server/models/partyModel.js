@@ -6,6 +6,10 @@ const partySchema = new mongoose.Schema({
         required: true,
         default: '',
     },
+    owner: {
+        type: String,
+        default: '',
+    },
     createdAt: {
         type: Date,
         default: Date.now
