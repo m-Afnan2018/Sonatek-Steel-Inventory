@@ -1,6 +1,6 @@
 const express = require('express');
 const { authentication } = require('../middlewares/authentication');
-const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark, getAllPartyDetails, createBookingFromUpcoming, getAllBookingsByItem, createBookingFromInventory, addParty, updateParty } = require('../controllers/bookingController')
+const { createBooking, updateBooking, getAllBookings, searchOptions, getMyBookings, getBooking, deleteBooking, confirmBooking, deliverBooking, cancelBooking, getAllBookingsDetails, getExcelBooking, shippedBooking, getAllBookingDetailsTablewise, getExcelTablewiseBooking, getAllIncompleteBookingsDetails, getAllParty, deleteParty, updateRemark, getAllPartyDetails, createBookingFromUpcoming, getAllBookingsByItem, createBookingFromInventory, addParty, updateParty, downloadPartyTemplate, importParties } = require('../controllers/bookingController')
 const { inventoryAccess, agentAccess, accountantAccess, directorAccess } = require('../middlewares/authorization');
 const router = express.Router();
 
@@ -29,6 +29,8 @@ router.post('/getAllBookingsByItem', authentication, getAllBookingsByItem)
 router.get('/getAllParty', authentication, getAllParty);
 router.get('/getAllPartyDetails', authentication, getAllPartyDetails);
 router.post('/addParty', authentication, agentAccess, addParty);
+router.get('/downloadPartyTemplate', authentication, agentAccess, downloadPartyTemplate);
+router.post('/importParties', authentication, agentAccess, importParties);
 router.patch('/updateParty', authentication, agentAccess, updateParty);
 router.delete('/deleteParty', authentication, directorAccess, deleteParty);
 

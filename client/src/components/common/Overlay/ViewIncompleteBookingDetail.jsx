@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import style from './Overlay.module.css'
 import { RxCross2 } from "react-icons/rx";
 
@@ -8,6 +8,15 @@ const ViewIncompleteBookingDetail = ({ data,
     ship,
     deliver,
     userData, close }) => {
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                close?.();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [close]);
     if (!data) return null;
 
     const bookedBy = data.bookedBy || {};
@@ -61,6 +70,9 @@ const ViewIncompleteBookingDetail = ({ data,
                         <p><strong>Quantity:</strong> {data.quantity?.toFixed(3)}</p>
                         <p><strong>Booked At:</strong> {new Date(data.bookingDate).toLocaleString()}</p>
                         <p><strong>Party:</strong> {data.partySnapshot?.name}</p>
+                        <p><strong>Owner:</strong> {data.partySnapshot?.owner || data.party?.owner || 'NULL'}</p>
+                        <p><strong>Phone:</strong> {data.partySnapshot?.phone || data.party?.phone || 'N/A'}</p>
+                        <p><strong>Address:</strong> {data.partySnapshot?.address || data.party?.address || 'N/A'}</p>
                         <p><strong>Ship To:</strong> {data.shipTo || 'NA'}</p>
                     </div>
 

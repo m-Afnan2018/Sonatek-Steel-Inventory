@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import style from "./Party.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
     getAllPartyDetails,
     createParty,
+    downloadPartyTemplate,
     editParty,
+    importParties,
     removeParty,
 } from "services/operations/bookingAPI";
-import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiCheck, FiX, FiPlus, FiDownload, FiUpload } from "react-icons/fi";
 
 const Party = () => {
     // ── Local State ────
@@ -17,14 +19,26 @@ const Party = () => {
     // Add form
     const [showForm, setShowForm] = useState(false);
     const [newName, setNewName] = useState("");
+    const [newOwner, setNewOwner] = useState("");
+    const [newPhone, setNewPhone] = useState("");
+    const [newAddress, setNewAddress] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [importing, setImporting] = useState(false);
+    const [importResult, setImportResult] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Inline edit
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState("");
+    const [editOwner, setEditOwner] = useState("");
+    const [editPhone, setEditPhone] = useState("");
+    const [editAddress, setEditAddress] = useState("");
 
     // Delete confirmation
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+    // Error state
+    const [formError, setFormError] = useState("");
 
     // ── Redux ─────
     const { parties } = useSelector((state) => state.booking);
@@ -44,18 +58,34 @@ const Party = () => {
         const q = search.trim().toLowerCase();
         if (!q) return parties ?? [];
         return (parties ?? []).filter((p) =>
-            (p.name || "").toLowerCase().includes(q)
+            (p.name || "").toLowerCase().includes(q) ||
+            (p.owner || "").toLowerCase().includes(q) ||
+            (p.phone || "").toLowerCase().includes(q) ||
+            (p.address || "").toLowerCase().includes(q)
         );
     }, [parties, search]);
 
     // ── Handlers: Create ─────
     const handleCreate = async (e) => {
         e.preventDefault();
+        setFormError("");
         if (!newName.trim()) return;
+        if (newPhone && !/^\d{10,15}$/.test(newPhone)) {
+            setFormError("Please enter a valid phone number");
+            return;
+        }
         setSubmitting(true);
-        const ok = await createParty({ name: newName.trim() }, dispatch);
+        const ok = await createParty({
+            name: newName.trim(),
+            owner: newOwner.trim(),
+            phone: newPhone.trim(),
+            address: newAddress.trim()
+        }, dispatch);
         if (ok) {
             setNewName("");
+            setNewOwner("");
+            setNewPhone("");
+            setNewAddress("");
             setShowForm(false);
         }
         setSubmitting(false);
@@ -65,20 +95,42 @@ const Party = () => {
     const startEdit = (party) => {
         setEditingId(party._id);
         setEditName(party.name);
+        setEditOwner(party.owner || "");
+        setEditPhone(party.phone || "");
+        setEditAddress(party.address || "");
         setConfirmDeleteId(null);
+        setFormError("");
     };
 
     const cancelEdit = () => {
         setEditingId(null);
         setEditName("");
+        setEditOwner("");
+        setEditPhone("");
+        setEditAddress("");
+        setFormError("");
     };
 
     const saveEdit = async (id) => {
+        setFormError("");
         if (!editName.trim()) return;
+        if (editPhone && !/^\d{10,15}$/.test(editPhone)) {
+            setFormError("Please enter a valid phone number");
+            return;
+        }
         setSubmitting(true);
-        await editParty({ id, name: editName.trim() }, dispatch);
+        await editParty({
+            id,
+            name: editName.trim(),
+            owner: editOwner.trim(),
+            phone: editPhone.trim(),
+            address: editAddress.trim()
+        }, dispatch);
         setEditingId(null);
         setEditName("");
+        setEditOwner("");
+        setEditPhone("");
+        setEditAddress("");
         setSubmitting(false);
     };
 
@@ -93,6 +145,37 @@ const Party = () => {
         await removeParty({ id }, dispatch);
         setConfirmDeleteId(null);
         setSubmitting(false);
+    };
+
+    const handleDownloadTemplate = async () => {
+        setFormError("");
+        const ok = await downloadPartyTemplate();
+        if (!ok) setFormError("Unable to download party template");
+    };
+
+    const handleImportClick = () => {
+        setFormError("");
+        setImportResult(null);
+        fileInputRef.current?.click();
+    };
+
+    const handleImportFile = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+
+        const isExcelFile = /\.(xlsx|xls|csv)$/i.test(file.name);
+        if (!isExcelFile) {
+            setFormError("Please upload an .xlsx, .xls, or .csv file");
+            return;
+        }
+
+        setImporting(true);
+        setFormError("");
+        const result = await importParties(file, dispatch);
+        setImportResult(result);
+        if (!result.success) setFormError(result.message);
+        setImporting(false);
     };
 
     return (
@@ -123,22 +206,109 @@ const Party = () => {
                             Add Party
                         </button>
                     )}
+                    <button
+                        className={style.secondaryBtn}
+                        onClick={handleDownloadTemplate}
+                        type="button"
+                    >
+                        <FiDownload style={{ marginRight: "6px" }} />
+                        Template
+                    </button>
+                    <button
+                        className={style.addBtn}
+                        onClick={handleImportClick}
+                        type="button"
+                        disabled={importing}
+                    >
+                        <FiUpload style={{ marginRight: "6px" }} />
+                        {importing ? "Importing..." : "Import Excel"}
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".xlsx,.xls,.csv"
+                        className={style.fileInput}
+                        onChange={handleImportFile}
+                    />
                 </div>
             </div>
 
+            {importResult?.success && (
+                <div className={style.importSummary}>
+                    <strong>{importResult.importedCount || 0} parties imported.</strong>
+                    {importResult.skippedRows?.length > 0 && (
+                        <span>
+                            {" "}
+                            {importResult.skippedRows.length} rows skipped. First issue:
+                            row {importResult.skippedRows[0].row} - {importResult.skippedRows[0].reason}
+                        </span>
+                    )}
+                    {!importing && (
+                        <button
+                            className={style.importCloseBtn}
+                            onClick={() => {
+                                setImportResult(null);
+                            }}
+                            type="button"
+                        >
+                            <FiX />
+                        </button>
+                    )}
+                </div>
+            )}
+
             {/* ── Add Form ── */}
+            {formError && !showForm && (
+                <p className={style.errorMsg}>{formError}</p>
+            )}
+
             {showForm && (
                 <form className={style.form} onSubmit={handleCreate}>
-                    <div className={style.formRow}>
-                        <input
-                            type="text"
-                            placeholder="Party Name"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                            required
-                            autoFocus
-                        />
+                    <div className={style.formGrid}>
+                        <div className={style.formGroup}>
+                            <label>Party Name</label>
+                            <input
+                                type="text"
+                                placeholder="Enter party name"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                required
+                                autoFocus
+                            />
+                        </div>
+                        <div className={style.formGroup}>
+                            <label>Owner</label>
+                            <input
+                                type="text"
+                                placeholder="Enter owner name"
+                                value={newOwner}
+                                onChange={(e) => setNewOwner(e.target.value)}
+                            />
+                        </div>
+                        <div className={style.formGroup}>
+                            <label>Phone</label>
+                            <input
+                                type="tel"
+                                placeholder="Phone number"
+                                value={newPhone}
+                                onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, '').slice(0, 15))}
+                                pattern="[0-9]{10,15}"
+                                maxLength="15"
+                            />
+                        </div>
+                        <div className={style.formGroup}>
+                            <label>Address</label>
+                            <input
+                                type="text"
+                                placeholder="Enter address"
+                                value={newAddress}
+                                onChange={(e) => setNewAddress(e.target.value)}
+                            />
+                        </div>
                     </div>
+
+                    {formError && <p className={style.errorMsg}>{formError}</p>}
+
                     <div className={style.formActions}>
                         <button type="submit" disabled={submitting}>
                             {submitting ? "Saving…" : "Add"}
@@ -148,6 +318,10 @@ const Party = () => {
                             onClick={() => {
                                 setShowForm(false);
                                 setNewName("");
+                                setNewOwner("");
+                                setNewPhone("");
+                                setNewAddress("");
+                                setFormError("");
                             }}
                         >
                             Cancel
@@ -166,6 +340,9 @@ const Party = () => {
                             <tr>
                                 <th style={{ width: "2rem" }}>#</th>
                                 <th>Name</th>
+                                <th>Owner</th>
+                                <th>Phone</th>
+                                <th>Address</th>
                                 <th style={{ width: "6rem" }}>Total Bookings</th>
                                 <th style={{ width: "10rem" }}>Actions</th>
                             </tr>
@@ -173,7 +350,7 @@ const Party = () => {
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className={style.noData}>
+                                    <td colSpan={7} className={style.noData}>
                                         No parties found
                                     </td>
                                 </tr>
@@ -204,6 +381,60 @@ const Party = () => {
                                                 )}
                                             </td>
 
+                                            {/* Owner — inline edit */}
+                                            <td>
+                                                {editingId === party._id ? (
+                                                    <input
+                                                        className={style.inlineInput}
+                                                        value={editOwner}
+                                                        onChange={(e) =>
+                                                            setEditOwner(e.target.value)
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <span className={style.cellPrimary}>
+                                                        {party.owner || "—"}
+                                                    </span>
+                                                )}
+                                            </td>
+
+                                            {/* Phone — inline edit */}
+                                            <td>
+                                                {editingId === party._id ? (
+                                                    <input
+                                                        type="tel"
+                                                        className={style.inlineInput}
+                                                        value={editPhone}
+                                                        onChange={(e) =>
+                                                            setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 15))
+                                                        }
+                                                        pattern="[0-9]{10,15}"
+                                                        maxLength="15"
+                                                    />
+                                                ) : (
+                                                    <span className={style.cellPrimary}>
+                                                        {party.phone || "—"}
+                                                    </span>
+                                                )}
+                                            </td>
+
+                                            {/* Address — inline edit */}
+                                            <td>
+                                                {editingId === party._id ? (
+                                                    <input
+                                                        className={style.inlineInput}
+                                                        value={editAddress}
+                                                        onChange={(e) =>
+                                                            setEditAddress(e.target.value)
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <span className={style.cellPrimary}>
+                                                        {party.address || "—"}
+                                                    </span>
+                                                )}
+                                            </td>
+
                                             {/* Booking Count */}
                                             <td className={style.center}>
                                                 {party.totalBookings ?? 0}
@@ -229,6 +460,7 @@ const Party = () => {
                                                         >
                                                             <FiX />
                                                         </button>
+                                                        {formError && <span className={style.errorMsg} style={{ position: 'absolute', bottom: '-15px', right: '14px', whiteSpace: 'nowrap' }}>{formError}</span>}
                                                     </div>
                                                 ) : confirmDeleteId === party._id ? (
                                                     /* Delete confirmation */

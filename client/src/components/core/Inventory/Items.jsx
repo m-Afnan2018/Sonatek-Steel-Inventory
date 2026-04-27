@@ -136,7 +136,7 @@ const Items = () => {
             <form onSubmit={onSearch} className={style.searchForm}>
                 <input
                     type="text"
-                    placeholder="Search bookings..."
+                    placeholder="Search Bookings..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className={style.searchInput}
@@ -157,6 +157,7 @@ const Items = () => {
                                 <tr>
                                     <th onClick={() => sortBy('item_id')}>ID{renderSortIcon(sortType, 'item_id', order)}</th>
                                     <th onClick={() => sortBy('challan.challanDate')}>Challan date{renderSortIcon(sortType, 'challan.challanDate', order)}</th>
+                                    <th onClick={() => sortBy('challan.challanNumber')}>Challan No.{renderSortIcon(sortType, 'challan.challanNumber', order)}</th>
                                     <th onClick={() => sortBy('materialDescription')}>Material Description{renderSortIcon(sortType, 'materialDescription', order)}</th>
                                     <th onClick={() => sortBy('quantity')}>Quantity{renderSortIcon(sortType, 'quantity', order)}</th>
                                     <th onClick={() => sortBy('available')}>Available{renderSortIcon(sortType, 'available', order)}</th>
@@ -274,6 +275,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
             updatedAt: data.createdAt,
             marking: data.marking,
             challanDate: data.challanDate,
+            challanNumber: data.challanNumber,
             coilNumber: data.coilNumber,
             vehicleNumber: data.vehicleNumber,
             transporter: data.transporterName,
@@ -394,6 +396,13 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
                     {isEditing
                         ? renderEditableField('challanDate', 'date', '8rem')
                         : itemDetail.challanDate ? new Date(itemDetail.challanDate).toLocaleDateString() : '-'}
+                </td>
+                <td onClick={(e) => e.stopPropagation()}>
+                    <div>
+                        {isEditing
+                            ? renderEditableField('challanNumber', 'text', '8rem')
+                            : itemDetail?.challanNumber ? <span style={{ width: '3rem' }}>{itemDetail.challanNumber}</span> : '-'}
+                    </div>
                 </td>
                 <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
                     <div>

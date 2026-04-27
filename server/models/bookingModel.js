@@ -97,6 +97,15 @@ const partySnapshotSchema = new mongoose.Schema({
     },
     party_id: {
         type: mongoose.Schema.Types.ObjectId
+    },
+    owner: {
+        type: String,
+    },
+    phone: {
+        type: String,
+    },
+    address: {
+        type: String,
     }
 }, { _id: false })
 
@@ -243,6 +252,9 @@ bookingSchema.statics.makePartySnapshot = function (partyDoc) {
     return {
         party_id: partyDoc._id || null,
         name: partyDoc.name || null,
+        owner: partyDoc.owner || null,
+        phone: partyDoc.phone || null,
+        address: partyDoc.address || null,
     };
 }
 

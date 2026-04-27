@@ -64,6 +64,8 @@ export const bookingEndpoints = {
     GET_ALL_PARTY: `${BASE_URL}/booking/getAllParty`,
     GET_ALL_PARTY_DETAILS: `${BASE_URL}/booking/getAllPartyDetails`,
     ADD_PARTY: `${BASE_URL}/booking/addParty`,
+    DOWNLOAD_PARTY_TEMPLATE: `${BASE_URL}/booking/downloadPartyTemplate`,
+    IMPORT_PARTIES: `${BASE_URL}/booking/importParties`,
     UPDATE_PARTY: `${BASE_URL}/booking/updateParty`,
     DELETE_PARTY: `${BASE_URL}/booking/deleteParty`,
 }

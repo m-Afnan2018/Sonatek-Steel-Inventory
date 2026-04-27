@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useActiveTheme } from "hooks/useActiveTheme";
 import style from "./Upcoming.module.css";
 import { useForm, Controller } from "react-hook-form";
@@ -22,6 +22,7 @@ const AddForm = () => {
     const { register, handleSubmit, control, setFocus, watch, setValue } = useForm({
         defaultValues: {
             type: 'Cold Rolled',
+            size: null,
             thickness: null,
             width: null,
             grade: null,
@@ -62,7 +63,7 @@ const AddForm = () => {
         });
 
         if (isDuplicate) {
-            toast.error("This item already exists in the upcoming list");
+            toast.success("This item already exists in the upcoming list");
         }
 
         addItem(formattedData, dispatch);
@@ -78,12 +79,30 @@ const AddForm = () => {
         })) || [];
     }
 
-    const typeOption = [
-        {
-            label: 'CR',
-            value: 'Cold Rolled'
-        }
-    ]
+    const sizeOptions = useMemo(() => {
+        const filteredThicknesses = thicknesses?.filter(t => t.type === type || t.type === 'Both') || [];
+        const filteredWidths = widths?.filter(w => w.type === type || w.type === 'Both') || [];
+
+        return filteredThicknesses.flatMap((thickness) =>
+            filteredWidths.map((width) => {
+                const thicknessLabel = thickness.name || thickness.value;
+                const widthLabel = width.name || width.value;
+
+                return {
+                    label: `${thicknessLabel} X ${widthLabel}`,
+                    value: `${thickness._id}-${width._id}`,
+                    thickness: {
+                        label: thicknessLabel,
+                        value: thickness._id,
+                    },
+                    width: {
+                        label: widthLabel,
+                        value: width._id,
+                    },
+                };
+            })
+        );
+    }, [thicknesses, widths, type]);
 
     const handleKeyDown = (e, prevField, nextField) => {
         if (e.key === "Enter") {
@@ -227,16 +246,16 @@ const AddForm = () => {
                     style={{ width: '100%', height: '2rem' }}
                     type="date"
                     {...register("date")}
-                    onKeyDown={(e) => handleKeyDown(e, null, 'thickness')}
+                    onKeyDown={(e) => handleKeyDown(e, null, 'size')}
                 />
             </div>
 
 
 
-            {/* Thickness */}
-            <div>
+            {/* Size */}
+            <div style={{ width: '14rem' }}>
                 <Controller
-                    name="thickness"
+                    name="size"
                     control={control}
                     render={({ field }) => (
                         <Select
@@ -246,31 +265,15 @@ const AddForm = () => {
 
                             }}
                             {...field}
-                            options={toOptions(thicknesses?.filter(t => t.type === type || t.type === 'Both'))}
+                            options={sizeOptions}
                             value={field.value}
-                            onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, thicknesses, 'date', "width")}
-                            placeholder="Thickness"
-                            styles={customStyles}
-                            isSearchable
-                        />
-                    )}
-                />
-            </div>
-
-            {/* Width */}
-            <div >
-                <Controller
-                    name="width"
-                    control={control}
-                    render={({ field }) => (
-                        <Select
-                            {...field}
-                            options={toOptions(widths?.filter(w => w.type === type || w.type === 'Both'))}
-                            value={field.value}
-                            onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, widths, "thickness", "grade")}
-                            placeholder="Width"
+                            onChange={(option) => {
+                                field.onChange(option);
+                                setValue("thickness", option?.thickness || null);
+                                setValue("width", option?.width || null);
+                            }}
+                            onKeyDown={(e) => handleSelectEnter(e, field, sizeOptions, 'date', "grade")}
+                            placeholder="Thickness X Width"
                             styles={customStyles}
                             isSearchable
                         />
@@ -289,7 +292,7 @@ const AddForm = () => {
                             options={toOptions(grades?.filter(g => g.type === type || g.type === 'Both'))}
                             value={field.value}
                             onChange={(option) => field.onChange(option)}
-                            onKeyDown={(e) => handleSelectEnter(e, field, grades, "width", "quantity")}
+                            onKeyDown={(e) => handleSelectEnter(e, field, grades, "size", "quantity")}
                             placeholder="Grade"
                             styles={customStyles}
                             isSearchable

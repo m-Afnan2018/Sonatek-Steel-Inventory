@@ -867,6 +867,7 @@ const getAllBookingsDetails = async (req, res) => {
         // Fetch all bookings with related details populated
         let bookings = await Booking.find(query)
             .populate("bookedBy", "firstName lastName email role")
+            .populate("party")
             .populate({
                 path: "items.item",
                 select: "type formType grade thickness width wagonNumber challan quantity currentStatus",
@@ -938,6 +939,7 @@ const getAllIncompleteBookingsDetails = async (req, res) => {
         // Fetch all bookings with related details populated
         let bookings = await Booking.find(query)
             .populate("bookedBy", "firstName lastName email role")
+            .populate("party")
             .populate({
                 path: "items.item",
                 select: "type formType grade thickness width wagonNumber challan quantity currentStatus",
@@ -1297,6 +1299,9 @@ const getAllBookingDetailsTablewise = async (req, res) => {
             reason: b.reason || "-",
             shipTo: b.shipTo || "-",
             party: b.partySnapshot?.name || "-",
+            owner: b.partySnapshot?.owner || "-",
+            phone: b.partySnapshot?.phone || "-",
+            address: b.partySnapshot?.address || "-",
         }));
 
         res.status(200).json({
@@ -1394,6 +1399,9 @@ const getExcelTablewiseBooking = async (req, res) => {
                 let temp = {
                     order_id: b.order_id,
                     party: b.partySnapshot?.name || "-",
+                    owner: b.partySnapshot?.owner || "-",
+                    phone: b.partySnapshot?.phone || "-",
+                    address: b.partySnapshot?.address || "-",
                     bookedBy: b.bookedBySnapshot?.name,
                     bookingDate: b.bookingDate,
                     form: item.itemSnapshot?.formType || "-",
@@ -1552,31 +1560,52 @@ const deleteParty = async (req, res) => {
     }
 }
 
-const getAllPartyDetails = async (req, res) => {
-    try {
-        const parties = await Party.find();
-
-        // Count bookings for each party
-        const bookingCounts = await Booking.aggregate([
+const getPartiesWithBookingCounts = async () => {
+    const parties = await Party.find();
+    const [bookingCounts, markedCounts] = await Promise.all([
+        Booking.aggregate([
+            {
+                $match: {
+                    "partySnapshot.party_id": { $ne: null }
+                }
+            },
             {
                 $group: {
-                    _id: "$partySnapshot.party_id", // change this according to your schema
+                    _id: "$partySnapshot.party_id",
                     count: { $sum: 1 }
                 }
             }
-        ]);
+        ]),
+        Item.aggregate([
+            {
+                $match: {
+                    "markedForBooking.party": { $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: "$markedForBooking.party",
+                    count: { $sum: 1 }
+                }
+            }
+        ])
+    ]);
 
-        // Convert aggregation result to a lookup object
-        const countsMap = bookingCounts.reduce((acc, item) => {
-            acc[item._id] = item.count;
-            return acc;
-        }, {});
+    const countsMap = [...bookingCounts, ...markedCounts].reduce((acc, item) => {
+        const key = String(item._id);
+        acc[key] = (acc[key] || 0) + item.count;
+        return acc;
+    }, {});
 
-        // Attach booking count to each party
-        const partiesWithCounts = parties.map(party => ({
-            ...party.toObject(),
-            totalBookings: countsMap[party._id] || 0
-        }));
+    return parties.map(party => ({
+        ...party.toObject(),
+        totalBookings: countsMap[String(party._id)] || 0
+    }));
+};
+
+const getAllPartyDetails = async (req, res) => {
+    try {
+        const partiesWithCounts = await getPartiesWithBookingCounts();
 
         res.status(200).json({
             success: true,
@@ -1591,9 +1620,8 @@ const getAllPartyDetails = async (req, res) => {
 
 const addParty = async (req, res) => {
     try {
-        const { name } = req.body;
-
-        const party = new Party({ name });
+        const { name, owner, phone, address } = req.body;
+        const party = new Party({ name, owner, phone, address });
 
         const savedParty = await party.save();
         const partyData = { ...savedParty.toObject(), totalBookings: 0 };
@@ -1608,11 +1636,143 @@ const addParty = async (req, res) => {
     }
 }
 
+const normalizeHeader = (value) => String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const normalizeCell = (value) => {
+    if (value === null || value === undefined) return "";
+    return String(value).trim();
+};
+
+const downloadPartyTemplate = async (req, res) => {
+    try {
+        const rows = [
+            ["Party Name", "Owner", "Phone", "Address"],
+            ["ABC Steel Traders", "Rahul Sharma", "9876543210", "Industrial Area, Delhi"],
+        ];
+
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+        worksheet["!cols"] = [
+            { wch: 28 },
+            { wch: 24 },
+            { wch: 18 },
+            { wch: 40 },
+        ];
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Parties");
+
+        const buffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "buffer",
+        });
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", "attachment; filename=party-template.xlsx");
+        res.send(buffer);
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
+const importParties = async (req, res) => {
+    try {
+        const file = req.files?.file;
+        if (!file) throw customError("Please upload an Excel file", 400);
+
+        const workbook = XLSX.readFile(file.tempFilePath);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+        if (rows.length < 2) {
+            throw customError("The uploaded file does not contain any party rows", 400);
+        }
+
+        const headerIndexes = rows[0].reduce((acc, header, index) => {
+            acc[normalizeHeader(header)] = index;
+            return acc;
+        }, {});
+
+        const getColumnIndex = (...keys) => {
+            for (const key of keys) {
+                if (headerIndexes[key] !== undefined) return headerIndexes[key];
+            }
+            return -1;
+        };
+
+        const columns = {
+            name: getColumnIndex("partyname", "name", "party"),
+            owner: getColumnIndex("owner", "ownername"),
+            phone: getColumnIndex("phone", "phonenumber", "mobile", "mobilenumber"),
+            address: getColumnIndex("address"),
+        };
+
+        if (columns.name === -1) {
+            throw customError("Template must include a Party Name column", 400);
+        }
+
+        const existingParties = await Party.find({}, { owner: 1 });
+        const existingOwners = new Set(existingParties.map((party) => party.owner.trim().toLowerCase()));
+        const fileOwners = new Set();
+        const partiesToCreate = [];
+        const skippedRows = [];
+
+        rows.slice(1).forEach((row, index) => {
+            const rowNumber = index + 2;
+            const name = normalizeCell(row[columns.name]);
+            const owner = columns.owner === -1 ? "" : normalizeCell(row[columns.owner]);
+            const phone = columns.phone === -1 ? "" : normalizeCell(row[columns.phone]).replace(/\D/g, "");
+            const address = columns.address === -1 ? "" : normalizeCell(row[columns.address]);
+            const ownerKey = owner.toLowerCase();
+
+            if (!name && !owner && !phone && !address) return;
+
+            if (!owner) {
+                skippedRows.push({ row: rowNumber, reason: "Party Owner is required" });
+                return;
+            }
+
+            if (phone && !/^\d{10,15}$/.test(phone)) {
+                skippedRows.push({ row: rowNumber, reason: "Phone must contain 10 to 15 digits" });
+                return;
+            }
+
+            if (existingOwners.has(ownerKey) || fileOwners.has(ownerKey)) {
+                skippedRows.push({ row: rowNumber, reason: "Duplicate owner name" });
+                return;
+            }
+
+            fileOwners.add(ownerKey);
+            partiesToCreate.push({ name, owner, phone, address });
+        });
+
+        const createdParties = partiesToCreate.length
+            ? await Party.insertMany(partiesToCreate)
+            : [];
+
+        const partyData = await getPartiesWithBookingCounts();
+
+        res.status(200).json({
+            success: true,
+            message: `Imported ${createdParties.length} parties`,
+            importedCount: createdParties.length,
+            skippedRows,
+            parties: partyData,
+        });
+    } catch (err) {
+        errorResponse(res, err);
+    }
+};
+
 const updateParty = async (req, res) => {
     try {
-        const { id, name } = req.body;
+        const { id, name, owner, phone, address } = req.body;
 
-        const party = await Party.findByIdAndUpdate(id, { name }, { new: true });
+        const party = await Party.findByIdAndUpdate(id, { name, owner, phone, address }, { new: true });
 
         res.status(200).json({
             success: true,
@@ -1643,6 +1803,9 @@ const getAllBookingsByItem = async (req, res) => {
                 "items.formType": 1,
                 "items.quantity": 1,
                 "partySnapshot.name": 1,
+                "partySnapshot.owner": 1,
+                "partySnapshot.phone": 1,
+                "partySnapshot.address": 1,
                 "bookedBySnapshot.name": 1,
                 bookingDate: 1,
                 shipTo: 1,
@@ -1661,6 +1824,9 @@ const getAllBookingsByItem = async (req, res) => {
                 formType: b.items?.[0]?.formType || null,
                 quantity: b.items?.[0]?.quantity || null,
                 party: b.partySnapshot?.name || null,
+                owner: b.partySnapshot?.owner || null,
+                phone: b.partySnapshot?.phone || null,
+                address: b.partySnapshot?.address || null,
                 bookedBy: b.bookedBySnapshot?.name || null,
                 bookingDate: b.bookingDate,
                 shipTo: b.shipTo || "",
@@ -1704,6 +1870,8 @@ module.exports = {
     getAllIncompleteBookingsDetails,
     getAllParty,
     addParty,
+    downloadPartyTemplate,
+    importParties,
     updateParty,
     deleteParty,
     getAllPartyDetails,

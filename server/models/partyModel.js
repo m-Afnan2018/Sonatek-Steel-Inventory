@@ -6,6 +6,19 @@ const partySchema = new mongoose.Schema({
         required: true,
         default: '',
     },
+    owner: {
+        type: String,
+        default: '',
+    },
+    phone: {
+        type: String,
+        default: '',
+        match: [/^\d{10,15}$/, 'Please provide a valid phone number']
+    },
+    address: {
+        type: String,
+        default: '',
+    },
     createdAt: {
         type: Date,
         default: Date.now
