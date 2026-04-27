@@ -1562,23 +1562,44 @@ const deleteParty = async (req, res) => {
 
 const getPartiesWithBookingCounts = async () => {
     const parties = await Party.find();
-    const bookingCounts = await Booking.aggregate([
-        {
-            $group: {
-                _id: "$partySnapshot.party_id",
-                count: { $sum: 1 }
+    const [bookingCounts, markedCounts] = await Promise.all([
+        Booking.aggregate([
+            {
+                $match: {
+                    "partySnapshot.party_id": { $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: "$partySnapshot.party_id",
+                    count: { $sum: 1 }
+                }
             }
-        }
+        ]),
+        Item.aggregate([
+            {
+                $match: {
+                    "markedForBooking.party": { $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: "$markedForBooking.party",
+                    count: { $sum: 1 }
+                }
+            }
+        ])
     ]);
 
-    const countsMap = bookingCounts.reduce((acc, item) => {
-        acc[item._id] = item.count;
+    const countsMap = [...bookingCounts, ...markedCounts].reduce((acc, item) => {
+        const key = String(item._id);
+        acc[key] = (acc[key] || 0) + item.count;
         return acc;
     }, {});
 
     return parties.map(party => ({
         ...party.toObject(),
-        totalBookings: countsMap[party._id] || 0
+        totalBookings: countsMap[String(party._id)] || 0
     }));
 };
 

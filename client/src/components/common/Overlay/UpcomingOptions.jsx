@@ -20,7 +20,7 @@ const customStyles = {
         height: "24px",
         fontSize: "12px",
         borderRadius: "6px",
-        width: '12rem'
+        width: '16rem'
     }),
     valueContainer: (provided) => ({
         ...provided,
@@ -53,8 +53,42 @@ const customStyles = {
     }),
     menu: (provided) => ({
         ...provided,
-        fontSize: "12px"
+        fontSize: "12px",
+        width: "20rem"
     })
+};
+
+const formatPartyOption = (option, { context }) => {
+    if (option.__isNew__) return option.label;
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                width: '100%'
+            }}>
+            <span title={option.label} style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {option.label}
+            </span>
+            {(option.owner || context === 'menu') && (
+                <span title={option.owner} style={{
+                    color: 'var(--text-primary)',
+                    fontSize: '11px',
+                    marginLeft: 'auto',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: context === 'menu' ? '9rem' : '6rem',
+                    fontWeight: 600
+                }}>
+                    {option.owner || 'No owner'}
+                </span>
+            )}
+        </div>
+    );
 };
 
 
@@ -164,7 +198,7 @@ const UpcomingOptions = ({ data, close, type }) => {
             <div style={{ marginTop: 'auto', justifyContent: 'flex-end' }}>
                 {data.marking?.markedBy && <button onClick={resetForm} className="btn error">Cancel Order</button>}
                 <button onClick={close} className="btn error">Close</button>
-                <button className="btn success" onClick={handleSubmit}>{text}</button>
+                {data.marking?.markedBy ? null : <button className="btn success" onClick={handleSubmit}>{text}</button>}
             </div>
         </div >
     );
@@ -313,7 +347,13 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
 
     const { control, getValues } = useForm({
         defaultValues: {
-            party: data.marking?.party ? { label: data.marking?.party.name, value: data.marking?.party._id } : null,
+            party: data.marking?.party ? {
+                label: data.marking?.party.name,
+                value: data.marking?.party._id,
+                owner: data.marking?.party.owner || '',
+                phone: data.marking?.party.phone || '',
+                address: data.marking?.party.address || '',
+            } : null,
         },
     });
 
@@ -358,29 +398,37 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
         setValidationError('');
         const { party: selectedParty } = getValues();
 
+        if (!selectedParty) {
+            setValidationError('Please select or add a Party');
+            return;
+        }
+
         if (fillUpData?.invoiceNumber && fillUpData?.invoiceNumber.length > 0 && !validateForm(selectedParty)) {
             return;
         }
 
-        let party;
+        let party = null;
         if (selectedParty && typeof selectedParty.value === "string") {
-            party = {};
-            party['val'] = selectedParty.value;
-
-            if (parties && !parties.some((p) => p._id === selectedParty.value)) {
-                party['type'] = 'name';
-            } else {
-                party['type'] = 'id';
-            }
+            party = {
+                val: selectedParty.value,
+                type: parties && parties.some((p) => p._id === selectedParty.value) ? 'id' : 'name'
+            };
         }
 
-        if (party === null) {
+        if (!party) {
             return;
         }
 
+        const shouldCreateBooking = Boolean(
+            fillUpData?.invoiceNumber?.trim() || fillUpData?.vehicleNumber?.trim()
+        );
+
         close();
-        createBookingFromUpcoming({ ...fillUpData, party }, dispatch);
-        markForBooking({ ...fillUpData, party }, dispatch);
+        if (shouldCreateBooking) {
+            createBookingFromUpcoming({ ...fillUpData, party }, dispatch);
+        } else {
+            markForBooking({ ...fillUpData, party }, dispatch);
+        }
     };
 
     useEffect(() => {
@@ -392,7 +440,17 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
         arr?.map((i) => ({
             label: i[labelField] || i.value,
             value: i[valueField] || i.label,
+            owner: i.owner || '',
+            phone: i.phone || '',
+            address: i.address || '',
         })) || [];
+
+    const filterPartyOption = (option, inputValue) => {
+        const query = inputValue.toLowerCase();
+        const data = option.data || {};
+        return [data.label, data.owner, data.phone, data.address]
+            .some((value) => String(value || '').toLowerCase().includes(query));
+    };
 
     return (
         <div>
@@ -462,9 +520,11 @@ const MoveToBooking = ({ data, close, fillUpData, setFillUpData, setHandleSubmit
                                 }}
                                 placeholder="Party"
                                 styles={customStyles}
-                                disabled={disableStatus}
+                                isDisabled={disableStatus}
                                 isSearchable
                                 isClearable
+                                formatOptionLabel={formatPartyOption}
+                                filterOption={filterPartyOption}
                                 formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
                             />
                         )}
