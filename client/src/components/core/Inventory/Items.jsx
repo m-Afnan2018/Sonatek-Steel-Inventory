@@ -424,7 +424,7 @@ const SingleItem = ({ color, item, setView, view, expandedRow, setExpandedRow, b
                     </div>
                 </td>
                 <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
-                    {itemDetail.originalQuantity}
+                    {itemDetail.originalQuantity.toFixed(3)}
                 </td>
                 <td className={style.numCell} onClick={(e) => e.stopPropagation()}>
                     {itemDetail.remaining.toFixed(3)}

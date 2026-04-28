@@ -10,7 +10,7 @@ import { useOverlay } from 'hooks/useOverlay';
 import UpcomingOptions from 'components/common/Overlay/UpcomingOptions';
 import ConfirmationOverlay from 'components/common/Overlay/ConfirmationOverlay';
 import { getAllPartyDetails } from 'services/operations/bookingAPI';
-import { FaRegTrashCan } from "react-icons/fa6";
+import { FaRegTrashCan, FaX } from "react-icons/fa6";
 import { FiEye, FiEdit } from 'react-icons/fi';
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { MdOutlineWarehouse } from 'react-icons/md';
@@ -69,10 +69,12 @@ const Upcoming = () => {
     const [items, setItems] = useState([]);
     const [view, setView] = useState(null);
     const [count, setCount] = useState(null);
+    const [search, setSearch] = useState('');
     const [colors, setColors] = useState(null);
     const [order, setOrder] = useState('desc');
     const [sortType, setSortType] = useState(null)
     const [file, setFile] = useState(null);
+    const [importResult, setImportResult] = useState(null);
     const [uploading, setUploading] = useState(false);
     const dispatch = useDispatch();
 
@@ -101,7 +103,10 @@ const Upcoming = () => {
 
     const handleFileChange = async (e) => {
         if (e.target.files[0]) {
-            uploadCSV(e.target.files[0], setUploading, inputRef);
+            const data = await uploadCSV(e.target.files[0], setUploading, inputRef);
+            if (data.success && data.data) {
+                setImportResult(data);
+            }
             setFile(null);
         }
     };
@@ -120,7 +125,58 @@ const Upcoming = () => {
     useEffect(() => {
         getUpcomingItem({}, dispatch);
         getAllPartyDetails(dispatch);
-    }, [dispatch])
+    }, [dispatch]);
+
+    function searchHandler(e) {
+        const searchVal = e.target.value;
+        setSearch(searchVal);
+
+        const lowerSearch = searchVal.trim().toLowerCase();
+
+        if (!lowerSearch) {
+            setItems(upcomingItem);
+            return;
+        }
+
+        const filtered = upcomingItem.filter(item => {
+            const id = String(item.id || '').toLowerCase();
+            const wagon = String(item.wagonNumber || '').toLowerCase();
+            const type = String(item.type || '').toLowerCase();
+            const grade = String(item.grade?.name || '').toLowerCase();
+            const thickness = String(item.thickness?.name || '').toLowerCase();
+            const width = String(item.width?.name || '').toLowerCase();
+            const warehouse = String(item.warehouse?.name || '').toLowerCase();
+            const originalQty = String(item.originalQuantity || '').toLowerCase();
+            const currentQty = String(item.currentQuantity || '').toLowerCase();
+            const date = String(item.date || '').toLowerCase();
+            const remark = String(item.remark || '').toLowerCase();
+            const party = String(item.marking?.party?.name || '').toLowerCase();
+            const shipTo = String(item.marking?.shipTo || '').toLowerCase();
+
+            // Also check the combined description
+            const description = `${thickness} ${width} ${grade}`;
+
+            return (
+                id.includes(lowerSearch) ||
+                originalQty.includes(lowerSearch) ||
+                currentQty.includes(lowerSearch) ||
+                wagon.includes(lowerSearch) ||
+                type.includes(lowerSearch) ||
+                grade.includes(lowerSearch) ||
+                thickness.includes(lowerSearch) ||
+                width.includes(lowerSearch) ||
+                warehouse.includes(lowerSearch) ||
+                date.includes(lowerSearch) ||
+                remark.includes(lowerSearch) ||
+                party.includes(lowerSearch) ||
+                shipTo.includes(lowerSearch) ||
+                description.includes(lowerSearch)
+            );
+        });
+
+        setItems(filtered);
+    }
+
 
     return (
         <div className={style.Upcoming}>
@@ -146,7 +202,45 @@ const Upcoming = () => {
                 {userData && ['admin', 'director', 'inventory_associate'].includes(userData.role) && <span onClick={downloadTemplate} style={{ fontSize: '0.875rem', textDecoration: 'underline' }}>Template</span>}
             </h3>
             <AddForm />
-            <h3 className={style.heading}>Upcoming Items</h3>
+            <div style={{
+                display: importResult?.data?.inserted > 0 || importResult?.data?.skipped > 0 ? 'flex' : 'none',
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "1rem",
+                marginBottom: "1rem",
+                backgroundColor: "#97e2974a", width: "100%",
+                border: "1px solid #2f972f",
+                borderRadius: "0.25rem",
+                padding: "0.15rem 1rem",
+                color: "#043304c6"
+            }}>
+                <div>
+
+                    {importResult && importResult?.data?.inserted > 0 && (
+                        <strong>{importResult.data.inserted} row{importResult.data.inserted === 1 ? "" : "s"} inserted.</strong>
+                    )}
+                    {(importResult && importResult?.data?.skipped > 0) && (
+                        <span style={{ color: "#e21b1b", fontWeight: "600", padding: "0.25rem .15rem", borderRadius: "0.25rem" }}>
+                            {importResult.data.skipped} row{importResult.data.skipped === 1 ? "" : "s"} skipped.
+                        </span>
+                    )}
+                    <span style={{ color: "#043304c6", fontWeight: "500", padding: "0.25rem .15rem" }}>Please refresh to see the changes.</span>
+                </div>
+                <span onClick={() => setImportResult(null)} style={{ display: "flex", cursor: 'pointer', color: '#0b710bff' }}>
+                    <FaX style={{ fontSize: '.65rem', cursor: 'pointer' }} />
+                </span>
+            </div>
+            <div className={style.heading} >
+                <h3>Upcoming Items</h3>
+                <input
+                    type="text"
+                    name='search'
+                    placeholder="Search upcoming items..."
+                    value={search}
+                    onChange={searchHandler}
+                    className={style.searchBar}
+                />
+            </div>
             <div className={style.card}>
                 {loading ? (
                     <div className={style.loading}>Loading items...</div>

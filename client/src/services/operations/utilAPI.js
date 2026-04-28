@@ -90,12 +90,13 @@ export async function uploadCSV(file, setUploading, inputRef) {
         setUploading(true);
         toast.loading("Uploading file...");
 
-        await axios.post(utilEndpoints.UPLOAD_CSV, formData, {
+        const { data } = await axios.post(utilEndpoints.UPLOAD_CSV, formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 
         toast.dismiss();
         toast.success("File uploaded successfully!");
+        return data;
     } catch (err) {
         toast.dismiss();
         toast.error(err.response?.data?.message || "Upload failed");
