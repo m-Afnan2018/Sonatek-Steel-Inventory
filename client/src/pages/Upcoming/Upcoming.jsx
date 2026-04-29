@@ -146,8 +146,8 @@ const Upcoming = () => {
             const thickness = String(item.thickness?.name || '').toLowerCase();
             const width = String(item.width?.name || '').toLowerCase();
             const warehouse = String(item.warehouse?.name || '').toLowerCase();
-            const originalQty = String(item.originalQuantity || '').toLowerCase();
-            const currentQty = String(item.currentQuantity || '').toLowerCase();
+            const originalQty = item.originalQuantity != null ? Number(item.originalQuantity).toFixed(3) : '';
+            const currentQty = item.currentQuantity != null ? Number(item.currentQuantity).toFixed(3) : '';
             const date = String(item.date || '').toLowerCase();
             const remark = String(item.remark || '').toLowerCase();
             const party = String(item.marking?.party?.name || '').toLowerCase();
