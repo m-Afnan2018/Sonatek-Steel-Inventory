@@ -54,8 +54,27 @@
     border-bottom: 0;
 }
 
+.heading h1 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
 .heading>span {
     cursor: pointer;
+}
+
+.searchBar {
+    padding: .3rem .45rem;
+    outline: none;
+    border: 1px solid var(--border);
+    background-color: var(--bg-surface);
+    border-radius: 5px;
+}
+
+.searchBar:focus {
+    border-color: var(--accent);
 }
 
 .card {
